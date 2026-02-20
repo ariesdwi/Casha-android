@@ -1,0 +1,3 @@
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.LoginViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.LoginViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.RegisterViewModel
