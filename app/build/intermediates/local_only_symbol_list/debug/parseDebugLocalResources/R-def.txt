@@ -2,6 +2,8 @@ R_DEF: Internal format may change without notice
 local
 color ic_launcher_background
 color ic_launcher_foreground
+drawable cashalogo
+mipmap cashalogo
 mipmap ic_launcher
 mipmap ic_launcher_round
 string app_name

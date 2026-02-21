@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.ui.draw.clip
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
@@ -94,23 +95,13 @@ fun LoginScreen(
         ) {
             // ── Header ──
             Spacer(modifier = Modifier.height(60.dp))
-            Box(
+            androidx.compose.foundation.Image(
+                painter = androidx.compose.ui.res.painterResource(id = com.casha.app.R.drawable.cashalogo),
+                contentDescription = "Casha Logo",
                 modifier = Modifier
                     .size(120.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                        shape = androidx.compose.foundation.shape.CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                // Assuming "app_logo" exists or using a colored icon placeholder
-                Icon(
-                    imageVector = Icons.Default.Lock, // Placeholder for actual green 'C' logo
-                    contentDescription = null,
-                    modifier = Modifier.size(60.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
+                    .clip(RoundedCornerShape(24.dp))
+            )
 
             Spacer(modifier = Modifier.height(48.dp))
 

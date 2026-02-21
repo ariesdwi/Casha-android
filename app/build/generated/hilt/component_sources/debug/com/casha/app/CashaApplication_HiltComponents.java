@@ -3,8 +3,16 @@ package com.casha.app;
 import com.casha.app.di.AppModule;
 import com.casha.app.di.DatabaseModule;
 import com.casha.app.di.NetworkModule;
+import com.casha.app.di.RepositoryModule;
+import com.casha.app.ui.feature.auth.ForgotPasswordViewModel_HiltModules;
 import com.casha.app.ui.feature.auth.LoginViewModel_HiltModules;
 import com.casha.app.ui.feature.auth.RegisterViewModel_HiltModules;
+import com.casha.app.ui.feature.auth.SetupCurrencyViewModel_HiltModules;
+import com.casha.app.ui.feature.dashboard.DashboardViewModel_HiltModules;
+import com.casha.app.ui.feature.goaltracker.GoalTrackerViewModel_HiltModules;
+import com.casha.app.ui.feature.loading.AppLoadingViewModel_HiltModules;
+import com.casha.app.ui.feature.profile.ProfileViewModel_HiltModules;
+import com.casha.app.ui.feature.transaction.TransactionViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -135,7 +143,8 @@ public final class CashaApplication_HiltComponents {
           ServiceCBuilderModule.class,
           DatabaseModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
-          NetworkModule.class
+          NetworkModule.class,
+          RepositoryModule.class
       }
   )
   @Singleton
@@ -158,12 +167,19 @@ public final class CashaApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AppLoadingViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
+          DashboardViewModel_HiltModules.KeyModule.class,
+          ForgotPasswordViewModel_HiltModules.KeyModule.class,
+          GoalTrackerViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
           LoginViewModel_HiltModules.KeyModule.class,
-          RegisterViewModel_HiltModules.KeyModule.class
+          ProfileViewModel_HiltModules.KeyModule.class,
+          RegisterViewModel_HiltModules.KeyModule.class,
+          SetupCurrencyViewModel_HiltModules.KeyModule.class,
+          TransactionViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -199,9 +215,16 @@ public final class CashaApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
+          AppLoadingViewModel_HiltModules.BindsModule.class,
+          DashboardViewModel_HiltModules.BindsModule.class,
+          ForgotPasswordViewModel_HiltModules.BindsModule.class,
+          GoalTrackerViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
           LoginViewModel_HiltModules.BindsModule.class,
-          RegisterViewModel_HiltModules.BindsModule.class
+          ProfileViewModel_HiltModules.BindsModule.class,
+          RegisterViewModel_HiltModules.BindsModule.class,
+          SetupCurrencyViewModel_HiltModules.BindsModule.class,
+          TransactionViewModel_HiltModules.BindsModule.class
       }
   )
   @ViewModelScoped

@@ -224,7 +224,6 @@ data class TransactionCasha(
     val amount: Double,
     val datetime: Date,
     val isSynced: Boolean,
-    val liabilityId: String?,     // non-null if credit card transaction
     val createdAt: Date,
     val updatedAt: Date
 )
@@ -1022,56 +1021,56 @@ data class CategoryCasha(
 ## Development Timeline
 
 ### Phase 0: Project Setup (Week 1)
-- [ ] Create Android project with Kotlin + Jetpack Compose
-- [ ] Setup Hilt dependency injection
-- [ ] Setup Retrofit + OkHttp + interceptors (auth, language)
-- [ ] Setup Room database + entities
-- [ ] Setup DataStore for preferences
-- [ ] Setup Navigation (NavHost + routes)
-- [ ] Implement `CashaTheme` (colors, typography, shapes)
+- [x] Create Android project with Kotlin + Jetpack Compose
+- [x] Setup Hilt dependency injection
+- [x] Setup Retrofit + OkHttp + interceptors (auth, language)
+- [x] Setup Room database + entities
+- [x] Setup DataStore for preferences
+- [x] Setup Navigation (NavHost + routes)
+- [x] Implement `CashaTheme` (colors, typography, shapes)
 - [ ] Configure Firebase (FCM, Crashlytics)
-- [ ] Setup build variants (dev, staging, prod)
+- [x] Setup build variants (dev, staging, prod)
 
 ### Phase 1: Core Infrastructure (Week 2)
-- [ ] Implement `AuthManager` (token storage, DataStore)
-- [ ] Implement `NetworkMonitor` (ConnectivityManager)
-- [ ] Implement `CurrencyFormatter` utility
-- [ ] Implement `DateHelper` utility
-- [ ] Implement base Retrofit API service with `BaseResponse<T>`
-- [ ] Implement all Retrofit endpoint interfaces
-- [ ] Implement Room entities (Transaction, Budget, Category, Income)
-- [ ] Implement Room DAOs
+- [x] Implement `AuthManager` (token storage, DataStore)
+- [x] Implement `NetworkMonitor` (ConnectivityManager)
+- [x] Implement `CurrencyFormatter` utility
+- [x] Implement `DateHelper` utility
+- [x] Implement base Retrofit API service with `BaseResponse<T>`
+- [x] Implement all Retrofit endpoint interfaces
+- [x] Implement Room entities (Transaction, Budget, Category, Income)
+- [x] Implement Room DAOs
 
 ### Phase 2: Auth Module (Week 3)
-- [ ] Domain: `UserCasha`, `LoginResult` models
-- [ ] Domain: Auth repository interface
-- [ ] Data: Auth DTOs + repository impl
-- [ ] Domain: `LoginUseCase`, `RegisterUseCase`, `GoogleLoginUseCase`
-- [ ] UI: `LoginScreen` (email + Google SSO)
-- [ ] UI: `RegisterScreen`
-- [ ] UI: `ForgotPasswordScreen`
-- [ ] UI: `SetupCurrencyScreen`
-- [ ] ViewModel: `LoginViewModel`, `RegisterViewModel`
-- [ ] Wire up auth flow with token + currency saving
+- [x] Domain: `UserCasha`, `LoginResult` models
+- [x] Domain: Auth repository interface
+- [x] Data: Auth DTOs + repository impl
+- [x] Domain: `LoginUseCase`, `RegisterUseCase`, `GoogleLoginUseCase`
+- [x] UI: `LoginScreen` (email + Google SSO)
+- [x] UI: `RegisterScreen`
+- [x] UI: `ForgotPasswordScreen`
+- [x] UI: `SetupCurrencyScreen`
+- [x] ViewModel: `LoginViewModel`, `RegisterViewModel`, `ForgotPasswordViewModel`, `SetupCurrencyViewModel`
+- [x] Wire up auth flow with token + currency saving
 
 ### Phase 3: Dashboard Module (Week 4)
-- [ ] Domain: `CashflowEntry`, `CashflowSummary`, `SpendingReport` models
-- [ ] Domain: Cashflow repository interface
-- [ ] Data: Cashflow DTOs + repository impl
-- [ ] Domain: Use cases (GetRecentTransactions, GetTotalSpending, GetSpendingReport, CashflowSync)
-- [ ] UI: `DashboardScreen` with `BalanceCard`, `ReportChart`, `GoalSection`, `RecentTransactions`
-- [ ] ViewModel: `DashboardViewModel`
-- [ ] Implement parallel data loading on app launch (`AppLoadingScreen`)
+- [x] Domain: `CashflowEntry`, `CashflowSummary`, `SpendingReport` models
+- [x] Domain: Cashflow repository interface
+- [x] Data: Cashflow DTOs + repository impl
+- [x] Domain: Use cases (GetRecentTransactions, GetTotalSpending, GetSpendingReport, CashflowSync)
+- [x] UI: `DashboardScreen` with `BalanceCard`, `ReportChart`, `GoalSection`, `RecentTransactions`
+- [x] ViewModel: `DashboardViewModel`
+- [x] Implement parallel data loading on app launch (`AppLoadingScreen`)
 
 ### Phase 4: Transaction Module (Week 5)
-- [ ] Domain: `TransactionCasha` model + local repo interface
-- [ ] Data: Transaction DTOs + Room entity + DAO
-- [ ] Data: Local + Remote repository impl
-- [ ] Domain: CRUD use cases + sync use case
+- [x] Domain: `TransactionCasha` model + expand `TransactionRepository` interface
+- [x] Data: Transaction DTOs + Room entity + DAO
+- [x] Data: Local + Remote repository impl
+- [x] Domain: CRUD use cases + sync use case
 - [ ] UI: `TransactionListScreen` + filter bar + grouped by date
 - [ ] UI: `TransactionDetailScreen` + `TransactionEditScreen`
-- [ ] ViewModel: `TransactionViewModel`
-- [ ] Implement offline-first sync
+- [x] ViewModel: `TransactionViewModel`
+- [x] Implement offline-first sync
 
 ### Phase 5: AddTransaction + AI Chat (Week 6)
 - [ ] Domain: `AddTransactionRequest`, `ChatParseResult` models
@@ -1137,9 +1136,9 @@ data class CategoryCasha(
 
 ### Phase 13: Profile + Settings (Week 15)
 - [ ] UI: `ProfileScreen` + `ProfileEditScreen`
-- [ ] ViewModel: `ProfileViewModel`
+- [x] ViewModel: `ProfileViewModel`
 - [ ] Implement avatar upload (multipart)
-- [ ] Implement logout + clear data
+- [x] Implement logout + clear data
 - [ ] Implement delete account
 
 ### Phase 14: Subscription (Week 15, parallel)

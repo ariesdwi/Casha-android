@@ -4,6 +4,10 @@ import com.casha.app.core.config.AppConfig
 import com.casha.app.core.network.AuthInterceptor
 import com.casha.app.core.network.ErrorInterceptor
 import com.casha.app.data.remote.api.AuthApiService
+import com.casha.app.data.remote.api.CashflowApiService
+import com.casha.app.data.remote.api.GoalApiService
+import com.casha.app.data.remote.api.IncomeApiService
+import com.casha.app.data.remote.api.TransactionApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -76,6 +80,36 @@ object NetworkModule {
     @Singleton
     fun provideAuthApiService(retrofit: Retrofit): AuthApiService {
         return retrofit.create(AuthApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTransactionApiService(retrofit: Retrofit): TransactionApiService {
+        return retrofit.create(TransactionApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCashflowApiService(retrofit: Retrofit): CashflowApiService {
+        return retrofit.create(CashflowApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideIncomeApiService(retrofit: Retrofit): IncomeApiService {
+        return retrofit.create(IncomeApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGoalApiService(retrofit: Retrofit): GoalApiService {
+        return retrofit.create(GoalApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCategoryApiService(retrofit: Retrofit): com.casha.app.data.remote.api.CategoryApiService {
+        return retrofit.create(com.casha.app.data.remote.api.CategoryApiService::class.java)
     }
 }
 

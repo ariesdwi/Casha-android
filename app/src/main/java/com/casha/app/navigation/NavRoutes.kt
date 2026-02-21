@@ -6,6 +6,7 @@ package com.casha.app.navigation
 sealed class NavRoutes(val route: String) {
 
     // ── Auth ──
+    data object Splash : NavRoutes("splash")
     data object Login : NavRoutes("login")
     data object Register : NavRoutes("register")
     data object ForgotPassword : NavRoutes("forgot_password")

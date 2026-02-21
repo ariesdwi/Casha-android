@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class BaseResponse<T>(
-    val code: Int,
-    val status: String,
-    val message: String,
+    val code: Int = 0,
+    val status: String = "error",
+    val message: String = "Unknown response",
     val data: T? = null
 )

@@ -29,7 +29,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -53,7 +53,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"")
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"")
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
             buildConfigField("String", "LOG_LEVEL", "\"warning\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "true")

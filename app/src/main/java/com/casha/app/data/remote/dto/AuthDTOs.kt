@@ -51,28 +51,25 @@ data class UpdateProfileRequestDTO(
 @Serializable
 data class LoginResponseDTO(
     @SerialName("access_token")
-    val accessToken: String,
+    val accessToken: String = "",
     val currency: String? = null
 )
 
 @Serializable
 data class RegisterResponseDTO(
     @SerialName("access_token")
-    val accessToken: String
+    val accessToken: String = ""
 )
 
 @Serializable
 data class ProfileDTO(
-    @SerialName("_id")
-    val id: String,
-    val email: String,
-    val name: String,
+    val id: String = "",
+    val email: String = "",
+    val name: String = "",
     val avatar: String? = null,
     val phone: String? = null,
     val currency: String = "USD",
-    @SerialName("created_at")
     val createdAt: String? = null,
-    @SerialName("updated_at")
     val updatedAt: String? = null
 )
 

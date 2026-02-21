@@ -1,0 +1,3 @@
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel

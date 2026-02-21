@@ -1,8 +1,7 @@
 package com.casha.app;
 
 import com.casha.app.core.auth.AuthManager;
-import com.casha.app.domain.usecase.auth.ResetPasswordUseCase;
-import com.casha.app.domain.usecase.auth.UpdateProfileUseCase;
+import com.casha.app.domain.usecase.auth.logout.DeleteAllLocalDataUseCase;
 import dagger.MembersInjector;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.InjectedFieldSignature;
@@ -29,36 +28,29 @@ import javax.annotation.processing.Generated;
 public final class MainActivity_MembersInjector implements MembersInjector<MainActivity> {
   private final Provider<AuthManager> authManagerProvider;
 
-  private final Provider<ResetPasswordUseCase> resetPasswordUseCaseProvider;
-
-  private final Provider<UpdateProfileUseCase> updateProfileUseCaseProvider;
+  private final Provider<DeleteAllLocalDataUseCase> deleteAllLocalDataUseCaseProvider;
 
   public MainActivity_MembersInjector(Provider<AuthManager> authManagerProvider,
-      Provider<ResetPasswordUseCase> resetPasswordUseCaseProvider,
-      Provider<UpdateProfileUseCase> updateProfileUseCaseProvider) {
+      Provider<DeleteAllLocalDataUseCase> deleteAllLocalDataUseCaseProvider) {
     this.authManagerProvider = authManagerProvider;
-    this.resetPasswordUseCaseProvider = resetPasswordUseCaseProvider;
-    this.updateProfileUseCaseProvider = updateProfileUseCaseProvider;
+    this.deleteAllLocalDataUseCaseProvider = deleteAllLocalDataUseCaseProvider;
   }
 
   public static MembersInjector<MainActivity> create(Provider<AuthManager> authManagerProvider,
-      Provider<ResetPasswordUseCase> resetPasswordUseCaseProvider,
-      Provider<UpdateProfileUseCase> updateProfileUseCaseProvider) {
-    return new MainActivity_MembersInjector(authManagerProvider, resetPasswordUseCaseProvider, updateProfileUseCaseProvider);
+      Provider<DeleteAllLocalDataUseCase> deleteAllLocalDataUseCaseProvider) {
+    return new MainActivity_MembersInjector(authManagerProvider, deleteAllLocalDataUseCaseProvider);
   }
 
   public static MembersInjector<MainActivity> create(
       javax.inject.Provider<AuthManager> authManagerProvider,
-      javax.inject.Provider<ResetPasswordUseCase> resetPasswordUseCaseProvider,
-      javax.inject.Provider<UpdateProfileUseCase> updateProfileUseCaseProvider) {
-    return new MainActivity_MembersInjector(Providers.asDaggerProvider(authManagerProvider), Providers.asDaggerProvider(resetPasswordUseCaseProvider), Providers.asDaggerProvider(updateProfileUseCaseProvider));
+      javax.inject.Provider<DeleteAllLocalDataUseCase> deleteAllLocalDataUseCaseProvider) {
+    return new MainActivity_MembersInjector(Providers.asDaggerProvider(authManagerProvider), Providers.asDaggerProvider(deleteAllLocalDataUseCaseProvider));
   }
 
   @Override
   public void injectMembers(MainActivity instance) {
     injectAuthManager(instance, authManagerProvider.get());
-    injectResetPasswordUseCase(instance, resetPasswordUseCaseProvider.get());
-    injectUpdateProfileUseCase(instance, updateProfileUseCaseProvider.get());
+    injectDeleteAllLocalDataUseCase(instance, deleteAllLocalDataUseCaseProvider.get());
   }
 
   @InjectedFieldSignature("com.casha.app.MainActivity.authManager")
@@ -66,15 +58,9 @@ public final class MainActivity_MembersInjector implements MembersInjector<MainA
     instance.authManager = authManager;
   }
 
-  @InjectedFieldSignature("com.casha.app.MainActivity.resetPasswordUseCase")
-  public static void injectResetPasswordUseCase(MainActivity instance,
-      ResetPasswordUseCase resetPasswordUseCase) {
-    instance.resetPasswordUseCase = resetPasswordUseCase;
-  }
-
-  @InjectedFieldSignature("com.casha.app.MainActivity.updateProfileUseCase")
-  public static void injectUpdateProfileUseCase(MainActivity instance,
-      UpdateProfileUseCase updateProfileUseCase) {
-    instance.updateProfileUseCase = updateProfileUseCase;
+  @InjectedFieldSignature("com.casha.app.MainActivity.deleteAllLocalDataUseCase")
+  public static void injectDeleteAllLocalDataUseCase(MainActivity instance,
+      DeleteAllLocalDataUseCase deleteAllLocalDataUseCase) {
+    instance.deleteAllLocalDataUseCase = deleteAllLocalDataUseCase;
   }
 }

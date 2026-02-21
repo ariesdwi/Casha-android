@@ -1,4 +1,12 @@
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.LoginViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.LoginViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.SetupCurrencyViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.SetupCurrencyViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.ForgotPasswordViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.ForgotPasswordViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.RegisterViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.auth.RegisterViewModel
