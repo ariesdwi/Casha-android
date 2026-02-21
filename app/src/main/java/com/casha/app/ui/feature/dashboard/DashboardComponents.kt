@@ -45,13 +45,12 @@ fun CardBalanceSection(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(elevation = 10.dp, shape = RoundedCornerShape(28.dp), clip = false),
-            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
-            )
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -334,13 +333,12 @@ fun ReportChartView(
     val maxAmount = chartData.map { it.value }.maxOrNull() ?: 1.0
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(elevation = 8.dp, shape = RoundedCornerShape(28.dp), clip = false),
-        shape = RoundedCornerShape(28.dp),
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -372,7 +370,7 @@ fun ReportChartView(
                 text = if (selectedTab == ChartTab.WEEK) weekTotal else monthTotal,
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2E7D32), // Casha green matching iOS
+                color = MaterialTheme.colorScheme.primary, 
                 modifier = Modifier.fillMaxWidth()
             )
 
@@ -412,8 +410,8 @@ fun ReportChartView(
                                 .width(24.dp)
                                 .fillMaxHeight(heightState.coerceAtLeast(0.02f))
                                 .background(
-                                    color = if (index % 2 == 0) Color(0xFF2E7D32) else Color(0xFF4CAF50),
-                                    shape = RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)
+                                    color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
                                 )
                         )
 
@@ -437,9 +435,9 @@ fun ChartToggleButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val backgroundColor = if (isSelected) Color(0xFF2E7D32) else Color.Transparent
-    val contentColor = if (isSelected) Color.White else Color(0xFF2E7D32)
-    val borderColor = Color(0xFF2E7D32)
+    val backgroundColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
+    val contentColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.primary
+    val borderColor = MaterialTheme.colorScheme.primary
 
     Surface(
         onClick = onClick,
@@ -514,9 +512,9 @@ fun GoalEmptyState() {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp),
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
@@ -671,14 +669,12 @@ fun RecentTransactionsSection(
 
         // Transaction List Card
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(28.dp), clip = false),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
-        ) {
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()

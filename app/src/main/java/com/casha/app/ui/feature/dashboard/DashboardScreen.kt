@@ -1,12 +1,6 @@
 package com.casha.app.ui.feature.dashboard
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,33 +13,25 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.casha.app.R
-import java.text.SimpleDateFormat
+import androidx.navigation.NavController
+import com.casha.app.navigation.Screen
 import java.util.Calendar
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    viewModel: DashboardViewModel = hiltViewModel(),
-    onNavigateToProfile: () -> Unit,
-    onNavigateToUnsyncedInfo: () -> Unit,
-    onNavigateToGoalTracker: () -> Unit,
-    onNavigateToGoalDetail: (String) -> Unit,
-    onNavigateToTransactionDetail: (String) -> Unit
+    navController: NavController,
+    viewModel: DashboardViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
-    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val calendar = remember { Calendar.getInstance() }
     val greeting = remember {
@@ -56,7 +42,7 @@ fun DashboardScreen(
             else -> "Good Evening"
         }
     }
-    
+
     val nickname = remember(uiState.nickname) {
         uiState.nickname.split(" ").firstOrNull() ?: "User"
     }
@@ -70,62 +56,34 @@ fun DashboardScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            LargeTopAppBar(
+            CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        text = "$greeting $nickname",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                navigationIcon = {
-                    if (uiState.unsyncedCount > 0) {
-                        Box(modifier = Modifier.padding(start = 12.dp)) {
-                            SyncBadge(
-                                count = uiState.unsyncedCount,
-                                isSyncing = uiState.isSyncing,
-                                onClick = onNavigateToUnsyncedInfo
-                            )
-                        }
+                    if (scrollBehavior.state.overlappedFraction > 0.5f) {
+                        Text(
+                            text = "Dashboard",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 },
                 actions = {
                     if (!uiState.isOnline) {
                         OfflineIndicator()
-                    } else {
-                        Surface(
-                            onClick = onNavigateToProfile,
-                            shape = CircleShape,
-                            color = Color.Transparent,
-                            modifier = Modifier.padding(end = 12.dp).size(36.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(
-                                                Color(0xFF2E7D32),
-                                                Color(0xFF66BB6A)
-                                            )
-                                        ),
-                                        shape = CircleShape
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = initial,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                    }
+                    if (uiState.unsyncedCount > 0) {
+                        SyncBadge(
+                            count = uiState.unsyncedCount,
+                            isSyncing = uiState.isSyncing,
+                            onClick = { navController.navigate(Screen.UnsyncedInfo.route) }
+                        )
+                        Spacer(modifier = Modifier.width(12.dp))
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.largeTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Transparent,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
                 )
             )
         },
@@ -135,38 +93,121 @@ fun DashboardScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            contentPadding = PaddingValues(bottom = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             item {
-                CardBalanceSection(
-                    summary = uiState.cashflowSummary,
-                    selectedPeriod = uiState.selectedPeriod,
-                    onPeriodChange = { viewModel.changePeriod(it) }
+                WelcomeHeader(
+                    greeting = greeting,
+                    nickname = nickname,
+                    initial = initial,
+                    onProfileClick = { navController.navigate(Screen.Profile.route) }
                 )
             }
+            
             item {
-                ReportSection(
-                    report = uiState.report,
-                    selectedTab = uiState.selectedChartTab,
-                    onTabChange = { viewModel.changeChartTab(it) },
-                    isSyncing = uiState.isSyncing
-                )
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    CardBalanceSection(
+                        summary = uiState.cashflowSummary,
+                        selectedPeriod = uiState.selectedPeriod,
+                        onPeriodChange = { viewModel.changePeriod(it) }
+                    )
+                }
             }
+            
             item {
-                GoalSection(
-                    goals = uiState.goals,
-                    onSeeAllClick = onNavigateToGoalTracker,
-                    onGoalClick = onNavigateToGoalDetail
-                )
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    ReportSection(
+                        report = uiState.report,
+                        selectedTab = uiState.selectedChartTab,
+                        onTabChange = { viewModel.changeChartTab(it) },
+                        isSyncing = uiState.isSyncing
+                    )
+                }
             }
+            
             item {
-                RecentTransactionsSection(
-                    transactions = uiState.recentTransactions,
-                    onTransactionClick = onNavigateToTransactionDetail
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    GoalSection(
+                        goals = uiState.goals,
+                        onSeeAllClick = { navController.navigate(Screen.GoalTracker.route) },
+                        onGoalClick = { goalId -> navController.navigate(Screen.GoalDetail(goalId).route) }
+                    )
+                }
+            }
+            
+            item {
+                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                    RecentTransactionsSection(
+                        transactions = uiState.recentTransactions,
+                        onTransactionClick = { transactionId ->
+                            navController.navigate(Screen.TransactionDetail(transactionId).route)
+                        }
+                    )
+                }
+            }
+            
+            item { Spacer(modifier = Modifier.height(16.dp)) }
+        }
+    }
+}
+
+@Composable
+fun WelcomeHeader(
+    greeting: String,
+    nickname: String,
+    initial: String,
+    onProfileClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = greeting,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = nickname,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+
+        Surface(
+            onClick = onProfileClick,
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+            modifier = Modifier.size(56.dp),
+            tonalElevation = 2.dp
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.secondary
+                            )
+                        ),
+                        shape = CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = initial,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontWeight = FontWeight.Bold
                 )
             }
-            item { Spacer(modifier = Modifier.height(40.dp)) }
         }
     }
 }

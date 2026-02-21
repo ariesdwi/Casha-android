@@ -1,7 +1,10 @@
 package com.casha.app.ui.feature.main
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
@@ -21,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import com.casha.app.navigation.NavRoutes
@@ -84,42 +88,44 @@ fun MainScreen(
         else -> NavRoutes.Dashboard.route
     }
 
-    Scaffold(
-        bottomBar = {
-            CustomTabBar(
-                selectedTab = selectedTab,
-                onTabSelected = { tag ->
-                    selectedTab = tag
-                    navController.navigate(tagToRoute(tag)) {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        Scaffold(
+            containerColor = Color.Transparent,
+            bottomBar = {
+                CustomTabBar(
+                    selectedTab = selectedTab,
+                    onTabSelected = { tag ->
+                        selectedTab = tag
+                        navController.navigate(tagToRoute(tag)) {
+                            popUpTo(navController.graph.startDestinationId) { saveState = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
+                    tabs = tabs.map { tabItem ->
+                        if (tabItem.isCenterButton) {
+                            tabItem.copy(onAction = { showAddTransaction = true })
+                        } else {
+                            tabItem
+                        }
                     }
-                },
-                tabs = tabs.map { tabItem ->
-                    if (tabItem.isCenterButton) {
-                        tabItem.copy(onAction = { showAddTransaction = true })
-                    } else {
-                        tabItem
-                    }
-                }
-            )
-        }
-    ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                )
+            }
+        ) { innerPadding ->
+        // We use innerPadding.calculateTopPadding() but ignore bottom padding 
+        // to allow content to scroll behind the floating transparent TabBar.
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(top = innerPadding.calculateTopPadding())
+        ) {
             NavHost(
                 navController = navController,
                 startDestination = NavRoutes.Dashboard.route
             ) {
                 composable(NavRoutes.Portfolio.route) { PlaceholderTab("Portfolio Screen") }
                 composable(NavRoutes.Dashboard.route) {
-                    DashboardScreen(
-                        onNavigateToProfile = { parentNavController.navigate(NavRoutes.Profile.route) },
-                        onNavigateToUnsyncedInfo = { /* TODO: Implement unsynced info screen */ },
-                        onNavigateToGoalTracker = { navController.navigate(NavRoutes.GoalTracker.route) },
-                        onNavigateToGoalDetail = { goalId -> navController.navigate(NavRoutes.GoalTrackerDetail.createRoute(goalId)) },
-                        onNavigateToTransactionDetail = { transactionId -> navController.navigate(NavRoutes.TransactionDetail.createRoute(transactionId)) }
-                    )
+                    DashboardScreen(navController = navController)
                 }
                 composable(NavRoutes.GoalTracker.route) {
                     GoalTrackerScreen(
@@ -134,6 +140,7 @@ fun MainScreen(
             }
         }
     }
+}
 
     // Modal interaction for the center Add button
     if (showAddTransaction) {

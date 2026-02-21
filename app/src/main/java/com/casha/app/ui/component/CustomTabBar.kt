@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -65,46 +67,32 @@ fun CustomTabBar(
     val backgroundColor = MaterialTheme.colorScheme.background
     val primaryColor = MaterialTheme.colorScheme.primary
 
+    // Outer Box has NO clip so the FAB can overflow above
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(
-                elevation = 12.dp,
-                clip = false
-            )
-            .drawBehind {
-                // Top edge gradient shadow for frosted glass effect
-                drawRect(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            Color.Black.copy(alpha = 0.05f),
-                            Color.Transparent
-                        ),
-                        startY = 0f,
-                        endY = 8.dp.toPx()
-                    ),
-                    topLeft = Offset.Zero,
-                    size = size.copy(height = 8.dp.toPx())
-                )
-            }
-            .background(backgroundColor.copy(alpha = 0.95f))
+            .navigationBarsPadding()
+            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
     ) {
+        // Inner background with rounded shape and shadow
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp)
-                .padding(top = 12.dp, bottom = 8.dp)
-                .height(56.dp),
+                .shadow(
+                    elevation = 8.dp,
+                    shape = RoundedCornerShape(28.dp),
+                    clip = false
+                )
+                .clip(RoundedCornerShape(28.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .padding(horizontal = 12.dp, vertical = 12.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
             tabs.forEach { tab ->
                 if (tab.isCenterButton) {
-                    CenterAddButton(
-                        tab = tab,
-                        primaryColor = primaryColor,
-                        haptic = haptic
-                    )
+                    // Placeholder box to maintain spacing in the Row
+                    Box(modifier = Modifier.weight(1f))
                 } else {
                     RegularTabButton(
                         tab = tab,
@@ -115,6 +103,22 @@ fun CustomTabBar(
                         modifier = Modifier.weight(1f)
                     )
                 }
+            }
+        }
+
+        // Overlay the center button on top of everything
+        tabs.firstOrNull { it.isCenterButton }?.let { centerTab ->
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.BottomCenter),
+                contentAlignment = Alignment.Center
+            ) {
+                CenterAddButton(
+                    tab = centerTab,
+                    primaryColor = primaryColor,
+                    haptic = haptic
+                )
             }
         }
     }
@@ -140,10 +144,13 @@ private fun CenterAddButton(
         label = "centerScale"
     )
 
+    // Darker green for the FAB to match the reference
+    val fabColor = Color(0xFF008C3E) 
+
     Box(
         modifier = Modifier
-            .offset(y = (-20).dp)
-            .size(64.dp)
+            .offset(y = (-36).dp)
+            .size(72.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -157,43 +164,27 @@ private fun CenterAddButton(
             },
         contentAlignment = Alignment.Center
     ) {
-        // Shadow + Circle
+        // Shadow + White Ring + Green Circle
         Box(
             modifier = Modifier
-                .size(56.dp)
+                .size(60.dp)
                 .shadow(
-                    elevation = 8.dp,
+                    elevation = 12.dp,
                     shape = CircleShape,
-                    ambientColor = primaryColor.copy(alpha = 0.3f),
-                    spotColor = primaryColor.copy(alpha = 0.3f)
+                    ambientColor = Color.Black.copy(alpha = 0.5f),
+                    spotColor = Color.Black.copy(alpha = 0.5f)
                 )
-                .clip(CircleShape)
-                .background(primaryColor),
+                .background(Color.White, CircleShape) // The white ring effect
+                .padding(4.dp) // Ring thickness
+                .background(fabColor, CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            // White border overlay
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(Color.Transparent)
-                    .drawBehind {
-                        drawCircle(
-                            color = Color.White.copy(alpha = 0.3f),
-                            radius = size.minDimension / 2,
-                            style = androidx.compose.ui.graphics.drawscope.Stroke(
-                                width = 1.5.dp.toPx()
-                            )
-                        )
-                    }
-            )
-
             // Plus icon
             Icon(
                 imageVector = tab.icon,
                 contentDescription = tab.title,
                 tint = Color.White,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(28.dp)
             )
         }
     }
@@ -268,18 +259,18 @@ private fun RegularTabButton(
         // Icon with highlight background
         Box(
             modifier = Modifier
-                .size(40.dp)
+                .size(48.dp) // Slightly smaller to give labels more room
                 .graphicsLayer {
                     scaleX = scale
                     scaleY = scale
                 },
             contentAlignment = Alignment.Center
         ) {
-            // Animated highlight circle
-            if (highlightSize > 0.dp) {
+            // Animated highlight circle - matches reference house background
+            if (isSelected) {
                 Box(
                     modifier = Modifier
-                        .size(highlightSize)
+                        .size(48.dp)
                         .clip(CircleShape)
                         .background(primaryColor.copy(alpha = 0.15f))
                 )
@@ -289,7 +280,7 @@ private fun RegularTabButton(
                 imageVector = if (isSelected) tab.selectedIcon else tab.icon,
                 contentDescription = tab.title,
                 tint = iconColor,
-                modifier = Modifier.size(22.dp)
+                modifier = Modifier.size(24.dp)
             )
         }
 
