@@ -2,30 +2,35 @@ package com.casha.app.ui.feature.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.casha.app.domain.model.CategoryCasha
+import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.TransactionRequest
+import com.casha.app.domain.usecase.category.CategorySyncUseCase
+import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase
 import com.casha.app.domain.usecase.transaction.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 data class TransactionUiState(
-    val transactions: List<TransactionCasha> = emptyList(),
+    val transactions: List<CashflowEntry> = emptyList(),
+    val rawTransactions: List<TransactionCasha> = emptyList(), // Keep for edit/delete access
+    val categories: List<CategoryCasha> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 )
 
 @HiltViewModel
 class TransactionViewModel @Inject constructor(
+    private val getCashflowHistoryUseCase: GetCashflowHistoryUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val syncTransactionsUseCase: SyncTransactionsUseCase
+    private val syncTransactionsUseCase: SyncTransactionsUseCase,
+    private val categorySyncUseCase: CategorySyncUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiState())
@@ -33,41 +38,86 @@ class TransactionViewModel @Inject constructor(
 
     init {
         observeTransactions()
-        syncData() // Initial fetch
+        fetchHistory()
+        syncData()
+        fetchCategories()
     }
 
     private fun observeTransactions() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
             getTransactionsUseCase().collect { transactions ->
-                _uiState.update { it.copy(transactions = transactions, isLoading = false) }
+                _uiState.update { it.copy(rawTransactions = transactions) }
             }
         }
     }
 
-    fun loadTransactions() {
-        // Redundant with observeTransactions, but kept for compatibility or forced refresh
-        syncData()
+    fun fetchHistory() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            try {
+                // Fetch current month history
+                val response = getCashflowHistoryUseCase.execute(null, null, 1, 50)
+                _uiState.update { it.copy(transactions = response.entries, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message, isLoading = false) }
+            }
+        }
+    }
+
+    fun syncData() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                syncTransactionsUseCase()
+                fetchHistory()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message) }
+            } finally {
+                _uiState.update { it.copy(isLoading = false) }
+            }
+        }
+    }
+
+    private fun fetchCategories() {
+        viewModelScope.launch {
+            try {
+                val result = categorySyncUseCase.fetchCategories()
+                val activeCategories = result.filter { it.isActive }
+                _uiState.update { it.copy(categories = activeCategories) }
+            } catch (e: Exception) {
+                // Silently fail or log
+            }
+        }
     }
 
     fun addTransaction(request: TransactionRequest) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 addTransactionUseCase(request)
-                loadTransactions()
+                syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
     }
 
-    fun updateTransaction(transaction: TransactionCasha) {
+    fun updateTransaction(id: String, request: TransactionRequest) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                updateTransactionUseCase(transaction)
-                loadTransactions()
+                val existing = _uiState.value.rawTransactions.find { it.id == id }
+                if (existing != null) {
+                    val updated = existing.copy(
+                        name = request.name,
+                        category = request.category,
+                        amount = request.amount,
+                        datetime = request.datetime,
+                        note = request.note
+                    )
+                    updateTransactionUseCase(updated)
+                    syncData()
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
@@ -76,22 +126,10 @@ class TransactionViewModel @Inject constructor(
 
     fun deleteTransaction(id: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteTransactionUseCase(id)
-                loadTransactions()
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
-            }
-        }
-    }
-
-    fun syncData() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                syncTransactionsUseCase()
-                loadTransactions()
+                syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }

@@ -85,4 +85,33 @@ object DateHelper {
         val formatter = SimpleDateFormat("dd MMM", Locale.getDefault())
         return formatter.format(date)
     }
+
+    /**
+     * Generates a list of month-year strings for the last 12 months.
+     * Format: "yyyy-MM" (e.g. "2026-02", "2026-01", "2025-12")
+     * The first item is the current month.
+     */
+    fun generateMonthYearOptions(): List<String> {
+        val formatter = SimpleDateFormat("yyyy-MM", Locale.US)
+        val calendar = java.util.Calendar.getInstance()
+        return (0 until 12).map { offset ->
+            val cal = calendar.clone() as java.util.Calendar
+            cal.add(java.util.Calendar.MONTH, -offset)
+            formatter.format(cal.time)
+        }
+    }
+
+    /**
+     * Formats a month-year string (e.g. "2026-02") to display format (e.g. "February 2026").
+     */
+    fun formatMonthYearDisplay(monthYear: String): String {
+        return try {
+            val inputFormat = SimpleDateFormat("yyyy-MM", Locale.US)
+            val outputFormat = SimpleDateFormat("MMMM yyyy", Locale.getDefault())
+            val date = inputFormat.parse(monthYear) ?: return monthYear
+            outputFormat.format(date)
+        } catch (_: Exception) {
+            monthYear
+        }
+    }
 }

@@ -35,6 +35,7 @@ object NetworkModule {
         ignoreUnknownKeys = true
         coerceInputValues = true
         encodeDefaults = true
+        explicitNulls = false
     }
 
     @Provides
@@ -110,6 +111,12 @@ object NetworkModule {
     @Singleton
     fun provideCategoryApiService(retrofit: Retrofit): com.casha.app.data.remote.api.CategoryApiService {
         return retrofit.create(com.casha.app.data.remote.api.CategoryApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideBudgetApiService(retrofit: Retrofit): com.casha.app.data.remote.api.BudgetApiService {
+        return retrofit.create(com.casha.app.data.remote.api.BudgetApiService::class.java)
     }
 }
 

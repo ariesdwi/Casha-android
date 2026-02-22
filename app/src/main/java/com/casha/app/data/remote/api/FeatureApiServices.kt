@@ -56,3 +56,37 @@ interface CategoryApiService {
     @DELETE("categories/{id}")
     suspend fun deleteCategory(@Path("id") id: String): BaseResponse<Unit>
 }
+
+interface BudgetApiService {
+    @GET("budgets")
+    suspend fun getBudgets(
+        @Query("month") month: String? = null
+    ): BaseResponse<List<BudgetDto>>
+
+    @GET("budgets/summary")
+    suspend fun getSummary(
+        @Query("month") month: String? = null
+    ): BaseResponse<BudgetSummaryDto>
+
+    @POST("budgets")
+    suspend fun addBudget(@Body request: NewBudgetRequestDto): BaseResponse<BudgetDto>
+
+    @PUT("budgets/{id}")
+    suspend fun updateBudget(
+        @Path("id") id: String,
+        @Body request: UpdateBudgetRequestDto
+    ): BaseResponse<BudgetDto>
+
+    @DELETE("budgets/{id}")
+    suspend fun deleteBudget(@Path("id") id: String): BaseResponse<Unit>
+
+    @GET("budgets/recommendations")
+    suspend fun getAIRecommendations(
+        @Query("monthlyIncome") monthlyIncome: Double? = null
+    ): BaseResponse<FinancialRecommendationResponseDto>
+
+    @POST("budgets/apply-recommendations")
+    suspend fun applyRecommendations(
+        @Body request: ApplyRecommendationsRequest
+    ): BaseResponse<ApplyRecommendationsResponseDto>
+}

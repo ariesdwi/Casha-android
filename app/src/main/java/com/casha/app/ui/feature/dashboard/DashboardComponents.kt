@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
+import com.casha.app.ui.theme.*
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.max
@@ -37,20 +38,21 @@ fun CardBalanceSection(
     var isBalanceVisible by remember { mutableStateOf(true) }
     var showPeriodPicker by remember { mutableStateOf(false) }
 
+    val netBalanceValue = summary?.netBalance ?: 0.0
     val amountColor = when {
-        (summary?.netBalance ?: 0.0) > 0 -> Color(0xFF4CAF50) // Casha Success
-        (summary?.netBalance ?: 0.0) < 0 -> Color(0xFFE57373) // Casha Danger
+        netBalanceValue > 0 -> CashaSuccess
+        netBalanceValue < 1 -> CashaDanger
         else -> MaterialTheme.colorScheme.onSurface
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
         ) {
             Column(
                 modifier = Modifier
@@ -62,8 +64,8 @@ fun CardBalanceSection(
                 // Label
                 Text(
                     text = "Net Cashflow", // TODO: Localize "dashboard.balance.net_cashflow"
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Medium
                 )
 
@@ -73,7 +75,7 @@ fun CardBalanceSection(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Text(
-                        text = if (isBalanceVisible) CurrencyFormatter.format((summary?.netBalance ?: 0.0), "IDR") else "••••••••",
+                        text = if (isBalanceVisible) CurrencyFormatter.format(summary?.netBalance ?: 0.0) else "••••••••",
                         style = MaterialTheme.typography.displaySmall,
                         color = amountColor,
                         fontWeight = FontWeight.Bold,
@@ -102,14 +104,14 @@ fun CardBalanceSection(
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text(
                             text = getPeriodTitle(selectedPeriod),
-                            style = MaterialTheme.typography.labelLarge,
+                            style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = null,
-                            modifier = Modifier.size(14.dp),
+                            modifier = Modifier.size(10.dp),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -126,7 +128,7 @@ fun CardBalanceSection(
                         title = "In", // TODO: Localize "dashboard.balance.in"
                         amount = summary?.totalIncome ?: 0.0,
                         icon = Icons.Default.NorthEast,
-                        color = Color(0xFF4CAF50),
+                        color = CashaSuccess,
                         isVisible = isBalanceVisible,
                         modifier = Modifier.weight(1f)
                     )
@@ -140,7 +142,7 @@ fun CardBalanceSection(
                         title = "Out", // TODO: Localize "dashboard.balance.out"
                         amount = summary?.totalExpense ?: 0.0,
                         icon = Icons.Default.SouthEast,
-                        color = Color(0xFFE57373),
+                        color = CashaDanger,
                         isVisible = isBalanceVisible,
                         modifier = Modifier.weight(1f)
                     )
@@ -184,12 +186,12 @@ fun MiniStatItem(
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Medium
         )
         Text(
-            text = if (isVisible) CurrencyFormatter.format(amount, "IDR") else "••••",
-            style = MaterialTheme.typography.bodyLarge,
+            text = if (isVisible) CurrencyFormatter.format(amount) else "••••",
+            style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface,
             fontWeight = FontWeight.Bold,
             maxLines = 1
@@ -326,8 +328,8 @@ fun ReportChartView(
     selectedTab: ChartTab,
     onTabChange: (ChartTab) -> Unit
 ) {
-    val weekTotal = CurrencyFormatter.format(report.thisWeekTotal, "IDR")
-    val monthTotal = CurrencyFormatter.format(report.thisMonthTotal, "IDR")
+    val weekTotal = CurrencyFormatter.format(report.thisWeekTotal)
+    val monthTotal = CurrencyFormatter.format(report.thisMonthTotal)
     
     val chartData = if (selectedTab == ChartTab.WEEK) report.dailyBars else report.weeklyBars
     val maxAmount = chartData.map { it.value }.maxOrNull() ?: 1.0
@@ -388,33 +390,41 @@ fun ReportChartView(
                     
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxHeight()
                     ) {
-                        Spacer(modifier = Modifier.weight(1f))
-                        
-                        // Animated Bar
-                        var animatedHeightFactor by remember { mutableStateOf(0f) }
-                        LaunchedEffect(barHeightFactor) {
-                            animatedHeightFactor = barHeightFactor
-                        }
-                        
-                        val heightState by animateFloatAsState(
-                            targetValue = animatedHeightFactor,
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
-                            label = "barHeight"
-                        )
-
+                        // Bar area takes all remaining space
                         Box(
                             modifier = Modifier
-                                .width(24.dp)
-                                .fillMaxHeight(heightState.coerceAtLeast(0.02f))
-                                .background(
-                                    color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                                )
-                        )
+                                .weight(1f)
+                                .width(24.dp),
+                            contentAlignment = Alignment.BottomCenter
+                        ) {
+                            // Animated Bar
+                            var animatedHeightFactor by remember { mutableStateOf(0f) }
+                            LaunchedEffect(barHeightFactor) {
+                                animatedHeightFactor = barHeightFactor
+                            }
+                            
+                            val heightState by animateFloatAsState(
+                                targetValue = animatedHeightFactor,
+                                animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+                                label = "barHeight"
+                            )
 
+                            Box(
+                                modifier = Modifier
+                                    .width(24.dp)
+                                    .fillMaxHeight(heightState.coerceAtLeast(0.02f))
+                                    .background(
+                                        color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                                    )
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
+                        // Label always visible below the bar
                         Text(
                             text = bar.label,
                             style = MaterialTheme.typography.labelSmall,
@@ -510,13 +520,12 @@ fun GoalSection(
 fun GoalEmptyState() {
     Card(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
@@ -571,7 +580,7 @@ fun GoalCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         val targetColor = remember(goal.color) {
-            val defaultColor = Color(0xFF4CAF50) // Default Casha Green
+            val defaultColor = CashaAccentLight // Default Casha Green
             try {
                 goal.color?.let { Color(android.graphics.Color.parseColor(it)) } ?: defaultColor
             } catch (e: Exception) {
@@ -669,12 +678,12 @@ fun RecentTransactionsSection(
 
         // Transaction List Card
         Card(
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
+            shape = RoundedCornerShape(28.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -811,7 +820,7 @@ fun CashflowRow(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            val amountColor = if (entry.type == CashflowType.INCOME) Color(0xFF4CAF50) else Color(0xFFE57373)
+            val amountColor = if (entry.type == CashflowType.INCOME) CashaSuccess else CashaDanger
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = if (entry.type == CashflowType.INCOME) "+" else "-",
@@ -820,7 +829,7 @@ fun CashflowRow(
                     color = amountColor
                 )
                 Text(
-                    text = CurrencyFormatter.format(entry.amount, "IDR"),
+                    text = CurrencyFormatter.format(entry.amount),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = amountColor
@@ -829,7 +838,7 @@ fun CashflowRow(
             Text(
                 text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(entry.date),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -837,15 +846,15 @@ fun CashflowRow(
 
 fun colorForType(type: CashflowType): Color {
     return when (type) {
-        CashflowType.INCOME -> Color(0xFF4CAF50) // Casha Success
-        CashflowType.EXPENSE -> Color(0xFF2196F3) // Blue for expense
+        CashflowType.INCOME -> CashaSuccess
+        CashflowType.EXPENSE -> CashaBlue
     }
 }
 
 fun gradientForType(type: CashflowType): Brush {
     val colors = when (type) {
-        CashflowType.INCOME -> listOf(Color(0xFF4CAF50), Color(0xFF009688))
-        CashflowType.EXPENSE -> listOf(Color(0xFF2196F3), Color(0xFF9C27B0))
+        CashflowType.INCOME -> listOf(CashaAccentLight, CashaTeal)
+        CashflowType.EXPENSE -> listOf(CashaBlue, CashaPurple)
     }
     return Brush.linearGradient(colors)
 }

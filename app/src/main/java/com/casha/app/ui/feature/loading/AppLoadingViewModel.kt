@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.loading
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.usecase.auth.GetProfileUseCase
 import com.casha.app.domain.usecase.dashboard.CashflowSyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,6 +60,11 @@ class AppLoadingViewModel @Inject constructor(
                 
                 // Determine destination based on currency
                 val isCurrencySet = !profile.currency.isNullOrBlank()
+                
+                // Set the global default currency for formatting
+                if (isCurrencySet) {
+                    CurrencyFormatter.defaultCurrency = profile.currency!!
+                }
                 
                 val destination = if (isCurrencySet) {
                     AppLoadingDestination.DASHBOARD

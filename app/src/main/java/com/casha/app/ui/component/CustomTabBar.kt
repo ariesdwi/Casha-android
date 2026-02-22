@@ -145,7 +145,7 @@ private fun CenterAddButton(
     )
 
     // Darker green for the FAB to match the reference
-    val fabColor = Color(0xFF008C3E) 
+    val fabColor = primaryColor // Uses theme primary (CashaPrimary)
 
     Box(
         modifier = Modifier

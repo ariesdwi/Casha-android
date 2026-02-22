@@ -56,8 +56,33 @@ interface GoalRepository {
  * CRUD strategy: Create/Update/Delete = remote-first, Read = local-first.
  */
 interface CategoryRepository {
-    suspend fun getAllCategories(): List<com.casha.app.data.local.entity.CategoryEntity>
-    suspend fun createCategory(name: String, isActive: Boolean): com.casha.app.data.local.entity.CategoryEntity
-    suspend fun updateCategory(id: String, name: String, isActive: Boolean): com.casha.app.data.local.entity.CategoryEntity
+    suspend fun getAllCategories(): List<com.casha.app.domain.model.CategoryCasha>
+    suspend fun createCategory(name: String, isActive: Boolean): com.casha.app.domain.model.CategoryCasha
+    suspend fun updateCategory(id: String, name: String, isActive: Boolean): com.casha.app.domain.model.CategoryCasha
     suspend fun deleteCategory(id: String)
+}
+
+/**
+ * Repository interface for Budget operations.
+ * Separates remote and local operations to support offline-first architecture.
+ */
+interface BudgetRepository {
+    // Remote
+    suspend fun fetchRemoteBudgets(month: String? = null): List<com.casha.app.domain.model.BudgetCasha>
+    suspend fun fetchRemoteSummary(month: String? = null): com.casha.app.domain.model.BudgetSummary
+    suspend fun createRemoteBudget(request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha
+    suspend fun updateRemoteBudget(id: String, request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha
+    suspend fun deleteRemoteBudget(id: String)
+    suspend fun fetchAIRecommendations(monthlyIncome: Double? = null): com.casha.app.domain.model.FinancialRecommendationResponse
+    suspend fun applyRemoteRecommendations(request: com.casha.app.data.remote.dto.ApplyRecommendationsRequest): List<com.casha.app.domain.model.BudgetCasha>
+
+    // Local
+    suspend fun getLocalBudgets(month: String? = null): List<com.casha.app.domain.model.BudgetCasha>
+    suspend fun saveLocalBudget(budget: com.casha.app.domain.model.BudgetCasha)
+    suspend fun saveLocalBudgets(budgets: List<com.casha.app.domain.model.BudgetCasha>)
+    suspend fun deleteLocalBudget(id: String)
+    suspend fun getUnsyncedBudgets(): List<com.casha.app.domain.model.BudgetCasha>
+    suspend fun markAsSynced(localId: String, remoteId: String)
+    suspend fun clearLocalBudgets()
+    fun calculateLocalSummary(budgets: List<com.casha.app.domain.model.BudgetCasha>): com.casha.app.domain.model.BudgetSummary
 }

@@ -11,11 +11,26 @@ interface BudgetDao {
     @Query("SELECT * FROM budgets ORDER BY updatedAt DESC")
     fun getAllBudgets(): Flow<List<BudgetEntity>>
 
+    @Query("SELECT * FROM budgets WHERE period = :month ORDER BY category ASC")
+    suspend fun getBudgetsByMonth(month: String): List<BudgetEntity>
+
+    @Query("SELECT * FROM budgets WHERE id = :id")
+    suspend fun getBudgetById(id: String): BudgetEntity?
+
+    @Query("SELECT * FROM budgets WHERE isSynced = 0")
+    suspend fun getUnsyncedBudgets(): List<BudgetEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBudget(budget: BudgetEntity)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBudgets(budgets: List<BudgetEntity>)
+
+    @Query("DELETE FROM budgets WHERE id = :id")
+    suspend fun deleteById(id: String)
+
+    @Query("UPDATE budgets SET isSynced = :synced, id = :newId WHERE id = :oldId")
+    suspend fun updateSyncStatus(oldId: String, newId: String, synced: Boolean)
 
     @Query("DELETE FROM budgets")
     suspend fun clearAll()

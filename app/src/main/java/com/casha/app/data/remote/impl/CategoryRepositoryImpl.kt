@@ -6,6 +6,7 @@ import com.casha.app.data.remote.api.CategoryApiService
 import com.casha.app.data.remote.dto.CategoryDto
 import com.casha.app.data.remote.dto.CreateCategoryRequest
 import com.casha.app.data.remote.dto.UpdateCategoryRequest
+import com.casha.app.domain.model.CategoryCasha
 import com.casha.app.domain.repository.CategoryRepository
 import java.text.SimpleDateFormat
 import java.util.*
@@ -22,31 +23,31 @@ class CategoryRepositoryImpl @Inject constructor(
         timeZone = TimeZone.getTimeZone("UTC")
     }
 
-    override suspend fun getAllCategories(): List<CategoryEntity> {
+    override suspend fun getAllCategories(): List<CategoryCasha> {
         val response = apiService.getAllCategories()
         val entities = response.data?.map { it.toEntity() } ?: emptyList()
         if (entities.isNotEmpty()) {
             categoryDao.insertCategories(entities)
         }
-        return entities
+        return entities.map { it.toDomain() }
     }
 
-    override suspend fun createCategory(name: String, isActive: Boolean): CategoryEntity {
+    override suspend fun createCategory(name: String, isActive: Boolean): CategoryCasha {
         // Remote-first: API must succeed before saving locally
         val response = apiService.createCategory(CreateCategoryRequest(name, isActive))
         val entity = response.data?.toEntity()
             ?: throw IllegalStateException("Failed to create category")
         categoryDao.insertCategory(entity)
-        return entity
+        return entity.toDomain()
     }
 
-    override suspend fun updateCategory(id: String, name: String, isActive: Boolean): CategoryEntity {
+    override suspend fun updateCategory(id: String, name: String, isActive: Boolean): CategoryCasha {
         // Remote-first: API must succeed before updating locally
         val response = apiService.updateCategory(id, UpdateCategoryRequest(name, isActive))
         val entity = response.data?.toEntity()
             ?: throw IllegalStateException("Failed to update category")
         categoryDao.insertCategory(entity) // upsert
-        return entity
+        return entity.toDomain()
     }
 
     override suspend fun deleteCategory(id: String) {
@@ -65,5 +66,14 @@ class CategoryRepositoryImpl @Inject constructor(
         userId = userId,
         createdAt = try { createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
         updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
+    )
+
+    private fun CategoryEntity.toDomain() = CategoryCasha(
+        id = id,
+        name = name,
+        isActive = isActive,
+        userId = userId,
+        createdAt = createdAt,
+        updatedAt = updatedAt
     )
 }

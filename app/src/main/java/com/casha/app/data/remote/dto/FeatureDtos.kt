@@ -168,3 +168,104 @@ data class GoalSummaryDto(
     val overallProgress: Double = 0.0,
     val nearestDeadline: NearestDeadlineDto? = null
 )
+
+// ── Budget DTOs ──
+
+@Serializable
+data class BudgetCategoryDto(
+    val id: String = "",
+    val name: String = ""
+)
+
+@Serializable
+data class BudgetDto(
+    val id: String = "",
+    val amount: Double = 0.0,
+    val spent: Double = 0.0,
+    val remaining: Double = 0.0,
+    val period: String = "",
+    val startDate: String? = null,
+    val endDate: String? = null,
+    val category: BudgetCategoryDto? = null,
+    val currency: String? = null,
+    val isSynced: Boolean = false,
+    val createdAt: String? = null,
+    val updatedAt: String? = null
+)
+
+@Serializable
+data class BudgetSummaryDto(
+    val totalBudget: Double = 0.0,
+    val totalSpent: Double = 0.0,
+    val totalRemaining: Double = 0.0,
+    val currency: String = "IDR"
+)
+
+@Serializable
+data class BudgetAIRecommendationDto(
+    val id: String = "",
+    val category: String = "",
+    val suggestedAmount: Double = 0.0,
+    val reasoning: String = ""
+)
+
+@Serializable
+data class RecommendationSummaryDto(
+    val strategy: String = "",
+    val needsPercentage: Int = 0,
+    val wantsPercentage: Int = 0,
+    val savingsPercentage: Int = 0
+)
+
+@Serializable
+data class FinancialSummaryDto(
+    val debts: Double = 0.0,
+    val assets: Double = 0.0
+)
+
+@Serializable
+data class BudgetMilestoneDto(
+    val title: String = "",
+    val target: String = "",
+    val action: String = ""
+)
+
+@Serializable
+data class FinancialRecommendationResponseDto(
+    val summary: RecommendationSummaryDto,
+    val financialSummary: FinancialSummaryDto,
+    val insights: List<String> = emptyList(),
+    val budgetMilestones: List<BudgetMilestoneDto> = emptyList(),
+    val recommendations: List<BudgetAIRecommendationDto> = emptyList()
+)
+
+@Serializable
+data class NewBudgetRequestDto(
+    val id: String? = null,
+    val amount: Double,
+    val month: String,
+    val category: String
+)
+
+@Serializable
+data class UpdateBudgetRequestDto(
+    val amount: Double
+)
+
+@Serializable
+data class RecommendedBudgetPayload(
+    val amount: Double,
+    val category: String
+)
+
+@Serializable
+data class ApplyRecommendationsRequest(
+    val month: String,
+    val budgets: List<RecommendedBudgetPayload>
+)
+
+@Serializable
+data class ApplyRecommendationsResponseDto(
+    val status: String,
+    val budgets: List<BudgetDto>
+)

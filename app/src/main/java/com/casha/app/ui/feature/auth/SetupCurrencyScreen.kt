@@ -50,21 +50,12 @@ fun SetupCurrencyScreen(
         ) {
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Header Icon
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(
-                        color = MaterialTheme.colorScheme.primaryContainer,
-                        shape = RoundedCornerShape(24.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "💰",
-                    fontSize = 48.sp
-                )
-            }
+            // Header Icon — no container, just the icon
+            Text(
+                text = "💰",
+                fontSize = 72.sp,
+                color = MaterialTheme.colorScheme.primary
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 

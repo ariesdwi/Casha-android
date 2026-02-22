@@ -188,6 +188,350 @@ public class BudgetDao_Impl(
     }
   }
 
+  public override suspend fun getBudgetsByMonth(month: String): List<BudgetEntity> {
+    val _sql: String = "SELECT * FROM budgets WHERE period = ? ORDER BY category ASC"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindText(_argIndex, month)
+        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
+        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, "amount")
+        val _columnIndexOfSpent: Int = getColumnIndexOrThrow(_stmt, "spent")
+        val _columnIndexOfRemaining: Int = getColumnIndexOrThrow(_stmt, "remaining")
+        val _columnIndexOfPeriod: Int = getColumnIndexOrThrow(_stmt, "period")
+        val _columnIndexOfStartDate: Int = getColumnIndexOrThrow(_stmt, "startDate")
+        val _columnIndexOfEndDate: Int = getColumnIndexOrThrow(_stmt, "endDate")
+        val _columnIndexOfCategory: Int = getColumnIndexOrThrow(_stmt, "category")
+        val _columnIndexOfCurrency: Int = getColumnIndexOrThrow(_stmt, "currency")
+        val _columnIndexOfIsSynced: Int = getColumnIndexOrThrow(_stmt, "isSynced")
+        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
+        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, "updatedAt")
+        val _result: MutableList<BudgetEntity> = mutableListOf()
+        while (_stmt.step()) {
+          val _item: BudgetEntity
+          val _tmpId: String
+          _tmpId = _stmt.getText(_columnIndexOfId)
+          val _tmpAmount: Double
+          _tmpAmount = _stmt.getDouble(_columnIndexOfAmount)
+          val _tmpSpent: Double
+          _tmpSpent = _stmt.getDouble(_columnIndexOfSpent)
+          val _tmpRemaining: Double
+          _tmpRemaining = _stmt.getDouble(_columnIndexOfRemaining)
+          val _tmpPeriod: String
+          _tmpPeriod = _stmt.getText(_columnIndexOfPeriod)
+          val _tmpStartDate: Date
+          val _tmp: Long?
+          if (_stmt.isNull(_columnIndexOfStartDate)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getLong(_columnIndexOfStartDate)
+          }
+          val _tmp_1: Date? = __converters.fromTimestamp(_tmp)
+          if (_tmp_1 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpStartDate = _tmp_1
+          }
+          val _tmpEndDate: Date
+          val _tmp_2: Long?
+          if (_stmt.isNull(_columnIndexOfEndDate)) {
+            _tmp_2 = null
+          } else {
+            _tmp_2 = _stmt.getLong(_columnIndexOfEndDate)
+          }
+          val _tmp_3: Date? = __converters.fromTimestamp(_tmp_2)
+          if (_tmp_3 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpEndDate = _tmp_3
+          }
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpCurrency: String
+          _tmpCurrency = _stmt.getText(_columnIndexOfCurrency)
+          val _tmpIsSynced: Boolean
+          val _tmp_4: Int
+          _tmp_4 = _stmt.getLong(_columnIndexOfIsSynced).toInt()
+          _tmpIsSynced = _tmp_4 != 0
+          val _tmpCreatedAt: Date
+          val _tmp_5: Long?
+          if (_stmt.isNull(_columnIndexOfCreatedAt)) {
+            _tmp_5 = null
+          } else {
+            _tmp_5 = _stmt.getLong(_columnIndexOfCreatedAt)
+          }
+          val _tmp_6: Date? = __converters.fromTimestamp(_tmp_5)
+          if (_tmp_6 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpCreatedAt = _tmp_6
+          }
+          val _tmpUpdatedAt: Date
+          val _tmp_7: Long?
+          if (_stmt.isNull(_columnIndexOfUpdatedAt)) {
+            _tmp_7 = null
+          } else {
+            _tmp_7 = _stmt.getLong(_columnIndexOfUpdatedAt)
+          }
+          val _tmp_8: Date? = __converters.fromTimestamp(_tmp_7)
+          if (_tmp_8 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpUpdatedAt = _tmp_8
+          }
+          _item =
+              BudgetEntity(_tmpId,_tmpAmount,_tmpSpent,_tmpRemaining,_tmpPeriod,_tmpStartDate,_tmpEndDate,_tmpCategory,_tmpCurrency,_tmpIsSynced,_tmpCreatedAt,_tmpUpdatedAt)
+          _result.add(_item)
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun getBudgetById(id: String): BudgetEntity? {
+    val _sql: String = "SELECT * FROM budgets WHERE id = ?"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindText(_argIndex, id)
+        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
+        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, "amount")
+        val _columnIndexOfSpent: Int = getColumnIndexOrThrow(_stmt, "spent")
+        val _columnIndexOfRemaining: Int = getColumnIndexOrThrow(_stmt, "remaining")
+        val _columnIndexOfPeriod: Int = getColumnIndexOrThrow(_stmt, "period")
+        val _columnIndexOfStartDate: Int = getColumnIndexOrThrow(_stmt, "startDate")
+        val _columnIndexOfEndDate: Int = getColumnIndexOrThrow(_stmt, "endDate")
+        val _columnIndexOfCategory: Int = getColumnIndexOrThrow(_stmt, "category")
+        val _columnIndexOfCurrency: Int = getColumnIndexOrThrow(_stmt, "currency")
+        val _columnIndexOfIsSynced: Int = getColumnIndexOrThrow(_stmt, "isSynced")
+        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
+        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, "updatedAt")
+        val _result: BudgetEntity?
+        if (_stmt.step()) {
+          val _tmpId: String
+          _tmpId = _stmt.getText(_columnIndexOfId)
+          val _tmpAmount: Double
+          _tmpAmount = _stmt.getDouble(_columnIndexOfAmount)
+          val _tmpSpent: Double
+          _tmpSpent = _stmt.getDouble(_columnIndexOfSpent)
+          val _tmpRemaining: Double
+          _tmpRemaining = _stmt.getDouble(_columnIndexOfRemaining)
+          val _tmpPeriod: String
+          _tmpPeriod = _stmt.getText(_columnIndexOfPeriod)
+          val _tmpStartDate: Date
+          val _tmp: Long?
+          if (_stmt.isNull(_columnIndexOfStartDate)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getLong(_columnIndexOfStartDate)
+          }
+          val _tmp_1: Date? = __converters.fromTimestamp(_tmp)
+          if (_tmp_1 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpStartDate = _tmp_1
+          }
+          val _tmpEndDate: Date
+          val _tmp_2: Long?
+          if (_stmt.isNull(_columnIndexOfEndDate)) {
+            _tmp_2 = null
+          } else {
+            _tmp_2 = _stmt.getLong(_columnIndexOfEndDate)
+          }
+          val _tmp_3: Date? = __converters.fromTimestamp(_tmp_2)
+          if (_tmp_3 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpEndDate = _tmp_3
+          }
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpCurrency: String
+          _tmpCurrency = _stmt.getText(_columnIndexOfCurrency)
+          val _tmpIsSynced: Boolean
+          val _tmp_4: Int
+          _tmp_4 = _stmt.getLong(_columnIndexOfIsSynced).toInt()
+          _tmpIsSynced = _tmp_4 != 0
+          val _tmpCreatedAt: Date
+          val _tmp_5: Long?
+          if (_stmt.isNull(_columnIndexOfCreatedAt)) {
+            _tmp_5 = null
+          } else {
+            _tmp_5 = _stmt.getLong(_columnIndexOfCreatedAt)
+          }
+          val _tmp_6: Date? = __converters.fromTimestamp(_tmp_5)
+          if (_tmp_6 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpCreatedAt = _tmp_6
+          }
+          val _tmpUpdatedAt: Date
+          val _tmp_7: Long?
+          if (_stmt.isNull(_columnIndexOfUpdatedAt)) {
+            _tmp_7 = null
+          } else {
+            _tmp_7 = _stmt.getLong(_columnIndexOfUpdatedAt)
+          }
+          val _tmp_8: Date? = __converters.fromTimestamp(_tmp_7)
+          if (_tmp_8 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpUpdatedAt = _tmp_8
+          }
+          _result =
+              BudgetEntity(_tmpId,_tmpAmount,_tmpSpent,_tmpRemaining,_tmpPeriod,_tmpStartDate,_tmpEndDate,_tmpCategory,_tmpCurrency,_tmpIsSynced,_tmpCreatedAt,_tmpUpdatedAt)
+        } else {
+          _result = null
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun getUnsyncedBudgets(): List<BudgetEntity> {
+    val _sql: String = "SELECT * FROM budgets WHERE isSynced = 0"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
+        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, "amount")
+        val _columnIndexOfSpent: Int = getColumnIndexOrThrow(_stmt, "spent")
+        val _columnIndexOfRemaining: Int = getColumnIndexOrThrow(_stmt, "remaining")
+        val _columnIndexOfPeriod: Int = getColumnIndexOrThrow(_stmt, "period")
+        val _columnIndexOfStartDate: Int = getColumnIndexOrThrow(_stmt, "startDate")
+        val _columnIndexOfEndDate: Int = getColumnIndexOrThrow(_stmt, "endDate")
+        val _columnIndexOfCategory: Int = getColumnIndexOrThrow(_stmt, "category")
+        val _columnIndexOfCurrency: Int = getColumnIndexOrThrow(_stmt, "currency")
+        val _columnIndexOfIsSynced: Int = getColumnIndexOrThrow(_stmt, "isSynced")
+        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
+        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, "updatedAt")
+        val _result: MutableList<BudgetEntity> = mutableListOf()
+        while (_stmt.step()) {
+          val _item: BudgetEntity
+          val _tmpId: String
+          _tmpId = _stmt.getText(_columnIndexOfId)
+          val _tmpAmount: Double
+          _tmpAmount = _stmt.getDouble(_columnIndexOfAmount)
+          val _tmpSpent: Double
+          _tmpSpent = _stmt.getDouble(_columnIndexOfSpent)
+          val _tmpRemaining: Double
+          _tmpRemaining = _stmt.getDouble(_columnIndexOfRemaining)
+          val _tmpPeriod: String
+          _tmpPeriod = _stmt.getText(_columnIndexOfPeriod)
+          val _tmpStartDate: Date
+          val _tmp: Long?
+          if (_stmt.isNull(_columnIndexOfStartDate)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getLong(_columnIndexOfStartDate)
+          }
+          val _tmp_1: Date? = __converters.fromTimestamp(_tmp)
+          if (_tmp_1 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpStartDate = _tmp_1
+          }
+          val _tmpEndDate: Date
+          val _tmp_2: Long?
+          if (_stmt.isNull(_columnIndexOfEndDate)) {
+            _tmp_2 = null
+          } else {
+            _tmp_2 = _stmt.getLong(_columnIndexOfEndDate)
+          }
+          val _tmp_3: Date? = __converters.fromTimestamp(_tmp_2)
+          if (_tmp_3 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpEndDate = _tmp_3
+          }
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpCurrency: String
+          _tmpCurrency = _stmt.getText(_columnIndexOfCurrency)
+          val _tmpIsSynced: Boolean
+          val _tmp_4: Int
+          _tmp_4 = _stmt.getLong(_columnIndexOfIsSynced).toInt()
+          _tmpIsSynced = _tmp_4 != 0
+          val _tmpCreatedAt: Date
+          val _tmp_5: Long?
+          if (_stmt.isNull(_columnIndexOfCreatedAt)) {
+            _tmp_5 = null
+          } else {
+            _tmp_5 = _stmt.getLong(_columnIndexOfCreatedAt)
+          }
+          val _tmp_6: Date? = __converters.fromTimestamp(_tmp_5)
+          if (_tmp_6 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpCreatedAt = _tmp_6
+          }
+          val _tmpUpdatedAt: Date
+          val _tmp_7: Long?
+          if (_stmt.isNull(_columnIndexOfUpdatedAt)) {
+            _tmp_7 = null
+          } else {
+            _tmp_7 = _stmt.getLong(_columnIndexOfUpdatedAt)
+          }
+          val _tmp_8: Date? = __converters.fromTimestamp(_tmp_7)
+          if (_tmp_8 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpUpdatedAt = _tmp_8
+          }
+          _item =
+              BudgetEntity(_tmpId,_tmpAmount,_tmpSpent,_tmpRemaining,_tmpPeriod,_tmpStartDate,_tmpEndDate,_tmpCategory,_tmpCurrency,_tmpIsSynced,_tmpCreatedAt,_tmpUpdatedAt)
+          _result.add(_item)
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun deleteById(id: String) {
+    val _sql: String = "DELETE FROM budgets WHERE id = ?"
+    return performSuspending(__db, false, true) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindText(_argIndex, id)
+        _stmt.step()
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun updateSyncStatus(
+    oldId: String,
+    newId: String,
+    synced: Boolean,
+  ) {
+    val _sql: String = "UPDATE budgets SET isSynced = ?, id = ? WHERE id = ?"
+    return performSuspending(__db, false, true) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        val _tmp: Int = if (synced) 1 else 0
+        _stmt.bindLong(_argIndex, _tmp.toLong())
+        _argIndex = 2
+        _stmt.bindText(_argIndex, newId)
+        _argIndex = 3
+        _stmt.bindText(_argIndex, oldId)
+        _stmt.step()
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
   public override suspend fun clearAll() {
     val _sql: String = "DELETE FROM budgets"
     return performSuspending(__db, false, true) { _connection ->

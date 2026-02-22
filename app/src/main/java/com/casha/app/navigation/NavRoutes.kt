@@ -17,31 +17,24 @@ sealed class NavRoutes(val route: String) {
 
     // ── Main Tabs ──
     data object Dashboard : NavRoutes("dashboard")
-    data object TransactionList : NavRoutes("transaction_list")
-    data object AddTransaction : NavRoutes("add_transaction")
     data object Budget : NavRoutes("budget")
     data object Report : NavRoutes("report")
 
-    // ── Transaction Detail ──
-    data object TransactionDetail : NavRoutes("transaction_detail/{transactionId}") {
-        fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
-    }
-
-    data object TransactionEdit : NavRoutes("transaction_edit/{transactionId}") {
-        fun createRoute(transactionId: String) = "transaction_edit/$transactionId"
-    }
-
-    // ── Budget Detail ──
+    // ── Budget Support ──
     data object BudgetDetail : NavRoutes("budget_detail/{budgetId}") {
         fun createRoute(budgetId: String) = "budget_detail/$budgetId"
     }
 
-    data object AddBudget : NavRoutes("add_budget")
-    data object EditBudget : NavRoutes("edit_budget/{budgetId}") {
-        fun createRoute(budgetId: String) = "edit_budget/$budgetId"
+    // ── Transaction ──
+    data object Transactions : NavRoutes("transactions")
+    data object AddTransaction : NavRoutes("add_transaction")
+    data object EditTransaction : NavRoutes("edit_transaction/{transactionId}") {
+        fun createRoute(transactionId: String) = "edit_transaction/$transactionId"
     }
 
-    data object BudgetAIAdvisor : NavRoutes("budget_ai_advisor")
+    data object TransactionDetail : NavRoutes("transaction_detail/{transactionId}") {
+        fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
+    }
 
     // ── Goal Tracker ──
     data object GoalTracker : NavRoutes("goal_tracker")

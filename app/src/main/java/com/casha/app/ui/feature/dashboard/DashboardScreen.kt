@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.casha.app.navigation.Screen
+import com.casha.app.ui.theme.*
 import java.util.Calendar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,7 +62,7 @@ fun DashboardScreen(
                     if (scrollBehavior.state.overlappedFraction > 0.5f) {
                         Text(
                             text = "Dashboard",
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
                     }
@@ -80,10 +81,11 @@ fun DashboardScreen(
                         Spacer(modifier = Modifier.width(12.dp))
                     }
                 },
+                windowInsets = WindowInsets(0.dp),
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f)
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
                 )
             )
         },
@@ -162,19 +164,19 @@ fun WelcomeHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 4.dp),
+            .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = greeting,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Text(
                 text = nickname,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -184,7 +186,7 @@ fun WelcomeHeader(
             onClick = onProfileClick,
             shape = CircleShape,
             color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(44.dp),
             tonalElevation = 2.dp
         ) {
             Box(
@@ -203,7 +205,7 @@ fun WelcomeHeader(
             ) {
                 Text(
                     text = initial,
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onPrimary,
                     fontWeight = FontWeight.Bold
                 )
@@ -231,7 +233,7 @@ fun SyncBadge(
 
     Surface(
         onClick = onClick,
-        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+        color = CashaBlue.copy(alpha = 0.15f),
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
@@ -245,12 +247,12 @@ fun SyncBadge(
                 modifier = Modifier
                     .size(14.dp)
                     .then(if (isSyncing) Modifier.rotate(rotation) else Modifier),
-                tint = MaterialTheme.colorScheme.primary
+                tint = CashaBlue
             )
             Text(
                 text = count.toString(),
                 style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = CashaBlue,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -260,7 +262,7 @@ fun SyncBadge(
 @Composable
 fun OfflineIndicator() {
     Surface(
-        color = Color(0xFFFFA500).copy(alpha = 0.1f),
+        color = CashaWarning.copy(alpha = 0.1f),
         shape = RoundedCornerShape(20.dp)
     ) {
         Row(
@@ -272,12 +274,12 @@ fun OfflineIndicator() {
                 imageVector = Icons.Default.WifiOff,
                 contentDescription = null,
                 modifier = Modifier.size(14.dp),
-                tint = Color(0xFFFFA500)
+                tint = CashaWarning
             )
             Text(
                 text = "Offline",
                 style = MaterialTheme.typography.labelSmall,
-                color = Color(0xFFFFA500),
+                color = CashaWarning,
                 fontWeight = FontWeight.Medium
             )
         }

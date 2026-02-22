@@ -32,6 +32,9 @@ import com.casha.app.ui.component.CustomTabBar
 import com.casha.app.ui.component.TabItem
 import com.casha.app.ui.feature.dashboard.DashboardScreen
 import com.casha.app.ui.feature.goaltracker.GoalTrackerScreen
+import com.casha.app.ui.feature.budget.BudgetScreen
+import com.casha.app.ui.feature.transaction.TransactionScreen
+import com.casha.app.ui.feature.transaction.AddTransactionScreen
 
 @Composable
 fun MainScreen(
@@ -41,7 +44,6 @@ fun MainScreen(
     val navBackStackEntry by navController.currentBackStackEntryAsState()
 
     var selectedTab by remember { mutableIntStateOf(1) } // Default to Home
-    var showAddTransaction by remember { mutableStateOf(false) }
 
     val tabs = remember {
         listOf(
@@ -83,7 +85,7 @@ fun MainScreen(
     fun tagToRoute(tag: Int): String = when (tag) {
         0 -> NavRoutes.Portfolio.route
         1 -> NavRoutes.Dashboard.route
-        2 -> NavRoutes.TransactionList.route
+        2 -> NavRoutes.Transactions.route
         3 -> NavRoutes.Budget.route
         else -> NavRoutes.Dashboard.route
     }
@@ -104,7 +106,9 @@ fun MainScreen(
                     },
                     tabs = tabs.map { tabItem ->
                         if (tabItem.isCenterButton) {
-                            tabItem.copy(onAction = { showAddTransaction = true })
+                            tabItem.copy(onAction = { 
+                                navController.navigate(NavRoutes.AddTransaction.route) 
+                            })
                         } else {
                             tabItem
                         }
@@ -134,28 +138,32 @@ fun MainScreen(
                         onNavigateToGoalDetail = { goalId -> navController.navigate(NavRoutes.GoalTrackerDetail.createRoute(goalId)) }
                     )
                 }
-                composable(NavRoutes.TransactionList.route) { PlaceholderTab("Transactions Screen") }
-                composable(NavRoutes.Budget.route) { PlaceholderTab("Budget Screen") }
+                composable(NavRoutes.Transactions.route) {
+                    TransactionScreen(
+                        onNavigateToAddTransaction = { navController.navigate(NavRoutes.AddTransaction.route) },
+                        onNavigateToEditTransaction = { id -> navController.navigate(NavRoutes.EditTransaction.createRoute(id)) }
+                    )
+                }
+                composable(NavRoutes.AddTransaction.route) {
+                    AddTransactionScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable(NavRoutes.EditTransaction.route) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("transactionId")
+                    AddTransactionScreen(
+                        transactionId = id,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable(NavRoutes.Budget.route) { 
+                    BudgetScreen()
+                }
                 composable(NavRoutes.Profile.route) { PlaceholderTab("Profile Screen") }
             }
         }
     }
 }
-
-    // Modal interaction for the center Add button
-    if (showAddTransaction) {
-        // TODO: Replace with actual AddTransactionBottomSheet
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showAddTransaction = false },
-            title = { Text("Add Transaction") },
-            text = { Text("This modal was triggered by the center tab button.") },
-            confirmButton = {
-                androidx.compose.material3.TextButton(onClick = { showAddTransaction = false }) {
-                    Text("Close")
-                }
-            }
-        )
-    }
 }
 
 @Composable

@@ -42,4 +42,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCategoryRepository(impl: com.casha.app.data.remote.impl.CategoryRepositoryImpl): com.casha.app.domain.repository.CategoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindBudgetRepository(impl: com.casha.app.data.remote.impl.BudgetRepositoryImpl): com.casha.app.domain.repository.BudgetRepository
 }
