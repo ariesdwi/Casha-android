@@ -50,10 +50,20 @@ class TransactionViewModel @Inject constructor(
     val uiState: StateFlow<TransactionUiState> = _uiState.asStateFlow()
 
     init {
+        setupSyncEventListener()
         observeTransactions()
         fetchHistory()
         syncData()
         fetchCategories()
+    }
+
+    private fun setupSyncEventListener() {
+        viewModelScope.launch {
+            syncEventBus.syncCompletedEvent.collect {
+                // Instantly force UI state refresh when global event received
+                fetchHistory()
+            }
+        }
     }
 
     private fun observeTransactions() {

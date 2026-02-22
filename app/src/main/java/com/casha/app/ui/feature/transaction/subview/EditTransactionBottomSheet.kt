@@ -67,7 +67,7 @@ fun EditTransactionBottomSheet(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        "transactions.detail.cancel", 
+                        "Cancel", 
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -181,7 +181,7 @@ fun EditTransactionBottomSheet(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "transactions.detail.date",
+                            text = "Date",
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
