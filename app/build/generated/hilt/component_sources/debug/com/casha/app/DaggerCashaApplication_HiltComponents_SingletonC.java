@@ -990,7 +990,7 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
           return (T) new NetworkMonitor(ApplicationContextModule_ProvideContextFactory.provideContext(singletonCImpl.applicationContextModule));
 
           case 16: // com.casha.app.data.remote.impl.TransactionRepositoryImpl 
-          return (T) new TransactionRepositoryImpl(singletonCImpl.provideTransactionApiServiceProvider.get(), singletonCImpl.transactionDao());
+          return (T) new TransactionRepositoryImpl(singletonCImpl.provideTransactionApiServiceProvider.get(), singletonCImpl.provideCashflowApiServiceProvider.get(), singletonCImpl.transactionDao());
 
           case 17: // com.casha.app.data.remote.api.TransactionApiService 
           return (T) NetworkModule_ProvideTransactionApiServiceFactory.provideTransactionApiService(singletonCImpl.provideRetrofitProvider.get());

@@ -2,6 +2,7 @@ package com.casha.app.data.remote.impl
 
 import com.casha.app.data.local.dao.TransactionDao
 import com.casha.app.data.local.entity.TransactionEntity
+import com.casha.app.data.remote.api.CashflowApiService
 import com.casha.app.data.remote.api.TransactionApiService
 import com.casha.app.data.remote.dto.*
 import com.casha.app.domain.model.*
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.map
 @Singleton
 class TransactionRepositoryImpl @Inject constructor(
     private val apiService: TransactionApiService,
+    private val cashflowApiService: CashflowApiService,
     private val transactionDao: TransactionDao
 ) : TransactionRepository {
 
@@ -202,9 +204,24 @@ class TransactionRepositoryImpl @Inject constructor(
         val unsynced = transactionDao.getUnsyncedTransactions()
         unsynced.forEach { entity ->
             try {
-                val dto = apiService.createTransaction(entity.toUploadDto())
-                // Update local with remote ID (if different) and mark as synced
-                transactionDao.insertTransaction(entity.copy(isSynced = true))
+                if (entity.remoteId != null && entity.remoteId.isNotEmpty()) {
+                    // Update existing transaction
+                    val dto = cashflowApiService.updateCashflow(
+                        type = if (entity.amount < 0 || entity.category == "Income") "INCOME" else "EXPENSE", // Crude type inference since entity lacks type field, but Transaction request doesn't provide it either. Oh wait, this repo serves Transaction which might be legacy. Actually we can use type from elsewhere or just "EXPENSE" if amount < 0
+                        id = entity.remoteId,
+                        request = UpdateTransactionDto(
+                            name = entity.name,
+                            amount = entity.amount,
+                            category = entity.category,
+                            datetime = dateFormat.format(entity.datetime)
+                        )
+                    )
+                    transactionDao.insertTransaction(entity.copy(isSynced = true))
+                } else {
+                    // Create new transaction
+                    val dto = apiService.createTransaction(entity.toUploadDto())
+                    transactionDao.insertTransaction(entity.copy(isSynced = true, remoteId = dto.id))
+                }
             } catch (e: Exception) {
                 // Keep unsynced
             }

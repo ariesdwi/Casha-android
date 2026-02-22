@@ -47,6 +47,7 @@ fun TransactionDetailScreen(
     var showingDeleteAlert by remember { mutableStateOf(false) }
     var showingSyncAlert by remember { mutableStateOf(false) }
     var showingTenorSheet by remember { mutableStateOf(false) }
+    var showingEditSheet by remember { mutableStateOf(false) }
 
     if (transaction == null) {
         // Fallback or loading state
@@ -88,7 +89,7 @@ fun TransactionDetailScreen(
                             onClick = {
                                 menuExpanded = false
                                 if (transaction.isSynced) {
-                                    onNavigateToEdit(transaction.id)
+                                    showingEditSheet = true
                                 } else {
                                     showingSyncAlert = true
                                 }
@@ -187,6 +188,18 @@ fun TransactionDetailScreen(
                 TextButton(onClick = { showingSyncAlert = false }) {
                     Text("OK")
                 }
+            }
+        )
+    }
+    
+    if (showingEditSheet) {
+        EditTransactionBottomSheet(
+            transaction = transaction,
+            cashflowType = cashflowType,
+            onDismissRequest = { showingEditSheet = false },
+            onSave = { request ->
+                viewModel.updateTransaction(transaction.id, request)
+                showingEditSheet = false
             }
         )
     }

@@ -17,6 +17,25 @@ interface CashflowApiService {
         @Query("month") month: String? = null,
         @Query("year") year: String? = null
     ): BaseResponse<CashflowSummaryDto>
+    
+    @PATCH("cashflow/{type}/{id}")
+    suspend fun updateCashflow(
+        @Path("type") type: String,
+        @Path("id") id: String,
+        @Body request: UpdateTransactionDto
+    ): BaseResponse<TransactionDto>
+    
+    @POST("cashflow/{type}")
+    suspend fun createCashflow(
+        @Path("type") type: String,
+        @Body request: TransactionUploadDto
+    ): BaseResponse<TransactionDto>
+    
+    @DELETE("cashflow/{type}/{id}")
+    suspend fun deleteCashflow(
+        @Path("type") type: String,
+        @Path("id") id: String
+    ): BaseResponse<Unit>
 }
 
 interface IncomeApiService {
