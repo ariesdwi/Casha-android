@@ -100,20 +100,23 @@ class DashboardViewModel @Inject constructor(
             _uiState.update { it.copy(isSyncing = true, errorMessage = null) }
             
             val period = _uiState.value.selectedPeriod
+            val (startDate, endDate) = period.dateRange()
+            
+            // For remote fetching (if supported by server)
             val calendar = Calendar.getInstance()
+            calendar.time = startDate
             val monthStr = when (period) {
-                SpendingPeriod.THIS_MONTH -> SimpleDateFormat("yyyy-MM", Locale.US).format(calendar.time)
-                SpendingPeriod.LAST_MONTH -> {
-                    calendar.add(Calendar.MONTH, -1)
+                SpendingPeriod.THIS_MONTH, SpendingPeriod.LAST_MONTH, is SpendingPeriod.CUSTOM -> {
                     SimpleDateFormat("yyyy-MM", Locale.US).format(calendar.time)
                 }
-                is SpendingPeriod.CUSTOM -> SimpleDateFormat("yyyy-MM", Locale.US).format(period.start)
                 else -> null
             }
             val yearStr = when (period) {
                 SpendingPeriod.THIS_YEAR -> calendar.get(Calendar.YEAR).toString()
                 else -> null
             }
+            // For UI display
+            val periodLabel = getPeriodTitle(period)
 
             try {
                 if (_uiState.value.isOnline) {
@@ -128,7 +131,7 @@ class DashboardViewModel @Inject constructor(
                     if (_uiState.value.isOnline) {
                         getCashflowHistoryUseCase.execute(monthStr, yearStr, 1, 5).entries
                     } else {
-                        cashflowSyncUseCase.loadFromLocal(Date(), Date()).take(5)
+                        cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
                     }
                 }
                 
@@ -136,7 +139,7 @@ class DashboardViewModel @Inject constructor(
                     if (_uiState.value.isOnline) {
                         getCashflowSummaryUseCase.execute(monthStr, yearStr)
                     } else {
-                        cashflowSyncUseCase.calculateSummaryFromLocal(Date(), Date(), monthStr ?: yearStr ?: "Current")
+                        cashflowSyncUseCase.calculateSummaryFromLocal(startDate, endDate ?: Date(), periodLabel)
                     }
                 }
                 
