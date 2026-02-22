@@ -129,7 +129,7 @@ fun TransactionDetailScreen(
                 AmountStatusSection(transaction, cashflowType)
                 CategorySection(transaction)
                 DetailsSection(transaction, onConvertInstallmentClick = { showingTenorSheet = true })
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(120.dp))
             }
 
             // Processing overlay

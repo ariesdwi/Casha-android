@@ -227,7 +227,7 @@ fun EditTransactionBottomSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("transactions.edit.confirmed", style = MaterialTheme.typography.bodyLarge)
+                    Text("Confirmed", style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = isConfirmed,
                         onCheckedChange = { isConfirmed = it },
