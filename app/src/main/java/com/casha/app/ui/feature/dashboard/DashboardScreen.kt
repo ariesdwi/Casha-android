@@ -142,8 +142,8 @@ fun DashboardScreen(
                 Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                     RecentTransactionsSection(
                         transactions = uiState.recentTransactions,
-                        onTransactionClick = { transactionId ->
-                            navController.navigate(Screen.TransactionDetail(transactionId).route)
+                        onTransactionClick = { transactionId, cashflowType ->
+                            navController.navigate(Screen.TransactionDetail(transactionId, cashflowType).route)
                         }
                     )
                 }

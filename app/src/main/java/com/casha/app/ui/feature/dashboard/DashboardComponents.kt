@@ -666,7 +666,7 @@ fun GoalCard(
 @Composable
 fun RecentTransactionsSection(
     transactions: List<CashflowEntry>,
-    onTransactionClick: (String) -> Unit
+    onTransactionClick: (String, String) -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -718,7 +718,7 @@ fun RecentTransactionsSection(
                         CashflowRow(
                             entry = entry,
                             index = index,
-                            onClick = { onTransactionClick(entry.id) }
+                            onClick = { onTransactionClick(entry.id, entry.type.name) }
                         )
                         if (index < transactions.size - 1) {
                             HorizontalDivider(
