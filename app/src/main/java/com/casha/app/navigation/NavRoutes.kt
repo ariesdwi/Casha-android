@@ -32,8 +32,8 @@ sealed class NavRoutes(val route: String) {
         fun createRoute(transactionId: String) = "edit_transaction/$transactionId"
     }
 
-    data object TransactionDetail : NavRoutes("transaction_detail/{transactionId}") {
-        fun createRoute(transactionId: String) = "transaction_detail/$transactionId"
+    data object TransactionDetail : NavRoutes("transaction_detail/{transactionId}/{cashflowType}") {
+        fun createRoute(transactionId: String, cashflowType: String) = "transaction_detail/$transactionId/$cashflowType"
     }
 
     // ── Goal Tracker ──

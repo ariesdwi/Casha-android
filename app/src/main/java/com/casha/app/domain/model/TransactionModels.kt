@@ -15,7 +15,8 @@ data class TransactionCasha(
     val isSynced: Boolean = false,
     val remoteId: String? = null,
     val createdAt: Date = Date(),
-    val updatedAt: Date = Date()
+    val updatedAt: Date = Date(),
+    val liabilityId: String? = null
 )
 
 /**

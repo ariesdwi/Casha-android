@@ -13,13 +13,24 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.casha.app.domain.model.CashflowDateSection
+
+import java.text.SimpleDateFormat
+import java.util.*
 
 data class TransactionUiState(
     val transactions: List<CashflowEntry> = emptyList(),
-    val rawTransactions: List<TransactionCasha> = emptyList(), // Keep for edit/delete access
+    val rawTransactions: List<TransactionCasha> = emptyList(),
     val categories: List<CategoryCasha> = emptyList(),
     val isLoading: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    
+    // New fields for iOS alignment
+    val selectedMonth: String = "This month",
+    val searchQuery: String = "",
+    val isSearching: Boolean = false,
+    val cashflowSections: List<CashflowDateSection> = emptyList(),
+    val filteredTransactions: List<CashflowDateSection> = emptyList()
 )
 
 @HiltViewModel
@@ -55,13 +66,68 @@ class TransactionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             try {
-                // Fetch current month history
-                val response = getCashflowHistoryUseCase.execute(null, null, 1, 50)
-                _uiState.update { it.copy(transactions = response.entries, isLoading = false) }
+                var targetMonth: String? = null
+                var targetYear: String? = null
+                val selected = _uiState.value.selectedMonth
+                
+                when {
+                    selected == "This month" -> {
+                        targetMonth = com.casha.app.core.util.DateHelper.generateMonthYearOptions().firstOrNull()
+                    }
+                    selected == "This year" -> {
+                        targetYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR).toString()
+                    }
+                    selected.matches(Regex("\\d{4}-\\d{2}")) -> {
+                        targetMonth = selected
+                    }
+                }
+
+                // Fetch up to 100 for better client side grouping
+                val response = getCashflowHistoryUseCase.execute(targetMonth, targetYear, 1, 100)
+                val sections = groupTransactionsByDate(response.entries)
+                _uiState.update { it.copy(
+                    transactions = response.entries,
+                    cashflowSections = sections,
+                    isLoading = false
+                ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = e.message, isLoading = false) }
             }
         }
+    }
+    
+    fun filterTransactionsByMonth(month: String) {
+        _uiState.update { it.copy(selectedMonth = month) }
+        // In a real app, you would pass the month/date range to getCashflowHistoryUseCase
+        // For now, we simulate by fetching history again (which currently loads latest)
+        fetchHistory()
+    }
+
+    fun searchTransactions(query: String) {
+        val isSearching = query.isNotEmpty()
+        val filtered = if (isSearching) {
+            val matchedEntries = _uiState.value.transactions.filter {
+                it.title.contains(query, ignoreCase = true) ||
+                it.category.contains(query, ignoreCase = true)
+            }
+            groupTransactionsByDate(matchedEntries)
+        } else {
+            emptyList()
+        }
+        
+        _uiState.update { it.copy(
+            searchQuery = query,
+            isSearching = isSearching,
+            filteredTransactions = filtered
+        ) }
+    }
+    
+    fun clearSearch() {
+        _uiState.update { it.copy(
+            searchQuery = "",
+            isSearching = false,
+            filteredTransactions = emptyList()
+        ) }
     }
 
     fun syncData() {
@@ -134,5 +200,28 @@ class TransactionViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
+    }
+
+    private fun groupTransactionsByDate(transactions: List<CashflowEntry>): List<CashflowDateSection> {
+        val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val displayDateFormatter = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+        val dayFormatter = SimpleDateFormat("EEEE", Locale.getDefault())
+        
+        val todayStr = dateFormatter.format(Date())
+        val yesterdayStr = dateFormatter.format(Calendar.getInstance().apply { add(Calendar.DATE, -1) }.time)
+
+        return transactions
+            .sortedByDescending { it.date }
+            .groupBy { dateFormatter.format(it.date) }
+            .map { (dateKey, entries) ->
+                val parsed = dateFormatter.parse(dateKey) ?: Date()
+                val displayDate = displayDateFormatter.format(parsed)
+                val day = when (dateKey) {
+                    todayStr -> "Today"
+                    yesterdayStr -> "Yesterday"
+                    else -> dayFormatter.format(parsed)
+                }
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+            }
     }
 }

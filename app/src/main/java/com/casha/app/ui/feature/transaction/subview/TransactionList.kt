@@ -13,46 +13,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.casha.app.domain.model.CashflowEntry
-import java.text.SimpleDateFormat
-import java.util.*
+import com.casha.app.domain.model.CashflowDateSection
 
 @Composable
 fun TransactionList(
-    transactions: List<CashflowEntry>,
+    sections: List<CashflowDateSection>,
     isLoading: Boolean,
     onDelete: (String) -> Unit,
     onEdit: (String) -> Unit,
+    onClick: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
-    if (transactions.isEmpty() && !isLoading) {
+    if (sections.isEmpty() && !isLoading) {
         EmptyTransactionsState(modifier)
     } else {
-        val groupedTransactions = remember(transactions) {
-            groupTransactionsByDate(transactions)
-        }
-
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            groupedTransactions.forEach { (dateHeader, transactionList) ->
+            sections.forEach { section ->
                 item {
-                    Text(
-                        text = dateHeader,
-                        style = MaterialTheme.typography.labelLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
-                }
-
-                items(transactionList, key = { it.id }) { entry ->
-                    TransactionCardItem(
-                        entry = entry,
-                        onDelete = { onDelete(entry.id) },
-                        onEdit = { onEdit(entry.id) }
+                    TransactionSectionCard(
+                        section = section,
+                        onDelete = onDelete,
+                        onEdit = onEdit,
+                        onClick = onClick
                     )
                 }
             }
@@ -96,24 +82,3 @@ private fun EmptyTransactionsState(modifier: Modifier = Modifier) {
     }
 }
 
-private fun groupTransactionsByDate(transactions: List<CashflowEntry>): Map<String, List<CashflowEntry>> {
-    val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-    val todayFormatter = SimpleDateFormat("EEEE, d MMMM yyyy", Locale.getDefault())
-    
-    val today = dateFormatter.format(Date())
-    val yesterday = dateFormatter.format(Calendar.getInstance().apply { add(Calendar.DATE, -1) }.time)
-
-    return transactions
-        .sortedByDescending { it.date }
-        .groupBy { dateFormatter.format(it.date) }
-        .mapKeys { (dateKey, _) ->
-            when (dateKey) {
-                today -> "Today"
-                yesterday -> "Yesterday"
-                else -> {
-                    val date = dateFormatter.parse(dateKey) ?: Date()
-                    todayFormatter.format(date)
-                }
-            }
-        }
-}

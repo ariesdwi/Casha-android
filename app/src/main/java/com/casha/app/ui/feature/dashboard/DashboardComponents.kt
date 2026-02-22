@@ -333,6 +333,7 @@ fun ReportChartView(
     
     val chartData = if (selectedTab == ChartTab.WEEK) report.dailyBars else report.weeklyBars
     val maxAmount = chartData.map { it.value }.maxOrNull() ?: 1.0
+    val isEmpty = chartData.all { it.value == 0.0 }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -377,10 +378,16 @@ fun ReportChartView(
             )
 
             // Bar Chart
+            val animatedHeight by animateDpAsState(
+                targetValue = if (isEmpty) 40.dp else 160.dp,
+                animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+                label = "chartHeight"
+            )
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(160.dp)
+                    .height(animatedHeight)
                     .padding(top = 12.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.Bottom
@@ -390,45 +397,48 @@ fun ReportChartView(
                     
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxHeight()
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.Bottom
                     ) {
-                        // Bar area takes all remaining space
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .width(24.dp),
-                            contentAlignment = Alignment.BottomCenter
-                        ) {
-                            // Animated Bar
-                            var animatedHeightFactor by remember { mutableStateOf(0f) }
-                            LaunchedEffect(barHeightFactor) {
-                                animatedHeightFactor = barHeightFactor
-                            }
-                            
-                            val heightState by animateFloatAsState(
-                                targetValue = animatedHeightFactor,
-                                animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
-                                label = "barHeight"
-                            )
-
+                        if (!isEmpty) {
+                            // Bar area takes all remaining space
                             Box(
                                 modifier = Modifier
-                                    .width(24.dp)
-                                    .fillMaxHeight(heightState.coerceAtLeast(0.02f))
-                                    .background(
-                                        color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
-                                        shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                                    )
-                            )
-                        }
+                                    .weight(1f)
+                                    .width(24.dp),
+                                contentAlignment = Alignment.BottomCenter
+                            ) {
+                                // Animated Bar
+                                var animatedHeightFactor by remember { mutableStateOf(0f) }
+                                LaunchedEffect(barHeightFactor) {
+                                    animatedHeightFactor = barHeightFactor
+                                }
+                                
+                                val heightState by animateFloatAsState(
+                                    targetValue = animatedHeightFactor,
+                                    animationSpec = spring(dampingRatio = Spring.DampingRatioLowBouncy, stiffness = Spring.StiffnessLow),
+                                    label = "barHeight"
+                                )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                                Box(
+                                    modifier = Modifier
+                                        .width(24.dp)
+                                        .fillMaxHeight(heightState.coerceAtLeast(0.02f))
+                                        .background(
+                                            color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                            shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                                        )
+                                )
+                            }
+    
+                            Spacer(modifier = Modifier.height(4.dp))
+                        }
 
                         // Label always visible below the bar
                         Text(
                             text = bar.label,
                             style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = if (isEmpty) 0.5f else 1f),
                             maxLines = 1
                         )
                     }

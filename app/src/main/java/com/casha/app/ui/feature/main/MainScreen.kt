@@ -26,7 +26,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.casha.app.navigation.NavRoutes
 import com.casha.app.ui.component.CustomTabBar
 import com.casha.app.ui.component.TabItem
@@ -35,6 +37,7 @@ import com.casha.app.ui.feature.goaltracker.GoalTrackerScreen
 import com.casha.app.ui.feature.budget.BudgetScreen
 import com.casha.app.ui.feature.transaction.TransactionScreen
 import com.casha.app.ui.feature.transaction.AddTransactionScreen
+import com.casha.app.ui.feature.transaction.subview.TransactionDetailScreen
 
 @Composable
 fun MainScreen(
@@ -141,7 +144,8 @@ fun MainScreen(
                 composable(NavRoutes.Transactions.route) {
                     TransactionScreen(
                         onNavigateToAddTransaction = { navController.navigate(NavRoutes.AddTransaction.route) },
-                        onNavigateToEditTransaction = { id -> navController.navigate(NavRoutes.EditTransaction.createRoute(id)) }
+                        onNavigateToEditTransaction = { id -> navController.navigate(NavRoutes.EditTransaction.createRoute(id)) },
+                        onNavigateToTransactionDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) }
                     )
                 }
                 composable(NavRoutes.AddTransaction.route) {
@@ -154,6 +158,29 @@ fun MainScreen(
                     AddTransactionScreen(
                         transactionId = id,
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                composable(
+                    route = NavRoutes.TransactionDetail.route,
+                    arguments = listOf(
+                        navArgument("transactionId") { type = NavType.StringType },
+                        navArgument("cashflowType") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("transactionId") ?: ""
+                    val typeString = backStackEntry.arguments?.getString("cashflowType") ?: "EXPENSE"
+                    val cashflowType = try {
+                        com.casha.app.domain.model.CashflowType.valueOf(typeString.uppercase())
+                    } catch (e: Exception) {
+                        com.casha.app.domain.model.CashflowType.EXPENSE
+                    }
+                    TransactionDetailScreen(
+                        transactionId = id,
+                        cashflowType = cashflowType,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToEdit = { editId ->
+                            navController.navigate(NavRoutes.EditTransaction.createRoute(editId))
+                        }
                     )
                 }
                 composable(NavRoutes.Budget.route) { 

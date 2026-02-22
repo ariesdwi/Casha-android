@@ -19,6 +19,12 @@ enum class CashflowType {
     INCOME, EXPENSE
 }
 
+data class CashflowDateSection(
+    val day: String,
+    val date: String,
+    val items: List<CashflowEntry>
+)
+
 /**
  * Summary of cashflow for a specific period.
  */
