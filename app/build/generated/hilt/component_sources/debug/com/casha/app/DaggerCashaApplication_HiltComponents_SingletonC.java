@@ -10,6 +10,7 @@ import com.casha.app.core.auth.AuthManager;
 import com.casha.app.core.network.AuthInterceptor;
 import com.casha.app.core.network.ErrorInterceptor;
 import com.casha.app.core.network.NetworkMonitor;
+import com.casha.app.core.network.SyncEventBus;
 import com.casha.app.data.local.dao.BudgetDao;
 import com.casha.app.data.local.dao.CategoryDao;
 import com.casha.app.data.local.dao.IncomeDao;
@@ -719,7 +720,7 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
           return (T) new BudgetViewModel(viewModelCImpl.getBudgetsUseCase(), viewModelCImpl.addBudgetUseCase(), viewModelCImpl.updateBudgetUseCase(), viewModelCImpl.deleteBudgetUseCase(), viewModelCImpl.getBudgetSummaryUseCase(), viewModelCImpl.getBudgetRecommendationsUseCase(), viewModelCImpl.applyBudgetRecommendationsUseCase(), viewModelCImpl.budgetSyncUseCase(), viewModelCImpl.categorySyncUseCase(), singletonCImpl.networkMonitorProvider.get());
 
           case 2: // com.casha.app.ui.feature.dashboard.DashboardViewModel 
-          return (T) new DashboardViewModel(viewModelCImpl.getRecentTransactionsUseCase(), viewModelCImpl.getTotalSpendingUseCase(), viewModelCImpl.getSpendingReportUseCase(), viewModelCImpl.getUnsyncTransactionCountUseCase(), viewModelCImpl.getCashflowHistoryUseCase(), viewModelCImpl.getCashflowSummaryUseCase(), viewModelCImpl.getGoalsUseCase(), viewModelCImpl.getGoalSummaryUseCase(), viewModelCImpl.cashflowSyncUseCase(), viewModelCImpl.transactionSyncUseCase(), viewModelCImpl.getProfileUseCase(), singletonCImpl.authManagerProvider.get(), singletonCImpl.networkMonitorProvider.get());
+          return (T) new DashboardViewModel(viewModelCImpl.getRecentTransactionsUseCase(), viewModelCImpl.getTotalSpendingUseCase(), viewModelCImpl.getSpendingReportUseCase(), viewModelCImpl.getUnsyncTransactionCountUseCase(), viewModelCImpl.getCashflowHistoryUseCase(), viewModelCImpl.getCashflowSummaryUseCase(), viewModelCImpl.getGoalsUseCase(), viewModelCImpl.getGoalSummaryUseCase(), viewModelCImpl.cashflowSyncUseCase(), viewModelCImpl.transactionSyncUseCase(), viewModelCImpl.getProfileUseCase(), singletonCImpl.authManagerProvider.get(), singletonCImpl.networkMonitorProvider.get(), singletonCImpl.syncEventBusProvider.get());
 
           case 3: // com.casha.app.ui.feature.auth.ForgotPasswordViewModel 
           return (T) new ForgotPasswordViewModel(viewModelCImpl.resetPasswordUseCase());
@@ -740,7 +741,7 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
           return (T) new SetupCurrencyViewModel(singletonCImpl.authManagerProvider.get(), viewModelCImpl.updateProfileUseCase());
 
           case 9: // com.casha.app.ui.feature.transaction.TransactionViewModel 
-          return (T) new TransactionViewModel(viewModelCImpl.getCashflowHistoryUseCase(), viewModelCImpl.getTransactionsUseCase(), viewModelCImpl.addTransactionUseCase(), viewModelCImpl.updateTransactionUseCase(), viewModelCImpl.deleteTransactionUseCase(), viewModelCImpl.syncTransactionsUseCase(), viewModelCImpl.categorySyncUseCase());
+          return (T) new TransactionViewModel(viewModelCImpl.getCashflowHistoryUseCase(), viewModelCImpl.getTransactionsUseCase(), viewModelCImpl.addTransactionUseCase(), viewModelCImpl.updateTransactionUseCase(), viewModelCImpl.deleteTransactionUseCase(), viewModelCImpl.syncTransactionsUseCase(), viewModelCImpl.categorySyncUseCase(), singletonCImpl.syncEventBusProvider.get());
 
           default: throw new AssertionError(id);
         }
@@ -862,6 +863,8 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
 
     private Provider<GoalRepositoryImpl> goalRepositoryImplProvider;
 
+    private Provider<SyncEventBus> syncEventBusProvider;
+
     private SingletonCImpl(ApplicationContextModule applicationContextModuleParam) {
       this.applicationContextModule = applicationContextModuleParam;
       initialize(applicationContextModuleParam);
@@ -906,6 +909,7 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
       this.transactionRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<TransactionRepositoryImpl>(singletonCImpl, 16));
       this.provideGoalApiServiceProvider = DoubleCheck.provider(new SwitchingProvider<GoalApiService>(singletonCImpl, 19));
       this.goalRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<GoalRepositoryImpl>(singletonCImpl, 18));
+      this.syncEventBusProvider = DoubleCheck.provider(new SwitchingProvider<SyncEventBus>(singletonCImpl, 20));
     }
 
     @Override
@@ -1000,6 +1004,9 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
 
           case 19: // com.casha.app.data.remote.api.GoalApiService 
           return (T) NetworkModule_ProvideGoalApiServiceFactory.provideGoalApiService(singletonCImpl.provideRetrofitProvider.get());
+
+          case 20: // com.casha.app.core.network.SyncEventBus 
+          return (T) new SyncEventBus();
 
           default: throw new AssertionError(id);
         }

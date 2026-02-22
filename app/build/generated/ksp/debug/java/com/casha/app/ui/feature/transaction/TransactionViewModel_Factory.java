@@ -1,5 +1,6 @@
 package com.casha.app.ui.feature.transaction;
 
+import com.casha.app.core.network.SyncEventBus;
 import com.casha.app.domain.usecase.category.CategorySyncUseCase;
 import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase;
 import com.casha.app.domain.usecase.transaction.AddTransactionUseCase;
@@ -46,6 +47,8 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
 
   private final Provider<CategorySyncUseCase> categorySyncUseCaseProvider;
 
+  private final Provider<SyncEventBus> syncEventBusProvider;
+
   public TransactionViewModel_Factory(
       Provider<GetCashflowHistoryUseCase> getCashflowHistoryUseCaseProvider,
       Provider<GetTransactionsUseCase> getTransactionsUseCaseProvider,
@@ -53,7 +56,8 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
       Provider<UpdateTransactionUseCase> updateTransactionUseCaseProvider,
       Provider<DeleteTransactionUseCase> deleteTransactionUseCaseProvider,
       Provider<SyncTransactionsUseCase> syncTransactionsUseCaseProvider,
-      Provider<CategorySyncUseCase> categorySyncUseCaseProvider) {
+      Provider<CategorySyncUseCase> categorySyncUseCaseProvider,
+      Provider<SyncEventBus> syncEventBusProvider) {
     this.getCashflowHistoryUseCaseProvider = getCashflowHistoryUseCaseProvider;
     this.getTransactionsUseCaseProvider = getTransactionsUseCaseProvider;
     this.addTransactionUseCaseProvider = addTransactionUseCaseProvider;
@@ -61,11 +65,12 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
     this.deleteTransactionUseCaseProvider = deleteTransactionUseCaseProvider;
     this.syncTransactionsUseCaseProvider = syncTransactionsUseCaseProvider;
     this.categorySyncUseCaseProvider = categorySyncUseCaseProvider;
+    this.syncEventBusProvider = syncEventBusProvider;
   }
 
   @Override
   public TransactionViewModel get() {
-    return newInstance(getCashflowHistoryUseCaseProvider.get(), getTransactionsUseCaseProvider.get(), addTransactionUseCaseProvider.get(), updateTransactionUseCaseProvider.get(), deleteTransactionUseCaseProvider.get(), syncTransactionsUseCaseProvider.get(), categorySyncUseCaseProvider.get());
+    return newInstance(getCashflowHistoryUseCaseProvider.get(), getTransactionsUseCaseProvider.get(), addTransactionUseCaseProvider.get(), updateTransactionUseCaseProvider.get(), deleteTransactionUseCaseProvider.get(), syncTransactionsUseCaseProvider.get(), categorySyncUseCaseProvider.get(), syncEventBusProvider.get());
   }
 
   public static TransactionViewModel_Factory create(
@@ -75,8 +80,9 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
       javax.inject.Provider<UpdateTransactionUseCase> updateTransactionUseCaseProvider,
       javax.inject.Provider<DeleteTransactionUseCase> deleteTransactionUseCaseProvider,
       javax.inject.Provider<SyncTransactionsUseCase> syncTransactionsUseCaseProvider,
-      javax.inject.Provider<CategorySyncUseCase> categorySyncUseCaseProvider) {
-    return new TransactionViewModel_Factory(Providers.asDaggerProvider(getCashflowHistoryUseCaseProvider), Providers.asDaggerProvider(getTransactionsUseCaseProvider), Providers.asDaggerProvider(addTransactionUseCaseProvider), Providers.asDaggerProvider(updateTransactionUseCaseProvider), Providers.asDaggerProvider(deleteTransactionUseCaseProvider), Providers.asDaggerProvider(syncTransactionsUseCaseProvider), Providers.asDaggerProvider(categorySyncUseCaseProvider));
+      javax.inject.Provider<CategorySyncUseCase> categorySyncUseCaseProvider,
+      javax.inject.Provider<SyncEventBus> syncEventBusProvider) {
+    return new TransactionViewModel_Factory(Providers.asDaggerProvider(getCashflowHistoryUseCaseProvider), Providers.asDaggerProvider(getTransactionsUseCaseProvider), Providers.asDaggerProvider(addTransactionUseCaseProvider), Providers.asDaggerProvider(updateTransactionUseCaseProvider), Providers.asDaggerProvider(deleteTransactionUseCaseProvider), Providers.asDaggerProvider(syncTransactionsUseCaseProvider), Providers.asDaggerProvider(categorySyncUseCaseProvider), Providers.asDaggerProvider(syncEventBusProvider));
   }
 
   public static TransactionViewModel_Factory create(
@@ -86,8 +92,9 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
       Provider<UpdateTransactionUseCase> updateTransactionUseCaseProvider,
       Provider<DeleteTransactionUseCase> deleteTransactionUseCaseProvider,
       Provider<SyncTransactionsUseCase> syncTransactionsUseCaseProvider,
-      Provider<CategorySyncUseCase> categorySyncUseCaseProvider) {
-    return new TransactionViewModel_Factory(getCashflowHistoryUseCaseProvider, getTransactionsUseCaseProvider, addTransactionUseCaseProvider, updateTransactionUseCaseProvider, deleteTransactionUseCaseProvider, syncTransactionsUseCaseProvider, categorySyncUseCaseProvider);
+      Provider<CategorySyncUseCase> categorySyncUseCaseProvider,
+      Provider<SyncEventBus> syncEventBusProvider) {
+    return new TransactionViewModel_Factory(getCashflowHistoryUseCaseProvider, getTransactionsUseCaseProvider, addTransactionUseCaseProvider, updateTransactionUseCaseProvider, deleteTransactionUseCaseProvider, syncTransactionsUseCaseProvider, categorySyncUseCaseProvider, syncEventBusProvider);
   }
 
   public static TransactionViewModel newInstance(
@@ -95,7 +102,8 @@ public final class TransactionViewModel_Factory implements Factory<TransactionVi
       GetTransactionsUseCase getTransactionsUseCase, AddTransactionUseCase addTransactionUseCase,
       UpdateTransactionUseCase updateTransactionUseCase,
       DeleteTransactionUseCase deleteTransactionUseCase,
-      SyncTransactionsUseCase syncTransactionsUseCase, CategorySyncUseCase categorySyncUseCase) {
-    return new TransactionViewModel(getCashflowHistoryUseCase, getTransactionsUseCase, addTransactionUseCase, updateTransactionUseCase, deleteTransactionUseCase, syncTransactionsUseCase, categorySyncUseCase);
+      SyncTransactionsUseCase syncTransactionsUseCase, CategorySyncUseCase categorySyncUseCase,
+      SyncEventBus syncEventBus) {
+    return new TransactionViewModel(getCashflowHistoryUseCase, getTransactionsUseCase, addTransactionUseCase, updateTransactionUseCase, deleteTransactionUseCase, syncTransactionsUseCase, categorySyncUseCase, syncEventBus);
   }
 }

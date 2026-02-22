@@ -9,6 +9,7 @@ import com.casha.app.domain.model.TransactionRequest
 import com.casha.app.domain.usecase.category.CategorySyncUseCase
 import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase
 import com.casha.app.domain.usecase.transaction.*
+import com.casha.app.core.network.SyncEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -41,7 +42,8 @@ class TransactionViewModel @Inject constructor(
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val syncTransactionsUseCase: SyncTransactionsUseCase,
-    private val categorySyncUseCase: CategorySyncUseCase
+    private val categorySyncUseCase: CategorySyncUseCase,
+    private val syncEventBus: SyncEventBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiState())
@@ -161,6 +163,7 @@ class TransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 addTransactionUseCase(request)
+                syncEventBus.emitSyncCompleted()
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -182,6 +185,7 @@ class TransactionViewModel @Inject constructor(
                         note = request.note
                     )
                     updateTransactionUseCase(updated)
+                    syncEventBus.emitSyncCompleted()
                     syncData()
                 }
             } catch (e: Exception) {
@@ -195,6 +199,7 @@ class TransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteTransactionUseCase(id)
+                syncEventBus.emitSyncCompleted()
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }

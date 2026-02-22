@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import com.casha.app.core.network.SyncEventBus
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -51,7 +52,8 @@ class DashboardViewModel @Inject constructor(
     private val transactionSyncUseCase: TransactionSyncUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val authManager: AuthManager,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val syncEventBus: SyncEventBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -62,7 +64,17 @@ class DashboardViewModel @Inject constructor(
 
     init {
         setupNetworkMonitoring()
+        setupSyncEventListener()
         loadInitialData()
+    }
+
+    private fun setupSyncEventListener() {
+        viewModelScope.launch {
+            syncEventBus.syncCompletedEvent.collect {
+                // Instantly force UI state refresh when global event received
+                refreshDashboard(force = true)
+            }
+        }
     }
 
     private fun loadInitialData() {

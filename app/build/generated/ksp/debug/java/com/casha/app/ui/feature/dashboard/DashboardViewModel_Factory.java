@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.dashboard;
 
 import com.casha.app.core.auth.AuthManager;
 import com.casha.app.core.network.NetworkMonitor;
+import com.casha.app.core.network.SyncEventBus;
 import com.casha.app.domain.usecase.auth.GetProfileUseCase;
 import com.casha.app.domain.usecase.dashboard.CashflowSyncUseCase;
 import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase;
@@ -64,6 +65,8 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
 
   private final Provider<NetworkMonitor> networkMonitorProvider;
 
+  private final Provider<SyncEventBus> syncEventBusProvider;
+
   public DashboardViewModel_Factory(
       Provider<GetRecentTransactionsUseCase> getRecentTransactionsUseCaseProvider,
       Provider<GetTotalSpendingUseCase> getTotalSpendingUseCaseProvider,
@@ -76,7 +79,8 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
       Provider<CashflowSyncUseCase> cashflowSyncUseCaseProvider,
       Provider<TransactionSyncUseCase> transactionSyncUseCaseProvider,
       Provider<GetProfileUseCase> getProfileUseCaseProvider,
-      Provider<AuthManager> authManagerProvider, Provider<NetworkMonitor> networkMonitorProvider) {
+      Provider<AuthManager> authManagerProvider, Provider<NetworkMonitor> networkMonitorProvider,
+      Provider<SyncEventBus> syncEventBusProvider) {
     this.getRecentTransactionsUseCaseProvider = getRecentTransactionsUseCaseProvider;
     this.getTotalSpendingUseCaseProvider = getTotalSpendingUseCaseProvider;
     this.getSpendingReportUseCaseProvider = getSpendingReportUseCaseProvider;
@@ -90,11 +94,12 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
     this.getProfileUseCaseProvider = getProfileUseCaseProvider;
     this.authManagerProvider = authManagerProvider;
     this.networkMonitorProvider = networkMonitorProvider;
+    this.syncEventBusProvider = syncEventBusProvider;
   }
 
   @Override
   public DashboardViewModel get() {
-    return newInstance(getRecentTransactionsUseCaseProvider.get(), getTotalSpendingUseCaseProvider.get(), getSpendingReportUseCaseProvider.get(), getUnsyncTransactionCountUseCaseProvider.get(), getCashflowHistoryUseCaseProvider.get(), getCashflowSummaryUseCaseProvider.get(), getGoalsUseCaseProvider.get(), getGoalSummaryUseCaseProvider.get(), cashflowSyncUseCaseProvider.get(), transactionSyncUseCaseProvider.get(), getProfileUseCaseProvider.get(), authManagerProvider.get(), networkMonitorProvider.get());
+    return newInstance(getRecentTransactionsUseCaseProvider.get(), getTotalSpendingUseCaseProvider.get(), getSpendingReportUseCaseProvider.get(), getUnsyncTransactionCountUseCaseProvider.get(), getCashflowHistoryUseCaseProvider.get(), getCashflowSummaryUseCaseProvider.get(), getGoalsUseCaseProvider.get(), getGoalSummaryUseCaseProvider.get(), cashflowSyncUseCaseProvider.get(), transactionSyncUseCaseProvider.get(), getProfileUseCaseProvider.get(), authManagerProvider.get(), networkMonitorProvider.get(), syncEventBusProvider.get());
   }
 
   public static DashboardViewModel_Factory create(
@@ -110,8 +115,9 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
       javax.inject.Provider<TransactionSyncUseCase> transactionSyncUseCaseProvider,
       javax.inject.Provider<GetProfileUseCase> getProfileUseCaseProvider,
       javax.inject.Provider<AuthManager> authManagerProvider,
-      javax.inject.Provider<NetworkMonitor> networkMonitorProvider) {
-    return new DashboardViewModel_Factory(Providers.asDaggerProvider(getRecentTransactionsUseCaseProvider), Providers.asDaggerProvider(getTotalSpendingUseCaseProvider), Providers.asDaggerProvider(getSpendingReportUseCaseProvider), Providers.asDaggerProvider(getUnsyncTransactionCountUseCaseProvider), Providers.asDaggerProvider(getCashflowHistoryUseCaseProvider), Providers.asDaggerProvider(getCashflowSummaryUseCaseProvider), Providers.asDaggerProvider(getGoalsUseCaseProvider), Providers.asDaggerProvider(getGoalSummaryUseCaseProvider), Providers.asDaggerProvider(cashflowSyncUseCaseProvider), Providers.asDaggerProvider(transactionSyncUseCaseProvider), Providers.asDaggerProvider(getProfileUseCaseProvider), Providers.asDaggerProvider(authManagerProvider), Providers.asDaggerProvider(networkMonitorProvider));
+      javax.inject.Provider<NetworkMonitor> networkMonitorProvider,
+      javax.inject.Provider<SyncEventBus> syncEventBusProvider) {
+    return new DashboardViewModel_Factory(Providers.asDaggerProvider(getRecentTransactionsUseCaseProvider), Providers.asDaggerProvider(getTotalSpendingUseCaseProvider), Providers.asDaggerProvider(getSpendingReportUseCaseProvider), Providers.asDaggerProvider(getUnsyncTransactionCountUseCaseProvider), Providers.asDaggerProvider(getCashflowHistoryUseCaseProvider), Providers.asDaggerProvider(getCashflowSummaryUseCaseProvider), Providers.asDaggerProvider(getGoalsUseCaseProvider), Providers.asDaggerProvider(getGoalSummaryUseCaseProvider), Providers.asDaggerProvider(cashflowSyncUseCaseProvider), Providers.asDaggerProvider(transactionSyncUseCaseProvider), Providers.asDaggerProvider(getProfileUseCaseProvider), Providers.asDaggerProvider(authManagerProvider), Providers.asDaggerProvider(networkMonitorProvider), Providers.asDaggerProvider(syncEventBusProvider));
   }
 
   public static DashboardViewModel_Factory create(
@@ -126,8 +132,9 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
       Provider<CashflowSyncUseCase> cashflowSyncUseCaseProvider,
       Provider<TransactionSyncUseCase> transactionSyncUseCaseProvider,
       Provider<GetProfileUseCase> getProfileUseCaseProvider,
-      Provider<AuthManager> authManagerProvider, Provider<NetworkMonitor> networkMonitorProvider) {
-    return new DashboardViewModel_Factory(getRecentTransactionsUseCaseProvider, getTotalSpendingUseCaseProvider, getSpendingReportUseCaseProvider, getUnsyncTransactionCountUseCaseProvider, getCashflowHistoryUseCaseProvider, getCashflowSummaryUseCaseProvider, getGoalsUseCaseProvider, getGoalSummaryUseCaseProvider, cashflowSyncUseCaseProvider, transactionSyncUseCaseProvider, getProfileUseCaseProvider, authManagerProvider, networkMonitorProvider);
+      Provider<AuthManager> authManagerProvider, Provider<NetworkMonitor> networkMonitorProvider,
+      Provider<SyncEventBus> syncEventBusProvider) {
+    return new DashboardViewModel_Factory(getRecentTransactionsUseCaseProvider, getTotalSpendingUseCaseProvider, getSpendingReportUseCaseProvider, getUnsyncTransactionCountUseCaseProvider, getCashflowHistoryUseCaseProvider, getCashflowSummaryUseCaseProvider, getGoalsUseCaseProvider, getGoalSummaryUseCaseProvider, cashflowSyncUseCaseProvider, transactionSyncUseCaseProvider, getProfileUseCaseProvider, authManagerProvider, networkMonitorProvider, syncEventBusProvider);
   }
 
   public static DashboardViewModel newInstance(
@@ -139,7 +146,7 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
       GetCashflowSummaryUseCase getCashflowSummaryUseCase, GetGoalsUseCase getGoalsUseCase,
       GetGoalSummaryUseCase getGoalSummaryUseCase, CashflowSyncUseCase cashflowSyncUseCase,
       TransactionSyncUseCase transactionSyncUseCase, GetProfileUseCase getProfileUseCase,
-      AuthManager authManager, NetworkMonitor networkMonitor) {
-    return new DashboardViewModel(getRecentTransactionsUseCase, getTotalSpendingUseCase, getSpendingReportUseCase, getUnsyncTransactionCountUseCase, getCashflowHistoryUseCase, getCashflowSummaryUseCase, getGoalsUseCase, getGoalSummaryUseCase, cashflowSyncUseCase, transactionSyncUseCase, getProfileUseCase, authManager, networkMonitor);
+      AuthManager authManager, NetworkMonitor networkMonitor, SyncEventBus syncEventBus) {
+    return new DashboardViewModel(getRecentTransactionsUseCase, getTotalSpendingUseCase, getSpendingReportUseCase, getUnsyncTransactionCountUseCase, getCashflowHistoryUseCase, getCashflowSummaryUseCase, getGoalsUseCase, getGoalSummaryUseCase, cashflowSyncUseCase, transactionSyncUseCase, getProfileUseCase, authManager, networkMonitor, syncEventBus);
   }
 }
