@@ -69,6 +69,10 @@ fun TransactionDetailScreen(
             TopAppBar(
                 title = { Text("Transaction Details") },
                 windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
+                ),
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
