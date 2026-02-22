@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -46,7 +47,29 @@ fun TransactionScreen(
         )
     )
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Transactions",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                windowInsets = WindowInsets(0.dp),
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Transparent, // Transparent to show gradient
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
+                )
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = onNavigateToAddTransaction,
@@ -67,14 +90,6 @@ fun TransactionScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Title
-                Text(
-                    text = "Transactions",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-
                 // Search Bar
                 OutlinedTextField(
                     value = uiState.searchQuery,

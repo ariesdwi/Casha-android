@@ -35,7 +35,18 @@ fun GoalTrackerScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Goal Tracker", fontWeight = FontWeight.Bold) }, // TODO: Localize "goal.title"
+                title = {
+                    Text(
+                        text = "Goal Tracker",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                windowInsets = WindowInsets(0.dp),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
+                ),
                 actions = {
                     IconButton(onClick = { viewModel.fetchAllData() }) {
                         Icon(Icons.Default.Refresh, contentDescription = "Sync", tint = MaterialTheme.colorScheme.primary)

@@ -73,262 +73,263 @@
 42-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:15:9-54
 43        android:supportsRtl="true"
 43-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:16:9-35
-44        android:theme="@style/Theme.Casha"
-44-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:17:9-43
-45        android:usesCleartextTraffic="true" >
-45-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:18:9-44
-46        <activity
-46-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:21:9-29:20
-47            android:name="com.casha.app.MainActivity"
-47-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:22:13-41
-48            android:exported="true"
-48-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:23:13-36
-49            android:theme="@style/Theme.Casha" >
-49-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:24:13-47
-50            <intent-filter>
-50-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:25:13-28:29
-51                <action android:name="android.intent.action.MAIN" />
-51-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:26:17-69
-51-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:26:25-66
-52
-53                <category android:name="android.intent.category.LAUNCHER" />
-53-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:27:17-77
-53-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:27:27-74
-54            </intent-filter>
-55        </activity>
-56
-57        <service
-57-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:24:9-32:19
-58            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
-58-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:25:13-94
-59            android:enabled="true"
-59-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:26:13-35
-60            android:exported="false" >
-60-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:27:13-37
-61            <meta-data
-61-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:29:13-31:104
-62                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
-62-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:30:17-76
-63                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
-63-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:31:17-101
-64        </service>
-65
-66        <activity
-66-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:34:9-41:20
-67            android:name="androidx.credentials.playservices.HiddenActivity"
-67-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:35:13-76
-68            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-68-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:36:13-87
-69            android:enabled="true"
-69-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:37:13-35
-70            android:exported="false"
-70-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:38:13-37
-71            android:fitsSystemWindows="true"
-71-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:39:13-45
-72            android:theme="@style/Theme.Hidden" >
-72-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:40:13-48
-73        </activity>
-74        <activity
-74-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:42:9-49:20
-75            android:name="androidx.credentials.playservices.IdentityCredentialApiHiddenActivity"
-75-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:43:13-97
-76            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
-76-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:44:13-87
-77            android:enabled="true"
-77-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:45:13-35
-78            android:exported="false"
-78-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:46:13-37
-79            android:fitsSystemWindows="true"
-79-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:47:13-45
-80            android:theme="@style/Theme.Hidden" >
-80-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:48:13-48
-81        </activity>
-82        <activity
-82-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:23:9-27:75
-83            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
-83-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:24:13-93
-84            android:excludeFromRecents="true"
-84-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:25:13-46
-85            android:exported="false"
-85-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:26:13-37
-86            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-86-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:27:13-72
-87        <!--
-88            Service handling Google Sign-In user revocation. For apps that do not integrate with
-89            Google Sign-In, this service will never be started.
-90        -->
-91        <service
-91-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:33:9-37:51
-92            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
-92-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:34:13-89
-93            android:exported="true"
-93-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:35:13-36
-94            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
-94-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:36:13-107
-95            android:visibleToInstantApps="true" />
-95-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:37:13-48
-96
-97        <meta-data
-97-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:22:9-24:37
-98            android:name="com.google.android.play.billingclient.version"
-98-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:23:13-73
-99            android:value="7.1.1" />
-99-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:24:13-34
-100
-101        <activity
-101-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:26:9-30:75
-102            android:name="com.android.billingclient.api.ProxyBillingActivity"
-102-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:27:13-78
-103            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-103-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:28:13-96
-104            android:exported="false"
-104-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:29:13-37
-105            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-105-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:30:13-72
-106        <activity
-106-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:31:9-35:75
-107            android:name="com.android.billingclient.api.ProxyBillingActivityV2"
-107-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:32:13-80
-108            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-108-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:33:13-96
-109            android:exported="false"
-109-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:34:13-37
-110            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-110-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:35:13-72
-111        <activity
-111-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
-112            android:name="com.google.android.gms.common.api.GoogleApiActivity"
-112-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
-113            android:exported="false"
-113-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
-114            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-114-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
-115
-116        <meta-data
-116-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
-117            android:name="com.google.android.gms.version"
-117-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
-118            android:value="@integer/google_play_services_version" />
-118-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
-119
-120        <activity
-120-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
-121            android:name="androidx.compose.ui.tooling.PreviewActivity"
-121-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
-122            android:exported="true" />
-122-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
-123
-124        <provider
-124-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
-125            android:name="androidx.startup.InitializationProvider"
-125-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
-126            android:authorities="com.casha.app.dev.androidx-startup"
-126-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
-127            android:exported="false" >
-127-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
-128            <meta-data
-128-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
-129                android:name="androidx.emoji2.text.EmojiCompatInitializer"
-129-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
-130                android:value="androidx.startup" />
-130-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
-131            <meta-data
-131-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
-132                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
-132-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
-133                android:value="androidx.startup" />
-133-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
-134            <meta-data
-134-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
-135                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
-135-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
-136                android:value="androidx.startup" />
-136-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
-137        </provider>
-138
-139        <activity
-139-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:23:9-25:39
-140            android:name="androidx.activity.ComponentActivity"
-140-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:24:13-63
-141            android:exported="true" />
-141-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:25:13-36
-142
-143        <service
-143-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:24:9-28:63
-144            android:name="androidx.room.MultiInstanceInvalidationService"
-144-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:25:13-74
-145            android:directBootAware="true"
-145-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:26:13-43
-146            android:exported="false" />
-146-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:27:13-37
-147
-148        <receiver
-148-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
-149            android:name="androidx.profileinstaller.ProfileInstallReceiver"
-149-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
-150            android:directBootAware="false"
-150-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
-151            android:enabled="true"
-151-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
-152            android:exported="true"
-152-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
-153            android:permission="android.permission.DUMP" >
-153-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
-154            <intent-filter>
-154-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
-155                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
-155-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
-155-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
-156            </intent-filter>
-157            <intent-filter>
-157-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
-158                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
-158-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
-158-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
-159            </intent-filter>
-160            <intent-filter>
-160-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
-161                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
-161-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
-161-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
-162            </intent-filter>
-163            <intent-filter>
-163-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
-164                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
-164-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
-164-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
-165            </intent-filter>
-166        </receiver>
-167
-168        <service
-168-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:28:9-34:19
-169            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
-169-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:29:13-103
-170            android:exported="false" >
-170-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:30:13-37
-171            <meta-data
-171-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:31:13-33:39
-172                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
-172-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:32:17-94
-173                android:value="cct" />
-173-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:33:17-36
-174        </service>
-175        <service
-175-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:26:9-30:19
-176            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
-176-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:27:13-117
-177            android:exported="false"
-177-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:28:13-37
-178            android:permission="android.permission.BIND_JOB_SERVICE" >
-178-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:29:13-69
-179        </service>
-180
-181        <receiver
-181-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:32:9-34:40
-182            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
-182-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:33:13-132
-183            android:exported="false" />
-183-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:34:13-37
-184    </application>
-185
-186</manifest>
+44        android:testOnly="true"
+45        android:theme="@style/Theme.Casha"
+45-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:17:9-43
+46        android:usesCleartextTraffic="true" >
+46-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:18:9-44
+47        <activity
+47-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:21:9-29:20
+48            android:name="com.casha.app.MainActivity"
+48-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:22:13-41
+49            android:exported="true"
+49-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:23:13-36
+50            android:theme="@style/Theme.Casha" >
+50-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:24:13-47
+51            <intent-filter>
+51-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:25:13-28:29
+52                <action android:name="android.intent.action.MAIN" />
+52-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:26:17-69
+52-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:26:25-66
+53
+54                <category android:name="android.intent.category.LAUNCHER" />
+54-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:27:17-77
+54-->/Users/ptsiagaabdiutama/Documents/Casha-android/app/src/main/AndroidManifest.xml:27:27-74
+55            </intent-filter>
+56        </activity>
+57
+58        <service
+58-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:24:9-32:19
+59            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+59-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:25:13-94
+60            android:enabled="true"
+60-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:26:13-35
+61            android:exported="false" >
+61-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:27:13-37
+62            <meta-data
+62-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:29:13-31:104
+63                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+63-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:30:17-76
+64                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+64-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:31:17-101
+65        </service>
+66
+67        <activity
+67-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:34:9-41:20
+68            android:name="androidx.credentials.playservices.HiddenActivity"
+68-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:35:13-76
+69            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+69-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:36:13-87
+70            android:enabled="true"
+70-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:37:13-35
+71            android:exported="false"
+71-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:38:13-37
+72            android:fitsSystemWindows="true"
+72-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:39:13-45
+73            android:theme="@style/Theme.Hidden" >
+73-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:40:13-48
+74        </activity>
+75        <activity
+75-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:42:9-49:20
+76            android:name="androidx.credentials.playservices.IdentityCredentialApiHiddenActivity"
+76-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:43:13-97
+77            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+77-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:44:13-87
+78            android:enabled="true"
+78-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:45:13-35
+79            android:exported="false"
+79-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:46:13-37
+80            android:fitsSystemWindows="true"
+80-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:47:13-45
+81            android:theme="@style/Theme.Hidden" >
+81-->[androidx.credentials:credentials-play-services-auth:1.5.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c09ac9fdbf4d0ff2122d20418ec22192/transformed/credentials-play-services-auth-1.5.0-rc01/AndroidManifest.xml:48:13-48
+82        </activity>
+83        <activity
+83-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:23:9-27:75
+84            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+84-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:24:13-93
+85            android:excludeFromRecents="true"
+85-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:25:13-46
+86            android:exported="false"
+86-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:26:13-37
+87            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+87-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:27:13-72
+88        <!--
+89            Service handling Google Sign-In user revocation. For apps that do not integrate with
+90            Google Sign-In, this service will never be started.
+91        -->
+92        <service
+92-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:33:9-37:51
+93            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+93-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:34:13-89
+94            android:exported="true"
+94-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:35:13-36
+95            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+95-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:36:13-107
+96            android:visibleToInstantApps="true" />
+96-->[com.google.android.gms:play-services-auth:21.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/1a46129e7c2a84d00badf40ab4ae6ed2/transformed/play-services-auth-21.1.1/AndroidManifest.xml:37:13-48
+97
+98        <meta-data
+98-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:22:9-24:37
+99            android:name="com.google.android.play.billingclient.version"
+99-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:23:13-73
+100            android:value="7.1.1" />
+100-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:24:13-34
+101
+102        <activity
+102-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:26:9-30:75
+103            android:name="com.android.billingclient.api.ProxyBillingActivity"
+103-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:27:13-78
+104            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+104-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:28:13-96
+105            android:exported="false"
+105-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:29:13-37
+106            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+106-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:30:13-72
+107        <activity
+107-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:31:9-35:75
+108            android:name="com.android.billingclient.api.ProxyBillingActivityV2"
+108-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:32:13-80
+109            android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+109-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:33:13-96
+110            android:exported="false"
+110-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:34:13-37
+111            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+111-->[com.android.billingclient:billing:7.1.1] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/884f8b3ccc1d2c6c7285b926c834f664/transformed/billing-7.1.1/AndroidManifest.xml:35:13-72
+112        <activity
+112-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:9-173
+113            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+113-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:19-85
+114            android:exported="false"
+114-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:146-170
+115            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+115-->[com.google.android.gms:play-services-base:18.5.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/61084014fe62f3105cd0c4625f79d61e/transformed/play-services-base-18.5.0/AndroidManifest.xml:5:86-145
+116
+117        <meta-data
+117-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:9-122
+118            android:name="com.google.android.gms.version"
+118-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:20-65
+119            android:value="@integer/google_play_services_version" />
+119-->[com.google.android.gms:play-services-basement:18.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/cda5d9798f2d191cd7de693fa7dc281b/transformed/play-services-basement-18.4.0/AndroidManifest.xml:6:66-119
+120
+121        <activity
+121-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+122            android:name="androidx.compose.ui.tooling.PreviewActivity"
+122-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+123            android:exported="true" />
+123-->[androidx.compose.ui:ui-tooling-android:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/30ab45582f34a301aa0616747dfc96d4/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+124
+125        <provider
+125-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+126            android:name="androidx.startup.InitializationProvider"
+126-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+127            android:authorities="com.casha.app.dev.androidx-startup"
+127-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+128            android:exported="false" >
+128-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+129            <meta-data
+129-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+130                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+130-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+131                android:value="androidx.startup" />
+131-->[androidx.emoji2:emoji2:1.3.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/45459fd8595a0ccd6d06a2e33419abfe/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+132            <meta-data
+132-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:29:13-31:52
+133                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+133-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:30:17-78
+134                android:value="androidx.startup" />
+134-->[androidx.lifecycle:lifecycle-process:2.8.7] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/2f6a811c316452e754c648329fc11738/transformed/lifecycle-process-2.8.7/AndroidManifest.xml:31:17-49
+135            <meta-data
+135-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:29:13-31:52
+136                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+136-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:30:17-85
+137                android:value="androidx.startup" />
+137-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:31:17-49
+138        </provider>
+139
+140        <activity
+140-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:23:9-25:39
+141            android:name="androidx.activity.ComponentActivity"
+141-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:24:13-63
+142            android:exported="true" />
+142-->[androidx.compose.ui:ui-test-manifest:1.7.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/e20ef18f794b896176363508b64096ab/transformed/ui-test-manifest-1.7.8/AndroidManifest.xml:25:13-36
+143
+144        <service
+144-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:24:9-28:63
+145            android:name="androidx.room.MultiInstanceInvalidationService"
+145-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:25:13-74
+146            android:directBootAware="true"
+146-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:26:13-43
+147            android:exported="false" />
+147-->[androidx.room:room-runtime-android:2.7.0-rc01] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/47cc3c382c390d171de231a6bcf4afb1/transformed/room-runtime-release/AndroidManifest.xml:27:13-37
+148
+149        <receiver
+149-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:34:9-52:20
+150            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+150-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:35:13-76
+151            android:directBootAware="false"
+151-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:36:13-44
+152            android:enabled="true"
+152-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:37:13-35
+153            android:exported="true"
+153-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:38:13-36
+154            android:permission="android.permission.DUMP" >
+154-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:39:13-57
+155            <intent-filter>
+155-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:40:13-42:29
+156                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+156-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:17-91
+156-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:41:25-88
+157            </intent-filter>
+158            <intent-filter>
+158-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:43:13-45:29
+159                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+159-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:17-85
+159-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:44:25-82
+160            </intent-filter>
+161            <intent-filter>
+161-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:46:13-48:29
+162                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+162-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:17-88
+162-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:47:25-85
+163            </intent-filter>
+164            <intent-filter>
+164-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:49:13-51:29
+165                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+165-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:17-95
+165-->[androidx.profileinstaller:profileinstaller:1.4.0] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/52216b03dc38fe5a5de5e3f96674f0b2/transformed/profileinstaller-1.4.0/AndroidManifest.xml:50:25-92
+166            </intent-filter>
+167        </receiver>
+168
+169        <service
+169-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:28:9-34:19
+170            android:name="com.google.android.datatransport.runtime.backends.TransportBackendDiscovery"
+170-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:29:13-103
+171            android:exported="false" >
+171-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:30:13-37
+172            <meta-data
+172-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:31:13-33:39
+173                android:name="backend:com.google.android.datatransport.cct.CctBackendFactory"
+173-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:32:17-94
+174                android:value="cct" />
+174-->[com.google.android.datatransport:transport-backend-cct:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/3e5823d8a335af300c15f2efe32e26fc/transformed/transport-backend-cct-3.1.8/AndroidManifest.xml:33:17-36
+175        </service>
+176        <service
+176-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:26:9-30:19
+177            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.JobInfoSchedulerService"
+177-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:27:13-117
+178            android:exported="false"
+178-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:28:13-37
+179            android:permission="android.permission.BIND_JOB_SERVICE" >
+179-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:29:13-69
+180        </service>
+181
+182        <receiver
+182-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:32:9-34:40
+183            android:name="com.google.android.datatransport.runtime.scheduling.jobscheduling.AlarmManagerSchedulerBroadcastReceiver"
+183-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:33:13-132
+184            android:exported="false" />
+184-->[com.google.android.datatransport:transport-runtime:3.1.8] /Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/c15e20ad527358cbd3d4a795e496e740/transformed/transport-runtime-3.1.8/AndroidManifest.xml:34:13-37
+185    </application>
+186
+187</manifest>

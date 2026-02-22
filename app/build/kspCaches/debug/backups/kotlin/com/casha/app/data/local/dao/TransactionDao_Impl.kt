@@ -478,6 +478,207 @@ public class TransactionDao_Impl(
     }
   }
 
+  public override suspend fun getTransactionsBetween(startDate: Long, endDate: Long):
+      List<TransactionEntity> {
+    val _sql: String =
+        "SELECT * FROM transactions WHERE datetime >= ? AND datetime <= ? ORDER BY datetime DESC"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindLong(_argIndex, startDate)
+        _argIndex = 2
+        _stmt.bindLong(_argIndex, endDate)
+        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
+        val _columnIndexOfName: Int = getColumnIndexOrThrow(_stmt, "name")
+        val _columnIndexOfCategory: Int = getColumnIndexOrThrow(_stmt, "category")
+        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, "amount")
+        val _columnIndexOfDatetime: Int = getColumnIndexOrThrow(_stmt, "datetime")
+        val _columnIndexOfNote: Int = getColumnIndexOrThrow(_stmt, "note")
+        val _columnIndexOfIsSynced: Int = getColumnIndexOrThrow(_stmt, "isSynced")
+        val _columnIndexOfRemoteId: Int = getColumnIndexOrThrow(_stmt, "remoteId")
+        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
+        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, "updatedAt")
+        val _result: MutableList<TransactionEntity> = mutableListOf()
+        while (_stmt.step()) {
+          val _item: TransactionEntity
+          val _tmpId: String
+          _tmpId = _stmt.getText(_columnIndexOfId)
+          val _tmpName: String
+          _tmpName = _stmt.getText(_columnIndexOfName)
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpAmount: Double
+          _tmpAmount = _stmt.getDouble(_columnIndexOfAmount)
+          val _tmpDatetime: Date
+          val _tmp: Long?
+          if (_stmt.isNull(_columnIndexOfDatetime)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getLong(_columnIndexOfDatetime)
+          }
+          val _tmp_1: Date? = __converters.fromTimestamp(_tmp)
+          if (_tmp_1 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpDatetime = _tmp_1
+          }
+          val _tmpNote: String?
+          if (_stmt.isNull(_columnIndexOfNote)) {
+            _tmpNote = null
+          } else {
+            _tmpNote = _stmt.getText(_columnIndexOfNote)
+          }
+          val _tmpIsSynced: Boolean
+          val _tmp_2: Int
+          _tmp_2 = _stmt.getLong(_columnIndexOfIsSynced).toInt()
+          _tmpIsSynced = _tmp_2 != 0
+          val _tmpRemoteId: String?
+          if (_stmt.isNull(_columnIndexOfRemoteId)) {
+            _tmpRemoteId = null
+          } else {
+            _tmpRemoteId = _stmt.getText(_columnIndexOfRemoteId)
+          }
+          val _tmpCreatedAt: Date
+          val _tmp_3: Long?
+          if (_stmt.isNull(_columnIndexOfCreatedAt)) {
+            _tmp_3 = null
+          } else {
+            _tmp_3 = _stmt.getLong(_columnIndexOfCreatedAt)
+          }
+          val _tmp_4: Date? = __converters.fromTimestamp(_tmp_3)
+          if (_tmp_4 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpCreatedAt = _tmp_4
+          }
+          val _tmpUpdatedAt: Date
+          val _tmp_5: Long?
+          if (_stmt.isNull(_columnIndexOfUpdatedAt)) {
+            _tmp_5 = null
+          } else {
+            _tmp_5 = _stmt.getLong(_columnIndexOfUpdatedAt)
+          }
+          val _tmp_6: Date? = __converters.fromTimestamp(_tmp_5)
+          if (_tmp_6 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpUpdatedAt = _tmp_6
+          }
+          _item =
+              TransactionEntity(_tmpId,_tmpName,_tmpCategory,_tmpAmount,_tmpDatetime,_tmpNote,_tmpIsSynced,_tmpRemoteId,_tmpCreatedAt,_tmpUpdatedAt)
+          _result.add(_item)
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun getTransactionsByCategoryBetween(
+    category: String,
+    startDate: Long,
+    endDate: Long,
+  ): List<TransactionEntity> {
+    val _sql: String =
+        "SELECT * FROM transactions WHERE category = ? AND datetime >= ? AND datetime <= ? ORDER BY datetime DESC"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindText(_argIndex, category)
+        _argIndex = 2
+        _stmt.bindLong(_argIndex, startDate)
+        _argIndex = 3
+        _stmt.bindLong(_argIndex, endDate)
+        val _columnIndexOfId: Int = getColumnIndexOrThrow(_stmt, "id")
+        val _columnIndexOfName: Int = getColumnIndexOrThrow(_stmt, "name")
+        val _columnIndexOfCategory: Int = getColumnIndexOrThrow(_stmt, "category")
+        val _columnIndexOfAmount: Int = getColumnIndexOrThrow(_stmt, "amount")
+        val _columnIndexOfDatetime: Int = getColumnIndexOrThrow(_stmt, "datetime")
+        val _columnIndexOfNote: Int = getColumnIndexOrThrow(_stmt, "note")
+        val _columnIndexOfIsSynced: Int = getColumnIndexOrThrow(_stmt, "isSynced")
+        val _columnIndexOfRemoteId: Int = getColumnIndexOrThrow(_stmt, "remoteId")
+        val _columnIndexOfCreatedAt: Int = getColumnIndexOrThrow(_stmt, "createdAt")
+        val _columnIndexOfUpdatedAt: Int = getColumnIndexOrThrow(_stmt, "updatedAt")
+        val _result: MutableList<TransactionEntity> = mutableListOf()
+        while (_stmt.step()) {
+          val _item: TransactionEntity
+          val _tmpId: String
+          _tmpId = _stmt.getText(_columnIndexOfId)
+          val _tmpName: String
+          _tmpName = _stmt.getText(_columnIndexOfName)
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpAmount: Double
+          _tmpAmount = _stmt.getDouble(_columnIndexOfAmount)
+          val _tmpDatetime: Date
+          val _tmp: Long?
+          if (_stmt.isNull(_columnIndexOfDatetime)) {
+            _tmp = null
+          } else {
+            _tmp = _stmt.getLong(_columnIndexOfDatetime)
+          }
+          val _tmp_1: Date? = __converters.fromTimestamp(_tmp)
+          if (_tmp_1 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpDatetime = _tmp_1
+          }
+          val _tmpNote: String?
+          if (_stmt.isNull(_columnIndexOfNote)) {
+            _tmpNote = null
+          } else {
+            _tmpNote = _stmt.getText(_columnIndexOfNote)
+          }
+          val _tmpIsSynced: Boolean
+          val _tmp_2: Int
+          _tmp_2 = _stmt.getLong(_columnIndexOfIsSynced).toInt()
+          _tmpIsSynced = _tmp_2 != 0
+          val _tmpRemoteId: String?
+          if (_stmt.isNull(_columnIndexOfRemoteId)) {
+            _tmpRemoteId = null
+          } else {
+            _tmpRemoteId = _stmt.getText(_columnIndexOfRemoteId)
+          }
+          val _tmpCreatedAt: Date
+          val _tmp_3: Long?
+          if (_stmt.isNull(_columnIndexOfCreatedAt)) {
+            _tmp_3 = null
+          } else {
+            _tmp_3 = _stmt.getLong(_columnIndexOfCreatedAt)
+          }
+          val _tmp_4: Date? = __converters.fromTimestamp(_tmp_3)
+          if (_tmp_4 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpCreatedAt = _tmp_4
+          }
+          val _tmpUpdatedAt: Date
+          val _tmp_5: Long?
+          if (_stmt.isNull(_columnIndexOfUpdatedAt)) {
+            _tmp_5 = null
+          } else {
+            _tmp_5 = _stmt.getLong(_columnIndexOfUpdatedAt)
+          }
+          val _tmp_6: Date? = __converters.fromTimestamp(_tmp_5)
+          if (_tmp_6 == null) {
+            error("Expected NON-NULL 'java.util.Date', but it was NULL.")
+          } else {
+            _tmpUpdatedAt = _tmp_6
+          }
+          _item =
+              TransactionEntity(_tmpId,_tmpName,_tmpCategory,_tmpAmount,_tmpDatetime,_tmpNote,_tmpIsSynced,_tmpRemoteId,_tmpCreatedAt,_tmpUpdatedAt)
+          _result.add(_item)
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
   public override suspend fun getTotalSpendingSince(startDate: Long): Double {
     val _sql: String = "SELECT COALESCE(SUM(amount), 0.0) FROM transactions WHERE datetime >= ?"
     return performSuspending(__db, true, false) { _connection ->
@@ -492,6 +693,36 @@ public class TransactionDao_Impl(
           _result = _tmp
         } else {
           _result = 0.0
+        }
+        _result
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
+  public override suspend fun getCategorySpendingBetween(startDate: Long, endDate: Long):
+      List<CategoryTotal> {
+    val _sql: String =
+        "SELECT category, SUM(amount) as total FROM transactions WHERE datetime >= ? AND datetime <= ? GROUP BY category ORDER BY total DESC"
+    return performSuspending(__db, true, false) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindLong(_argIndex, startDate)
+        _argIndex = 2
+        _stmt.bindLong(_argIndex, endDate)
+        val _columnIndexOfCategory: Int = 0
+        val _columnIndexOfTotal: Int = 1
+        val _result: MutableList<CategoryTotal> = mutableListOf()
+        while (_stmt.step()) {
+          val _item: CategoryTotal
+          val _tmpCategory: String
+          _tmpCategory = _stmt.getText(_columnIndexOfCategory)
+          val _tmpTotal: Double
+          _tmpTotal = _stmt.getDouble(_columnIndexOfTotal)
+          _item = CategoryTotal(_tmpCategory,_tmpTotal)
+          _result.add(_item)
         }
         _result
       } finally {

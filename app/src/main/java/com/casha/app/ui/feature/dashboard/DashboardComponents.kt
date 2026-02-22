@@ -278,7 +278,8 @@ fun ReportSection(
     report: SpendingReport,
     selectedTab: ChartTab,
     onTabChange: (ChartTab) -> Unit,
-    isSyncing: Boolean
+    isSyncing: Boolean,
+    onSeeAllClick: () -> Unit = {}
 ) {
     val transition = rememberInfiniteTransition(label = "syncRotation")
     val rotation by transition.animateFloat(
@@ -303,7 +304,6 @@ fun ReportSection(
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
             if (isSyncing) {
                 Icon(
                     imageVector = Icons.Default.Sync,
@@ -311,6 +311,14 @@ fun ReportSection(
                     modifier = Modifier.size(16.dp).rotate(rotation),
                     tint = MaterialTheme.colorScheme.primary
                 )
+            } else {
+                TextButton(onClick = onSeeAllClick) {
+                    Text(
+                        text = "See All",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
         

@@ -19,6 +19,9 @@ sealed class NavRoutes(val route: String) {
     data object Dashboard : NavRoutes("dashboard")
     data object Budget : NavRoutes("budget")
     data object Report : NavRoutes("report")
+    data object ReportCategoryDetail : NavRoutes("report_category/{category}") {
+        fun createRoute(category: String) = "report_category/$category"
+    }
 
     // ── Budget Support ──
     data object BudgetDetail : NavRoutes("budget_detail/{budgetId}") {

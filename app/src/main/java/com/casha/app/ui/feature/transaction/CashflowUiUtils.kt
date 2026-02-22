@@ -7,6 +7,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
+import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.ui.theme.*
 
 /**
@@ -46,5 +47,42 @@ object CashflowUiUtils {
             "education" -> Icons.Default.School
             else -> Icons.Default.CreditCard
         }
+    }
+
+    fun groupTransactionsByDate(transactions: List<CashflowEntry>): List<com.casha.app.domain.model.CashflowDateSection> {
+        val dateFormatter = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault())
+        val displayDateFormatter = java.text.SimpleDateFormat("d MMM yyyy", java.util.Locale.getDefault())
+        val dayFormatter = java.text.SimpleDateFormat("EEEE", java.util.Locale.getDefault())
+        
+        val now = java.util.Date()
+        val todayStr = dateFormatter.format(now)
+        val calendar = java.util.Calendar.getInstance().apply { time = now; add(java.util.Calendar.DATE, -1) }
+        val yesterdayStr = dateFormatter.format(calendar.time)
+
+        return transactions
+            .sortedByDescending { it.date }
+            .groupBy { dateFormatter.format(it.date) }
+            .map { (dateKey, entries) ->
+                val parsed = dateFormatter.parse(dateKey) ?: java.util.Date()
+                val displayDate = displayDateFormatter.format(parsed)
+                val day = when (dateKey) {
+                    todayStr -> "Today"
+                    yesterdayStr -> "Yesterday"
+                    else -> dayFormatter.format(parsed)
+                }
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+            }
+    }
+
+    fun TransactionCasha.toCashflowEntry(): CashflowEntry {
+        return CashflowEntry(
+            id = this.id,
+            title = this.name,
+            amount = this.amount,
+            category = this.category,
+            type = if (this.amount < 0) CashflowType.EXPENSE else CashflowType.INCOME,
+            date = this.datetime,
+            icon = null
+        )
     }
 }

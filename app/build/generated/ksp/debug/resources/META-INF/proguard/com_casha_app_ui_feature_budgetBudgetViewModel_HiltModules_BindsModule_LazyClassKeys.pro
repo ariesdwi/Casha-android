@@ -16,4 +16,6 @@
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.dashboard.DashboardViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.ProfileViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.ProfileViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.report.ReportViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.report.ReportViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.budget.BudgetViewModel

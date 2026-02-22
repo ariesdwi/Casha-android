@@ -20,6 +20,8 @@ interface TransactionRepository {
     suspend fun getTotalSpending(period: SpendingPeriod): Double
     suspend fun getUnsyncCount(): Int
     suspend fun fetchSpendingReport(): SpendingReport
+    suspend fun getTransactionsByCategory(category: String, startDate: java.util.Date, endDate: java.util.Date): List<TransactionCasha>
+    suspend fun getCategorySpendings(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.ChartCategorySpending>
     
     // Command
     suspend fun saveTransaction(transaction: TransactionCasha)

@@ -61,10 +61,11 @@ fun AddTransactionScreen(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
                     Text(
                         text = if (isEditMode) "Edit Transaction" else "Add Transaction",
+                        style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
                 },
@@ -73,6 +74,7 @@ fun AddTransactionScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
+                windowInsets = WindowInsets(0.dp),
                 actions = {
                     TextButton(
                         onClick = {

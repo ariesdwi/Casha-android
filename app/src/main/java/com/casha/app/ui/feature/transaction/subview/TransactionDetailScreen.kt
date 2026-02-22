@@ -67,8 +67,14 @@ fun TransactionDetailScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Transaction Details") },
-                windowInsets = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp),
+                title = {
+                    Text(
+                        text = "Transaction Details",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                },
+                windowInsets = WindowInsets(0.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.background

@@ -13,10 +13,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
+import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Work
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -38,6 +40,8 @@ import com.casha.app.ui.feature.budget.BudgetScreen
 import com.casha.app.ui.feature.transaction.TransactionScreen
 import com.casha.app.ui.feature.transaction.AddTransactionScreen
 import com.casha.app.ui.feature.transaction.subview.TransactionDetailScreen
+import com.casha.app.ui.feature.report.ReportScreen
+import com.casha.app.ui.feature.report.subview.TransactionListByCategoryView
 
 @Composable
 fun MainScreen(
@@ -51,9 +55,9 @@ fun MainScreen(
     val tabs = remember {
         listOf(
             TabItem(
-                title = "Wealth",
-                icon = Icons.Outlined.Work,
-                selectedIcon = Icons.Filled.Work,
+                title = "Report",
+                icon = Icons.Outlined.PieChart,
+                selectedIcon = Icons.Filled.PieChart,
                 tag = 0
             ),
             TabItem(
@@ -86,7 +90,7 @@ fun MainScreen(
 
     // Map tag -> NavRoute for tab navigation
     fun tagToRoute(tag: Int): String = when (tag) {
-        0 -> NavRoutes.Portfolio.route
+        0 -> NavRoutes.Report.route
         1 -> NavRoutes.Dashboard.route
         2 -> NavRoutes.Transactions.route
         3 -> NavRoutes.Budget.route
@@ -130,7 +134,6 @@ fun MainScreen(
                 navController = navController,
                 startDestination = NavRoutes.Dashboard.route
             ) {
-                composable(NavRoutes.Portfolio.route) { PlaceholderTab("Portfolio Screen") }
                 composable(NavRoutes.Dashboard.route) {
                     DashboardScreen(navController = navController)
                 }
@@ -185,6 +188,23 @@ fun MainScreen(
                 }
                 composable(NavRoutes.Budget.route) { 
                     BudgetScreen()
+                }
+                composable(NavRoutes.Report.route) {
+                    ReportScreen(
+                        onNavigateToCategoryDetail = { category ->
+                            navController.navigate(NavRoutes.ReportCategoryDetail.createRoute(category))
+                        }
+                    )
+                }
+                composable(
+                    route = NavRoutes.ReportCategoryDetail.route,
+                    arguments = listOf(navArgument("category") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val category = backStackEntry.arguments?.getString("category") ?: ""
+                    TransactionListByCategoryView(
+                        category = category,
+                        onBackClick = { navController.popBackStack() }
+                    )
                 }
                 composable(NavRoutes.Profile.route) { PlaceholderTab("Profile Screen") }
             }

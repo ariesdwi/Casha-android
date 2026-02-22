@@ -13,6 +13,7 @@ import com.casha.app.ui.feature.dashboard.DashboardViewModel_HiltModules;
 import com.casha.app.ui.feature.goaltracker.GoalTrackerViewModel_HiltModules;
 import com.casha.app.ui.feature.loading.AppLoadingViewModel_HiltModules;
 import com.casha.app.ui.feature.profile.ProfileViewModel_HiltModules;
+import com.casha.app.ui.feature.report.ReportViewModel_HiltModules;
 import com.casha.app.ui.feature.transaction.TransactionViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
@@ -180,6 +181,7 @@ public final class CashaApplication_HiltComponents {
           LoginViewModel_HiltModules.KeyModule.class,
           ProfileViewModel_HiltModules.KeyModule.class,
           RegisterViewModel_HiltModules.KeyModule.class,
+          ReportViewModel_HiltModules.KeyModule.class,
           SetupCurrencyViewModel_HiltModules.KeyModule.class,
           TransactionViewModel_HiltModules.KeyModule.class
       }
@@ -226,6 +228,7 @@ public final class CashaApplication_HiltComponents {
           LoginViewModel_HiltModules.BindsModule.class,
           ProfileViewModel_HiltModules.BindsModule.class,
           RegisterViewModel_HiltModules.BindsModule.class,
+          ReportViewModel_HiltModules.BindsModule.class,
           SetupCurrencyViewModel_HiltModules.BindsModule.class,
           TransactionViewModel_HiltModules.BindsModule.class
       }

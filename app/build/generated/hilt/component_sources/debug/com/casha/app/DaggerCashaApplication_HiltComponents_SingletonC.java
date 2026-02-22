@@ -68,6 +68,8 @@ import com.casha.app.domain.usecase.dashboard.GetUnsyncTransactionCountUseCase;
 import com.casha.app.domain.usecase.dashboard.TransactionSyncUseCase;
 import com.casha.app.domain.usecase.goal.GetGoalSummaryUseCase;
 import com.casha.app.domain.usecase.goal.GetGoalsUseCase;
+import com.casha.app.domain.usecase.report.GetCategorySpendingUseCase;
+import com.casha.app.domain.usecase.report.GetTransactionByCategoryUseCase;
 import com.casha.app.domain.usecase.transaction.AddTransactionUseCase;
 import com.casha.app.domain.usecase.transaction.DeleteTransactionUseCase;
 import com.casha.app.domain.usecase.transaction.GetTransactionsUseCase;
@@ -109,6 +111,10 @@ import com.casha.app.ui.feature.profile.ProfileViewModel;
 import com.casha.app.ui.feature.profile.ProfileViewModel_HiltModules;
 import com.casha.app.ui.feature.profile.ProfileViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
 import com.casha.app.ui.feature.profile.ProfileViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
+import com.casha.app.ui.feature.report.ReportViewModel;
+import com.casha.app.ui.feature.report.ReportViewModel_HiltModules;
+import com.casha.app.ui.feature.report.ReportViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
+import com.casha.app.ui.feature.report.ReportViewModel_HiltModules_KeyModule_Provide_LazyMapKey;
 import com.casha.app.ui.feature.transaction.TransactionViewModel;
 import com.casha.app.ui.feature.transaction.TransactionViewModel_HiltModules;
 import com.casha.app.ui.feature.transaction.TransactionViewModel_HiltModules_BindsModule_Binds_LazyMapKey;
@@ -481,7 +487,7 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(10).put(AppLoadingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, AppLoadingViewModel_HiltModules.KeyModule.provide()).put(BudgetViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, BudgetViewModel_HiltModules.KeyModule.provide()).put(DashboardViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, DashboardViewModel_HiltModules.KeyModule.provide()).put(ForgotPasswordViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ForgotPasswordViewModel_HiltModules.KeyModule.provide()).put(GoalTrackerViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, GoalTrackerViewModel_HiltModules.KeyModule.provide()).put(LoginViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, LoginViewModel_HiltModules.KeyModule.provide()).put(ProfileViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ProfileViewModel_HiltModules.KeyModule.provide()).put(RegisterViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, RegisterViewModel_HiltModules.KeyModule.provide()).put(SetupCurrencyViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SetupCurrencyViewModel_HiltModules.KeyModule.provide()).put(TransactionViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, TransactionViewModel_HiltModules.KeyModule.provide()).build());
+      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(11).put(AppLoadingViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, AppLoadingViewModel_HiltModules.KeyModule.provide()).put(BudgetViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, BudgetViewModel_HiltModules.KeyModule.provide()).put(DashboardViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, DashboardViewModel_HiltModules.KeyModule.provide()).put(ForgotPasswordViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ForgotPasswordViewModel_HiltModules.KeyModule.provide()).put(GoalTrackerViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, GoalTrackerViewModel_HiltModules.KeyModule.provide()).put(LoginViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, LoginViewModel_HiltModules.KeyModule.provide()).put(ProfileViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ProfileViewModel_HiltModules.KeyModule.provide()).put(RegisterViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, RegisterViewModel_HiltModules.KeyModule.provide()).put(ReportViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, ReportViewModel_HiltModules.KeyModule.provide()).put(SetupCurrencyViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, SetupCurrencyViewModel_HiltModules.KeyModule.provide()).put(TransactionViewModel_HiltModules_KeyModule_Provide_LazyMapKey.lazyClassKeyName, TransactionViewModel_HiltModules.KeyModule.provide()).build());
     }
 
     @Override
@@ -528,6 +534,8 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
     private Provider<ProfileViewModel> profileViewModelProvider;
 
     private Provider<RegisterViewModel> registerViewModelProvider;
+
+    private Provider<ReportViewModel> reportViewModelProvider;
 
     private Provider<SetupCurrencyViewModel> setupCurrencyViewModelProvider;
 
@@ -643,6 +651,14 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
       return new RegisterUseCase(singletonCImpl.authRepositoryImplProvider.get());
     }
 
+    private GetCategorySpendingUseCase getCategorySpendingUseCase() {
+      return new GetCategorySpendingUseCase(singletonCImpl.transactionRepositoryImplProvider.get());
+    }
+
+    private GetTransactionByCategoryUseCase getTransactionByCategoryUseCase() {
+      return new GetTransactionByCategoryUseCase(singletonCImpl.transactionRepositoryImplProvider.get());
+    }
+
     private UpdateProfileUseCase updateProfileUseCase() {
       return new UpdateProfileUseCase(singletonCImpl.authRepositoryImplProvider.get());
     }
@@ -678,13 +694,14 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
       this.loginViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 5);
       this.profileViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
       this.registerViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
-      this.setupCurrencyViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
-      this.transactionViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.reportViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
+      this.setupCurrencyViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.transactionViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
     }
 
     @Override
     public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(10).put(AppLoadingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) appLoadingViewModelProvider)).put(BudgetViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) budgetViewModelProvider)).put(DashboardViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) dashboardViewModelProvider)).put(ForgotPasswordViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) forgotPasswordViewModelProvider)).put(GoalTrackerViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) goalTrackerViewModelProvider)).put(LoginViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) loginViewModelProvider)).put(ProfileViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) profileViewModelProvider)).put(RegisterViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) registerViewModelProvider)).put(SetupCurrencyViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) setupCurrencyViewModelProvider)).put(TransactionViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) transactionViewModelProvider)).build());
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(11).put(AppLoadingViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) appLoadingViewModelProvider)).put(BudgetViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) budgetViewModelProvider)).put(DashboardViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) dashboardViewModelProvider)).put(ForgotPasswordViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) forgotPasswordViewModelProvider)).put(GoalTrackerViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) goalTrackerViewModelProvider)).put(LoginViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) loginViewModelProvider)).put(ProfileViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) profileViewModelProvider)).put(RegisterViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) registerViewModelProvider)).put(ReportViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) reportViewModelProvider)).put(SetupCurrencyViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) setupCurrencyViewModelProvider)).put(TransactionViewModel_HiltModules_BindsModule_Binds_LazyMapKey.lazyClassKeyName, ((Provider) transactionViewModelProvider)).build());
     }
 
     @Override
@@ -737,10 +754,13 @@ public final class DaggerCashaApplication_HiltComponents_SingletonC {
           case 7: // com.casha.app.ui.feature.auth.RegisterViewModel 
           return (T) new RegisterViewModel(viewModelCImpl.registerUseCase(), singletonCImpl.authManagerProvider.get());
 
-          case 8: // com.casha.app.ui.feature.auth.SetupCurrencyViewModel 
+          case 8: // com.casha.app.ui.feature.report.ReportViewModel 
+          return (T) new ReportViewModel(viewModelCImpl.getCategorySpendingUseCase(), viewModelCImpl.getTransactionByCategoryUseCase());
+
+          case 9: // com.casha.app.ui.feature.auth.SetupCurrencyViewModel 
           return (T) new SetupCurrencyViewModel(singletonCImpl.authManagerProvider.get(), viewModelCImpl.updateProfileUseCase());
 
-          case 9: // com.casha.app.ui.feature.transaction.TransactionViewModel 
+          case 10: // com.casha.app.ui.feature.transaction.TransactionViewModel 
           return (T) new TransactionViewModel(viewModelCImpl.getCashflowHistoryUseCase(), viewModelCImpl.getTransactionsUseCase(), viewModelCImpl.addTransactionUseCase(), viewModelCImpl.updateTransactionUseCase(), viewModelCImpl.deleteTransactionUseCase(), viewModelCImpl.syncTransactionsUseCase(), viewModelCImpl.categorySyncUseCase(), singletonCImpl.syncEventBusProvider.get());
 
           default: throw new AssertionError(id);

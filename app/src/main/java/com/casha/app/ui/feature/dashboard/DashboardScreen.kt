@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.casha.app.navigation.Screen
+import com.casha.app.navigation.NavRoutes
 import com.casha.app.ui.theme.*
 import java.util.Calendar
 
@@ -57,15 +58,13 @@ fun DashboardScreen(
             .fillMaxSize()
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 title = {
-                    if (scrollBehavior.state.overlappedFraction > 0.5f) {
-                        Text(
-                            text = "Dashboard",
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    Text(
+                        text = "Dashboard",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 actions = {
                     if (!uiState.isOnline) {
@@ -78,12 +77,44 @@ fun DashboardScreen(
                             isSyncing = uiState.isSyncing,
                             onClick = { navController.navigate(Screen.UnsyncedInfo.route) }
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
                     }
+
+                    // Profile Circle in Navigation
+                    Surface(
+                        onClick = { navController.navigate(NavRoutes.Profile.route) },
+                        shape = CircleShape,
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
+                        modifier = Modifier.size(32.dp),
+                        tonalElevation = 2.dp
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.linearGradient(
+                                        colors = listOf(
+                                            MaterialTheme.colorScheme.primary,
+                                            MaterialTheme.colorScheme.secondary
+                                        )
+                                    ),
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = initial,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
                 },
                 windowInsets = WindowInsets(0.dp),
                 scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.background
                 )
@@ -101,9 +132,7 @@ fun DashboardScreen(
             item {
                 WelcomeHeader(
                     greeting = greeting,
-                    nickname = nickname,
-                    initial = initial,
-                    onProfileClick = { navController.navigate(Screen.Profile.route) }
+                    nickname = nickname
                 )
             }
             
@@ -123,7 +152,8 @@ fun DashboardScreen(
                         report = uiState.report,
                         selectedTab = uiState.selectedChartTab,
                         onTabChange = { viewModel.changeChartTab(it) },
-                        isSyncing = uiState.isSyncing
+                        isSyncing = uiState.isSyncing,
+                        onSeeAllClick = { navController.navigate(NavRoutes.Report.route) }
                     )
                 }
             }
@@ -157,60 +187,24 @@ fun DashboardScreen(
 @Composable
 fun WelcomeHeader(
     greeting: String,
-    nickname: String,
-    initial: String,
-    onProfileClick: () -> Unit
+    nickname: String
 ) {
-    Row(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 20.dp, end = 20.dp, top = 0.dp, bottom = 0.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 20.dp, vertical = 0.dp)
     ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = greeting,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = nickname,
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-
-        Surface(
-            onClick = onProfileClick,
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-            modifier = Modifier.size(44.dp),
-            tonalElevation = 2.dp
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                MaterialTheme.colorScheme.primary,
-                                MaterialTheme.colorScheme.secondary
-                            )
-                        ),
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = initial,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-        }
+        Text(
+            text = greeting,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = nickname,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

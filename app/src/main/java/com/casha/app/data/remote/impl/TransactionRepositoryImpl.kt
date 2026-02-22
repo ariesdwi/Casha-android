@@ -172,6 +172,38 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getTransactionsByCategory(
+        category: String,
+        startDate: Date,
+        endDate: Date
+    ): List<TransactionCasha> {
+        return transactionDao.getTransactionsByCategoryBetween(
+            category,
+            startDate.time,
+            endDate.time
+        ).map { it.toDomain() }
+    }
+
+    override suspend fun getCategorySpendings(
+        startDate: Date,
+        endDate: Date
+    ): List<ChartCategorySpending> {
+        val categoryTotals = transactionDao.getCategorySpendingBetween(
+            startDate.time,
+            endDate.time
+        )
+        val grandTotal = categoryTotals.sumOf { it.total }
+        
+        return categoryTotals.map { total ->
+            ChartCategorySpending(
+                id = UUID.randomUUID().toString(),
+                category = total.category,
+                total = total.total,
+                percentage = if (grandTotal > 0) total.total / grandTotal else 0.0
+            )
+        }
+    }
+
     override suspend fun getUnsyncCount(): Int {
         return transactionDao.getUnsyncedTransactions().size
     }

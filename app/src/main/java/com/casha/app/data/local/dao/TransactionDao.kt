@@ -29,9 +29,23 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE datetime >= :startDate ORDER BY datetime ASC")
     suspend fun getTransactionsSince(startDate: Long): List<TransactionEntity>
 
+    @Query("SELECT * FROM transactions WHERE datetime >= :startDate AND datetime <= :endDate ORDER BY datetime DESC")
+    suspend fun getTransactionsBetween(startDate: Long, endDate: Long): List<TransactionEntity>
+
+    @Query("SELECT * FROM transactions WHERE category = :category AND datetime >= :startDate AND datetime <= :endDate ORDER BY datetime DESC")
+    suspend fun getTransactionsByCategoryBetween(category: String, startDate: Long, endDate: Long): List<TransactionEntity>
+
     @Query("SELECT COALESCE(SUM(amount), 0.0) FROM transactions WHERE datetime >= :startDate")
     suspend fun getTotalSpendingSince(startDate: Long): Double
+
+    @Query("SELECT category, SUM(amount) as total FROM transactions WHERE datetime >= :startDate AND datetime <= :endDate GROUP BY category ORDER BY total DESC")
+    suspend fun getCategorySpendingBetween(startDate: Long, endDate: Long): List<CategoryTotal>
 
     @Query("DELETE FROM transactions")
     suspend fun clearAll()
 }
+
+data class CategoryTotal(
+    val category: String,
+    val total: Double
+)
