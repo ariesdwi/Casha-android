@@ -1,8 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddMessageViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddMessageViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinatorViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinatorViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel

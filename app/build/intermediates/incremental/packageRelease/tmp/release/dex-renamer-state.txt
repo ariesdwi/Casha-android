@@ -1,4 +1,0 @@
-#Mon Feb 23 11:46:49 WIB 2026
-base.0=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
-path.0=classes.dex
-renamed.0=classes.dex

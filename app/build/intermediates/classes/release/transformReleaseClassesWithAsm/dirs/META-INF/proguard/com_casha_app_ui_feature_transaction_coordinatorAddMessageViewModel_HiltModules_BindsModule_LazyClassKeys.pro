@@ -1,1 +1,0 @@
--keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddMessageViewModel
