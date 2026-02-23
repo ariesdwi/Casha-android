@@ -52,4 +52,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindLiabilityRepository(impl: com.casha.app.data.remote.impl.LiabilityRepositoryImpl): com.casha.app.domain.repository.LiabilityRepository
 }

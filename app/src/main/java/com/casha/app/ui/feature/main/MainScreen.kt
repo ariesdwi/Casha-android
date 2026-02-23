@@ -276,6 +276,86 @@ fun MainScreen(
                     )
                 }
 
+                composable(NavRoutes.Liabilities.route) {
+                    val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    com.casha.app.ui.feature.liability.LiabilitiesListScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToDetail = { id -> navController.navigate(NavRoutes.LiabilityDetail.createRoute(id)) },
+                        onNavigateToCreate = { navController.navigate(NavRoutes.CreateLiability.route) }
+                    )
+                }
+
+                composable(NavRoutes.CreateLiability.route) {
+                    val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    com.casha.app.ui.feature.liability.CreateLiabilityScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        viewModel = viewModel
+                    )
+                }
+
+                composable(
+                    route = NavRoutes.LiabilityDetail.route,
+                    arguments = listOf(navArgument("liabilityId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val liabilityId = backStackEntry.arguments?.getString("liabilityId") ?: return@composable
+                    val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    val uiState by viewModel.uiState.collectAsState()
+                    
+                    // The view expects `Liability` as initialLiability parameter, it can be passed via the list or fetched individually
+                    // Usually we look inside the current state if provided
+                    val matchingLiability = uiState.liabilities.firstOrNull { it.id == liabilityId } 
+                    
+                    if (matchingLiability != null) {
+                        com.casha.app.ui.feature.liability.LiabilityDetailView(
+                            initialLiability = matchingLiability,
+                            liabilityState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onRecordPayment = { amount, paymentType ->
+                                viewModel.recordPayment(liabilityId, amount, paymentType, onSuccess = {})
+                            },
+                            onAddTransaction = {
+                                // You might need a specific AddLiabilityTransactionScreen route or use the main AddTransaction mechanism
+                            },
+                            onStatementClick = { statement ->
+                                navController.navigate("statement_detail/$liabilityId/${statement.id}")
+                            }
+                        )
+                    } else {
+                        // Normally handle fetch state here. But as backup invoke list fetch
+                        LaunchedEffect(liabilityId) { viewModel.fetchLiabilities() }
+                    }
+                }
+
+                composable(
+                    route = "statement_detail/{liabilityId}/{statementId}",
+                    arguments = listOf(
+                        navArgument("liabilityId") { type = NavType.StringType },
+                        navArgument("statementId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val liabilityId = backStackEntry.arguments?.getString("liabilityId") ?: return@composable
+                    val statementId = backStackEntry.arguments?.getString("statementId") ?: return@composable
+                    val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    val uiState by viewModel.uiState.collectAsState()
+                    
+                    val matchingLiability = uiState.liabilities.firstOrNull { it.id == liabilityId }
+                    val matchingStatement = uiState.statements.firstOrNull { it.id == statementId } ?: uiState.latestStatement
+
+                    if (matchingLiability != null && matchingStatement != null) {
+                        com.casha.app.ui.feature.liability.StatementDetailView(
+                            statement = matchingStatement,
+                            liability = matchingLiability,
+                            liabilityState = uiState,
+                            onBack = { navController.popBackStack() },
+                            onFetchStatementDetails = viewModel::fetchStatementDetails,
+                            onTransactionClick = { tx ->
+                                // Optional link to transaction detail if supported
+                             }
+                        )
+                    }
+                }
+
                 composable(NavRoutes.Categories.route) {
                     com.casha.app.ui.feature.profile.CategoryListScreen(
                         onBackClick = { navController.popBackStack() }

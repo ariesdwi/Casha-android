@@ -125,5 +125,11 @@ object NetworkModule {
     fun provideBudgetApiService(retrofit: Retrofit): com.casha.app.data.remote.api.BudgetApiService {
         return retrofit.create(com.casha.app.data.remote.api.BudgetApiService::class.java)
     }
+
+    @Provides
+    @Singleton
+    fun provideLiabilityApiService(retrofit: Retrofit): com.casha.app.data.remote.api.LiabilityApiService {
+        return retrofit.create(com.casha.app.data.remote.api.LiabilityApiService::class.java)
+    }
 }
 
