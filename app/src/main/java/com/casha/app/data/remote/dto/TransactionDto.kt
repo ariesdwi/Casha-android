@@ -23,6 +23,7 @@ data class TransactionDto(
  */
 @Serializable
 data class TransactionUploadDto(
+    val id: String? = null,
     val name: String = "",
     val category: String = "",
     val amount: Double = 0.0,

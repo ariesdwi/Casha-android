@@ -14,7 +14,7 @@ interface TransactionApiService {
         @Query("pageSize") pageSize: Int? = null
     ): TransactionListResponse
 
-    @POST("transactions")
+    @POST("transactions/create")
     suspend fun createTransaction(
         @Body request: TransactionUploadDto
     ): TransactionDto

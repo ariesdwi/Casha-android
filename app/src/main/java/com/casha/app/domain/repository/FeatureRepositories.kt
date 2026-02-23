@@ -41,8 +41,12 @@ interface CashflowRepository {
  * Repository interface for Income operations.
  */
 interface IncomeRepository {
+    fun getIncomesFlow(): Flow<List<com.casha.app.domain.model.IncomeCasha>>
     suspend fun getIncomes(): List<com.casha.app.domain.model.IncomeCasha>
     suspend fun getSummary(period: String?): com.casha.app.domain.model.IncomeSummary
+    suspend fun saveIncome(request: com.casha.app.domain.model.CreateIncomeRequest)
+    suspend fun updateIncome(id: String, request: com.casha.app.domain.model.CreateIncomeRequest)
+    suspend fun deleteIncome(id: String)
 }
 
 /**

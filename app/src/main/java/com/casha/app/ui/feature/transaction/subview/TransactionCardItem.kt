@@ -234,28 +234,34 @@ fun TransactionListItem(
                 Spacer(modifier = Modifier.width(16.dp))
 
                 // Name and Type pill and Category
-                Column(modifier = Modifier.weight(1f)) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         Text(
                             text = entry.title,
-                            style = MaterialTheme.typography.titleMedium,
+                            style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface,
                             maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f, fill = false)
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = if (entry.type == CashflowType.INCOME) "Income" else "Expense",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.White,
+
+                        // Type Badge
+                        Box(
                             modifier = Modifier
-                                .background(
-                                    if (entry.type == CashflowType.INCOME) CashaSuccess else MaterialTheme.colorScheme.primary,
-                                    RoundedCornerShape(4.dp)
-                                )
+                                .background(CashflowUiUtils.colorForType(entry.type), RoundedCornerShape(4.dp))
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
-                        )
+                        ) {
+                            Text(
+                                text = if (entry.type == CashflowType.INCOME) "INCOME" else "EXPENSE",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color.White,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
                     Text(
                         text = entry.category,
@@ -265,16 +271,27 @@ fun TransactionListItem(
                 }
 
                 // Amount and Time
-                Column(horizontalAlignment = Alignment.End) {
-                    val amountColor = if (entry.type == CashflowType.INCOME) CashaSuccess else CashaDanger
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    val amountColor = CashflowUiUtils.colorForType(entry.type)
                     val prefix = if (entry.type == CashflowType.INCOME) "+" else "-"
 
-                    Text(
-                        text = "$prefix${CurrencyFormatter.format(entry.amount)}",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = amountColor
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = prefix,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = amountColor
+                        )
+                        Text(
+                            text = CurrencyFormatter.format(entry.amount),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            color = amountColor
+                        )
+                    }
                     Text(
                         text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(entry.date),
                         style = MaterialTheme.typography.labelSmall,

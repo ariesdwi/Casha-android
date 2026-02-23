@@ -1,0 +1,19 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.casha.app-mergeReleaseResources-78:/values-h720dp-v13/values-h720dp-v13.xml",
+            "map": [
+                {
+                    "source": "/Users/ptsiagaabdiutama/.gradle/caches/8.13/transforms/db33e7de486c6c75ad31fab38b29653e/transformed/appcompat-1.6.1/res/values-h720dp-v13/values-h720dp-v13.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "66",
+                        "endOffsets": "117"
+                    }
+                }
+            ]
+        }
+    ]
+}

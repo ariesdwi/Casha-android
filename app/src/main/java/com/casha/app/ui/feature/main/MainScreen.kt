@@ -27,10 +27,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import android.net.Uri
 import com.casha.app.navigation.NavRoutes
 import com.casha.app.ui.component.CustomTabBar
 import com.casha.app.ui.component.TabItem
@@ -42,13 +44,42 @@ import com.casha.app.ui.feature.transaction.AddTransactionScreen
 import com.casha.app.ui.feature.transaction.subview.TransactionDetailScreen
 import com.casha.app.ui.feature.report.ReportScreen
 import com.casha.app.ui.feature.report.subview.TransactionListByCategoryView
+import com.casha.app.ui.feature.transaction.coordinator.AddMessageScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun MainScreen(
-    parentNavController: NavHostController
+    parentNavController: NavHostController,
+    viewModel: MainViewModel = hiltViewModel()
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.notificationEvents.collect { notification ->
+            val result = snackbarHostState.showSnackbar(
+                message = "${notification.title}: ${notification.body}",
+                actionLabel = "View",
+                duration = androidx.compose.material3.SnackbarDuration.Long
+            )
+            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
+                // Navigate based on type
+                val route = when (notification.type) {
+                    com.casha.app.domain.model.NotificationType.TRANSACTION_ADDED -> {
+                        val id = notification.data["transactionId"]
+                        val type = notification.data["cashflowType"] ?: "EXPENSE"
+                        if (id != null) NavRoutes.TransactionDetail.createRoute(id, type) else null
+                    }
+                    com.casha.app.domain.model.NotificationType.BUDGET_ALERT,
+                    com.casha.app.domain.model.NotificationType.BUDGET_CREATED -> NavRoutes.Budget.route
+                    com.casha.app.domain.model.NotificationType.MONTHLY_SUMMARY -> NavRoutes.Report.route
+                    else -> null
+                }
+                route?.let { navController.navigate(it) }
+            }
+        }
+    }
 
     var selectedTab by remember { mutableIntStateOf(1) } // Default to Home
 
@@ -97,38 +128,59 @@ fun MainScreen(
         else -> NavRoutes.Dashboard.route
     }
 
+    var showCoordinator by remember { mutableStateOf(false) }
+
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val hideBottomBar = remember(currentRoute) {
+        currentRoute == NavRoutes.AddTransaction.route ||
+        currentRoute == NavRoutes.EditTransaction.route ||
+        currentRoute == NavRoutes.Chat.route ||
+        currentRoute == NavRoutes.ReceiptCamera.route
+    }
+
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         Scaffold(
             containerColor = Color.Transparent,
+            snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) },
             bottomBar = {
-                CustomTabBar(
-                    selectedTab = selectedTab,
-                    onTabSelected = { tag ->
-                        selectedTab = tag
-                        navController.navigate(tagToRoute(tag)) {
-                            popUpTo(navController.graph.startDestinationId) { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+                if (!hideBottomBar) {
+                    CustomTabBar(
+                        selectedTab = selectedTab,
+                        onTabSelected = { tag ->
+                            selectedTab = tag
+                            navController.navigate(tagToRoute(tag)) {
+                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        },
+                        tabs = tabs.map { tabItem ->
+                            if (tabItem.isCenterButton) {
+                                tabItem.copy(onAction = { showCoordinator = true })
+                            } else {
+                                tabItem
+                            }
                         }
-                    },
-                    tabs = tabs.map { tabItem ->
-                        if (tabItem.isCenterButton) {
-                            tabItem.copy(onAction = { 
-                                navController.navigate(NavRoutes.AddTransaction.route) 
-                            })
-                        } else {
-                            tabItem
-                        }
-                    }
-                )
+                    )
+                }
             }
         ) { innerPadding ->
+        com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinator(
+            isPresented = showCoordinator,
+            onDismiss = { showCoordinator = false },
+            onNavigate = { route ->
+                navController.navigate(route)
+                showCoordinator = false
+            }
+        )
+
         // We use innerPadding.calculateTopPadding() but ignore bottom padding 
         // to allow content to scroll behind the floating transparent TabBar.
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = innerPadding.calculateTopPadding())
+                .padding(top = innerPadding.calculateTopPadding(), bottom = if (hideBottomBar) innerPadding.calculateBottomPadding() else 0.dp)
         ) {
             NavHost(
                 navController = navController,
@@ -146,7 +198,7 @@ fun MainScreen(
                 }
                 composable(NavRoutes.Transactions.route) {
                     TransactionScreen(
-                        onNavigateToAddTransaction = { navController.navigate(NavRoutes.AddTransaction.route) },
+                        onNavigate = { route -> navController.navigate(route) },
                         onNavigateToEditTransaction = { id -> navController.navigate(NavRoutes.EditTransaction.createRoute(id)) },
                         onNavigateToTransactionDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) }
                     )
@@ -206,7 +258,55 @@ fun MainScreen(
                         onBackClick = { navController.popBackStack() }
                     )
                 }
-                composable(NavRoutes.Profile.route) { PlaceholderTab("Profile Screen") }
+                composable(NavRoutes.Profile.route) {
+                    com.casha.app.ui.feature.profile.ProfileScreen(
+                        onBackClick = { navController.popBackStack() },
+                        onNavigateToEditProfile = { navController.navigate(NavRoutes.ProfileEdit.route) },
+                        onNavigateToNotifications = { /* TODO */ },
+                        onNavigateToPortfolio = { navController.navigate(NavRoutes.Portfolio.route) },
+                        onNavigateToLiabilities = { navController.navigate(NavRoutes.Liabilities.route) },
+                        onNavigateToGoalTracker = { navController.navigate(NavRoutes.GoalTracker.route) },
+                        onNavigateToCategories = { navController.navigate(NavRoutes.Categories.route) },
+                        onNavigateToSubscription = { navController.navigate(NavRoutes.Subscription.route) },
+                        onLogout = {
+                            parentNavController.navigate(NavRoutes.Splash.route) {
+                                popUpTo(NavRoutes.Dashboard.route) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                composable(NavRoutes.Categories.route) {
+                    com.casha.app.ui.feature.profile.CategoryListScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = NavRoutes.Chat.route,
+                    arguments = listOf(
+                        navArgument("imageUri") { 
+                            type = NavType.StringType
+                            nullable = true 
+                        }
+                    )
+                ) { backStackEntry ->
+                    val imageUriString = backStackEntry.arguments?.getString("imageUri")
+                    val imageUri = imageUriString?.let { Uri.parse(java.net.URLDecoder.decode(it, "UTF-8")) }
+                    
+                    AddMessageScreen(
+                        initialImageUri = imageUri,
+                        onClose = { navController.popBackStack() }
+                    )
+                }
+
+                composable(NavRoutes.ReceiptCamera.route) {
+                    PlaceholderTab(title = "Scan Receipt (Premium ✨)")
+                }
+
+                composable(NavRoutes.Subscription.route) {
+                    PlaceholderTab(title = "Upgrade to Premium ✨")
+                }
             }
         }
     }

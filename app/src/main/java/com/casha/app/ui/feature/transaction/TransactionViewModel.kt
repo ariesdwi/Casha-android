@@ -9,6 +9,7 @@ import com.casha.app.domain.model.TransactionRequest
 import com.casha.app.domain.usecase.category.CategorySyncUseCase
 import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase
 import com.casha.app.domain.usecase.transaction.*
+import com.casha.app.domain.model.CreateIncomeRequest
 import com.casha.app.core.network.SyncEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -22,6 +23,7 @@ import java.util.*
 data class TransactionUiState(
     val transactions: List<CashflowEntry> = emptyList(),
     val rawTransactions: List<TransactionCasha> = emptyList(),
+    val rawIncomes: List<com.casha.app.domain.model.IncomeCasha> = emptyList(),
     val categories: List<CategoryCasha> = emptyList(),
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
@@ -39,10 +41,14 @@ class TransactionViewModel @Inject constructor(
     private val getCashflowHistoryUseCase: GetCashflowHistoryUseCase,
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val addIncomeUseCase: AddIncomeUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val syncTransactionsUseCase: SyncTransactionsUseCase,
     private val categorySyncUseCase: CategorySyncUseCase,
+    private val getIncomesUseCase: GetIncomesUseCase,
+    private val updateIncomeUseCase: UpdateIncomeUseCase,
+    private val deleteIncomeUseCase: DeleteIncomeUseCase,
     private val syncEventBus: SyncEventBus
 ) : ViewModel() {
 
@@ -52,9 +58,18 @@ class TransactionViewModel @Inject constructor(
     init {
         setupSyncEventListener()
         observeTransactions()
+        observeIncomes()
         fetchHistory()
         syncData()
         fetchCategories()
+    }
+
+    private fun observeIncomes() {
+        viewModelScope.launch {
+            getIncomesUseCase().collect { incomes ->
+                _uiState.update { it.copy(rawIncomes = incomes) }
+            }
+        }
     }
 
     private fun setupSyncEventListener() {
@@ -181,6 +196,32 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
+    fun addIncome(request: CreateIncomeRequest) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                addIncomeUseCase(request)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun updateIncome(id: String, request: CreateIncomeRequest) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                updateIncomeUseCase(id, request)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
     fun updateTransaction(id: String, request: TransactionRequest) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
@@ -209,6 +250,19 @@ class TransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteTransactionUseCase(id)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun deleteIncome(id: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                deleteIncomeUseCase(id)
                 syncEventBus.emitSyncCompleted()
                 syncData()
             } catch (e: Exception) {

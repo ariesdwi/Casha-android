@@ -140,6 +140,20 @@ public class CategoryDao_Impl(
     }
   }
 
+  public override suspend fun deleteById(id: String) {
+    val _sql: String = "DELETE FROM categories WHERE id = ?"
+    return performSuspending(__db, false, true) { _connection ->
+      val _stmt: SQLiteStatement = _connection.prepare(_sql)
+      try {
+        var _argIndex: Int = 1
+        _stmt.bindText(_argIndex, id)
+        _stmt.step()
+      } finally {
+        _stmt.close()
+      }
+    }
+  }
+
   public override suspend fun clearAll() {
     val _sql: String = "DELETE FROM categories"
     return performSuspending(__db, false, true) { _connection ->

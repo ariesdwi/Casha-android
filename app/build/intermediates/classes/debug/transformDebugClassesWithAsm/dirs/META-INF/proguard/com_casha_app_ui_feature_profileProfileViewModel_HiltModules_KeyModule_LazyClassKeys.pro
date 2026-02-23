@@ -1,3 +1,7 @@
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddMessageViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddMessageViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinatorViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinatorViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.transaction.TransactionViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.loading.AppLoadingViewModel
@@ -14,5 +18,7 @@
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.goaltracker.GoalTrackerViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.dashboard.DashboardViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.dashboard.DashboardViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.CategoryViewModel
+-keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.CategoryViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.ProfileViewModel
 -keep,allowobfuscation,allowshrinking class com.casha.app.ui.feature.profile.ProfileViewModel

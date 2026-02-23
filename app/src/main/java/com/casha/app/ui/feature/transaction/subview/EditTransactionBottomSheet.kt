@@ -92,7 +92,7 @@ fun EditTransactionBottomSheet(
             // Transaction Details Group
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Transaction Details",
+                    text = if (cashflowType == CashflowType.INCOME) "Income Details" else "Transaction Details",
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
@@ -259,7 +259,9 @@ fun EditTransactionBottomSheet(
                     onDismissRequest()
                 },
                 modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF34C759)),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (cashflowType == CashflowType.INCOME) Color(0xFF34C759) else MaterialTheme.colorScheme.primary
+                ),
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text("Save Changes", fontWeight = FontWeight.Bold)

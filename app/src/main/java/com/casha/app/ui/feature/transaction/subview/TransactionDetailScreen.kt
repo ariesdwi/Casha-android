@@ -29,6 +29,8 @@ import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.CashflowType
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.ui.feature.transaction.TransactionViewModel
+import com.casha.app.ui.feature.transaction.CashflowUiUtils
+import com.casha.app.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,8 +43,14 @@ fun TransactionDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
-    // Find the specific transaction from rawTransactions list
-    val transaction = uiState.rawTransactions.find { it.id == transactionId }
+    // Find the specific transaction based on type
+    val transaction = if (cashflowType == CashflowType.INCOME) {
+        uiState.rawIncomes.find { it.id == transactionId }?.let { 
+            with(CashflowUiUtils) { it.toTransaction() }
+        }
+    } else {
+        uiState.rawTransactions.find { it.id == transactionId }
+    }
 
     var showingDeleteAlert by remember { mutableStateOf(false) }
     var showingSyncAlert by remember { mutableStateOf(false) }
@@ -69,7 +77,7 @@ fun TransactionDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Transaction Details",
+                        text = if (cashflowType == CashflowType.INCOME) "Income Detail" else "Transaction Details",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -174,7 +182,11 @@ fun TransactionDetailScreen(
                 TextButton(
                     onClick = {
                         showingDeleteAlert = false
-                        viewModel.deleteTransaction(transaction.id)
+                        if (cashflowType == CashflowType.INCOME) {
+                            viewModel.deleteIncome(transaction.id)
+                        } else {
+                            viewModel.deleteTransaction(transaction.id)
+                        }
                         onNavigateBack() // Auto navigate back after initiating delete
                     }
                 ) {
@@ -208,7 +220,19 @@ fun TransactionDetailScreen(
             cashflowType = cashflowType,
             onDismissRequest = { showingEditSheet = false },
             onSave = { request ->
-                viewModel.updateTransaction(transaction.id, request)
+                if (cashflowType == CashflowType.INCOME) {
+                    // Convert TransactionRequest to CreateIncomeRequest
+                    val incomeRequest = com.casha.app.domain.model.CreateIncomeRequest(
+                        name = request.name,
+                        amount = request.amount,
+                        datetime = request.datetime,
+                        type = try { com.casha.app.domain.model.IncomeType.valueOf(request.category.uppercase()) } catch(e: Exception) { com.casha.app.domain.model.IncomeType.OTHER },
+                        note = request.note
+                    )
+                    viewModel.updateIncome(transaction.id, incomeRequest)
+                } else {
+                    viewModel.updateTransaction(transaction.id, request)
+                }
                 showingEditSheet = false
             }
         )
@@ -219,9 +243,10 @@ fun TransactionDetailScreen(
 
 @Composable
 private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
-    val icon = if (type == CashflowType.INCOME) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp
-    val color = if (type == CashflowType.INCOME) Color(0xFF4CAF50) else Color(0xFFF44336)
-    val typeName = if (type == CashflowType.INCOME) "Income" else "Expense"
+    val tempEntry = with(CashflowUiUtils) { transaction.toCashflowEntry() }
+    val icon = CashflowUiUtils.iconForEntry(tempEntry)
+    val color = CashflowUiUtils.colorForType(type)
+    val typeName = if (type == CashflowType.INCOME) "INCOME" else "EXPENSE"
 
     Column(
         modifier = Modifier
@@ -268,7 +293,7 @@ private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
 
 @Composable
 private fun AmountStatusSection(transaction: TransactionCasha, type: CashflowType) {
-    val color = if (type == CashflowType.INCOME) Color(0xFF4CAF50) else Color(0xFFF44336)
+    val color = CashflowUiUtils.colorForType(type)
     val titleText = if (type == CashflowType.INCOME) "Amount Received" else "Amount Spent"
 
     Column(
@@ -344,7 +369,7 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            text = "Transaction Details",
+            text = if (transaction.category.isEmpty() && transaction.amount > 0) "Income Details" else "Transaction Details",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -369,7 +394,7 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
                 Text(
                     text = if (transaction.isSynced) "Synced" else "Pending",
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (transaction.isSynced) Color(0xFF4CAF50) else Color(0xFFFF9800),
+                    color = if (transaction.isSynced) CashaSuccess else Color(0xFFFF9800),
                     textAlign = TextAlign.End
                 )
                 if (transaction.isSynced) {

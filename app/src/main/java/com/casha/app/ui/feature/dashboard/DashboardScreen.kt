@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.WifiOff
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -122,64 +123,70 @@ fun DashboardScreen(
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
-        LazyColumn(
+        PullToRefreshBox(
+            isRefreshing = uiState.isSyncing,
+            onRefresh = { viewModel.refreshDashboard(force = true) },
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(bottom = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+                .padding(paddingValues)
         ) {
-            item {
-                WelcomeHeader(
-                    greeting = greeting,
-                    nickname = nickname
-                )
-            }
-            
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    CardBalanceSection(
-                        summary = uiState.cashflowSummary,
-                        selectedPeriod = uiState.selectedPeriod,
-                        onPeriodChange = { viewModel.changePeriod(it) }
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
+                    WelcomeHeader(
+                        greeting = greeting,
+                        nickname = nickname
                     )
                 }
-            }
-            
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    ReportSection(
-                        report = uiState.report,
-                        selectedTab = uiState.selectedChartTab,
-                        onTabChange = { viewModel.changeChartTab(it) },
-                        isSyncing = uiState.isSyncing,
-                        onSeeAllClick = { navController.navigate(NavRoutes.Report.route) }
-                    )
+                
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        CardBalanceSection(
+                            summary = uiState.cashflowSummary,
+                            selectedPeriod = uiState.selectedPeriod,
+                            onPeriodChange = { viewModel.changePeriod(it) }
+                        )
+                    }
                 }
-            }
-            
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    GoalSection(
-                        goals = uiState.goals,
-                        onSeeAllClick = { navController.navigate(Screen.GoalTracker.route) },
-                        onGoalClick = { goalId -> navController.navigate(Screen.GoalDetail(goalId).route) }
-                    )
+                
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        ReportSection(
+                            report = uiState.report,
+                            selectedTab = uiState.selectedChartTab,
+                            onTabChange = { viewModel.changeChartTab(it) },
+                            isSyncing = uiState.isSyncing,
+                            onSeeAllClick = { navController.navigate(NavRoutes.Report.route) }
+                        )
+                    }
                 }
-            }
-            
-            item {
-                Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                    RecentTransactionsSection(
-                        transactions = uiState.recentTransactions,
-                        onTransactionClick = { transactionId, cashflowType ->
-                            navController.navigate(Screen.TransactionDetail(transactionId, cashflowType).route)
-                        }
-                    )
+                
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        GoalSection(
+                            goals = uiState.goals,
+                            onSeeAllClick = { navController.navigate(Screen.GoalTracker.route) },
+                            onGoalClick = { goalId -> navController.navigate(Screen.GoalDetail(goalId).route) }
+                        )
+                    }
                 }
+                
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        RecentTransactionsSection(
+                            transactions = uiState.recentTransactions,
+                            onTransactionClick = { transactionId, cashflowType ->
+                                navController.navigate(Screen.TransactionDetail(transactionId, cashflowType).route)
+                            }
+                        )
+                    }
+                }
+                
+                item { Spacer(modifier = Modifier.height(16.dp)) }
             }
-            
-            item { Spacer(modifier = Modifier.height(16.dp)) }
         }
     }
 }

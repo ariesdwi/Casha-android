@@ -28,3 +28,15 @@
 # Room
 -keep class * extends androidx.room.RoomDatabase
 -keep @androidx.room.Entity class *
+-keep class * extends androidx.room.Dao
+-keep class * extends androidx.room.Entity
+
+# Hilt / Dagger
+-keep class dagger.hilt.android.internal.managers.** { *; }
+-keep class * extends dagger.hilt.android.internal.managers.HiltWrapper*
+-keep class com.casha.app.CashaApplication_HiltComponents** { *; }
+-keep @dagger.hilt.android.EntryPoint class *
+-keep @dagger.hilt.InstallIn class *
+
+# Keep public fields for JSON mapping if not already covered
+-keepclassmembers class com.casha.app.data.remote.dto.** { *; }

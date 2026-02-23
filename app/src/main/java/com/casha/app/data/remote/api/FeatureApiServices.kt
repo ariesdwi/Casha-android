@@ -23,13 +23,13 @@ interface CashflowApiService {
         @Path("type") type: String,
         @Path("id") id: String,
         @Body request: UpdateTransactionDto
-    ): BaseResponse<TransactionDto>
+    ): BaseResponse<CashflowDto>
     
     @POST("cashflow/{type}")
     suspend fun createCashflow(
         @Path("type") type: String,
         @Body request: TransactionUploadDto
-    ): BaseResponse<TransactionDto>
+    ): BaseResponse<CashflowDto>
     
     @DELETE("cashflow/{type}/{id}")
     suspend fun deleteCashflow(
@@ -46,6 +46,9 @@ interface IncomeApiService {
     suspend fun getSummary(
         @Query("period") period: String? = null
     ): BaseResponse<IncomeSummaryDto>
+
+    @POST("income")
+    suspend fun createIncome(@Body request: CreateIncomeRequestDto): BaseResponse<IncomeDto>
 }
 
 interface GoalApiService {

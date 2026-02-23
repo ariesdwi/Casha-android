@@ -6,8 +6,8 @@ plugins {
     alias(libs.plugins.hilt.android)
     alias(libs.plugins.ksp)
     // Uncomment when google-services.json is added:
-    // alias(libs.plugins.google.services)
-    // alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -22,6 +22,17 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com\"")
+    }
+
+    signingConfigs {
+        create("release") {
+            // Placeholder keys for the user to update
+            keyAlias = "casha"
+            keyPassword = "password"
+            storeFile = file("../release.keystore")
+            storePassword = "password"
+        }
     }
 
     buildTypes {
@@ -29,7 +40,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -53,11 +64,19 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"")
+            // Production environment settings
+            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"")
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
-            buildConfigField("String", "LOG_LEVEL", "\"warning\"")
+            buildConfigField("String", "LOG_LEVEL", "\"error\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "true")
             buildConfigField("Boolean", "ENABLE_CRASHLYTICS", "true")
+
+            // Fallback to debug signing if release keystore doesn't exist yet, to prevent build failure
+            signingConfig = if (file("../release.keystore").exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
 
@@ -94,6 +113,7 @@ dependencies {
     implementation(libs.navigation.compose)
 
     // Lifecycle
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.lifecycle.runtime.compose)
     implementation(libs.lifecycle.viewmodel.compose)
 
@@ -117,10 +137,11 @@ dependencies {
     // DataStore
     implementation(libs.datastore.preferences)
 
-    // Firebase (uncomment when google-services.json is added)
-    // implementation(platform(libs.firebase.bom))
-    // implementation(libs.firebase.crashlytics)
-    // implementation(libs.firebase.messaging)
+    // Firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.crashlytics)
+    implementation(libs.firebase.messaging)
 
     // Google Auth
     implementation(libs.credentials)

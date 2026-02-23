@@ -67,17 +67,18 @@ fun CustomTabBar(
     val backgroundColor = MaterialTheme.colorScheme.background
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    // Outer Box has NO clip so the FAB can overflow above
+    // Outer Box has layout bounds expanded to fit the FAB
     Box(
         modifier = modifier
             .fillMaxWidth()
             .navigationBarsPadding()
-            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp)
+            .padding(start = 16.dp, end = 16.dp, bottom = 12.dp, top = 36.dp)
     ) {
         // Inner background with rounded shape and shadow
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .align(Alignment.BottomCenter)
                 .shadow(
                     elevation = 8.dp,
                     shape = RoundedCornerShape(28.dp),
@@ -111,7 +112,7 @@ fun CustomTabBar(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.BottomCenter),
+                    .align(Alignment.TopCenter),
                 contentAlignment = Alignment.Center
             ) {
                 CenterAddButton(
@@ -149,7 +150,6 @@ private fun CenterAddButton(
 
     Box(
         modifier = Modifier
-            .offset(y = (-36).dp)
             .size(72.dp)
             .graphicsLayer {
                 scaleX = scale

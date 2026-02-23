@@ -29,4 +29,7 @@ interface AuthRepository {
 
     /** Delete the current user's account. */
     suspend fun deleteAccount()
+
+    /** Register FCM push token for the current user. */
+    suspend fun registerPushToken(token: String)
 }

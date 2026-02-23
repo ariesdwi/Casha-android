@@ -25,6 +25,18 @@ enum class IncomeFrequency {
     DAILY, WEEKLY, BIWEEKLY, MONTHLY, YEARLY
 }
 
+data class CreateIncomeRequest(
+    val name: String,
+    val amount: Double,
+    val datetime: Date,
+    val type: IncomeType,
+    val source: String? = null,
+    val assetId: String? = null,
+    val isRecurring: Boolean = false,
+    val frequency: IncomeFrequency? = null,
+    val note: String? = null
+)
+
 data class IncomeSummary(
     val totalIncome: Double,
     val count: Int,

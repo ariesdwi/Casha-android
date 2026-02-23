@@ -73,8 +73,13 @@ sealed class NavRoutes(val route: String) {
     // ── Profile ──
     data object Profile : NavRoutes("profile")
     data object ProfileEdit : NavRoutes("profile_edit")
+    data object Categories : NavRoutes("categories")
 
     // ── Other ──
     data object Recommendation : NavRoutes("recommendation")
     data object Subscription : NavRoutes("subscription")
+    data object Chat : NavRoutes("chat?imageUri={imageUri}") {
+        fun createRoute(imageUri: String? = null) = if (imageUri != null) "chat?imageUri=$imageUri" else "chat"
+    }
+    data object ReceiptCamera : NavRoutes("receipt_camera")
 }

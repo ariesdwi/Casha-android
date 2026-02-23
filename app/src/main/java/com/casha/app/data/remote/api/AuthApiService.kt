@@ -40,4 +40,7 @@ interface AuthApiService {
 
     @DELETE("auth/profile/")
     suspend fun deleteAccount(): BaseResponse<Unit>
+
+    @POST("push-notifications/register-token")
+    suspend fun registerPushToken(@Body request: com.casha.app.data.remote.dto.RegisterTokenRequestDTO): BaseResponse<Unit>
 }

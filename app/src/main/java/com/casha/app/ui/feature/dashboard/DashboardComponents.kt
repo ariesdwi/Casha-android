@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CallMade
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import com.casha.app.ui.theme.*
+import com.casha.app.ui.feature.transaction.CashflowUiUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.max
@@ -778,16 +781,15 @@ fun CashflowRow(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Icon with Gradient Background
         Box(
             modifier = Modifier
                 .size(48.dp)
                 .shadow(elevation = 4.dp, shape = CircleShape)
-                .background(gradientForType(entry.type), CircleShape),
+                .background(CashflowUiUtils.gradientForType(entry.type), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector = iconForEntry(entry),
+                imageVector = CashflowUiUtils.iconForEntry(entry),
                 contentDescription = null,
                 tint = Color.White,
                 modifier = Modifier.size(20.dp)
@@ -808,13 +810,15 @@ fun CashflowRow(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f, fill = false)
                 )
 
                 // Type Badge
                 Box(
                     modifier = Modifier
-                        .background(colorForType(entry.type), RoundedCornerShape(4.dp))
+                        .background(CashflowUiUtils.colorForType(entry.type), RoundedCornerShape(4.dp))
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
@@ -838,7 +842,7 @@ fun CashflowRow(
             horizontalAlignment = Alignment.End,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            val amountColor = if (entry.type == CashflowType.INCOME) CashaSuccess else CashaDanger
+            val amountColor = CashflowUiUtils.colorForType(entry.type)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = if (entry.type == CashflowType.INCOME) "+" else "-",
@@ -859,36 +863,5 @@ fun CashflowRow(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-    }
-}
-
-fun colorForType(type: CashflowType): Color {
-    return when (type) {
-        CashflowType.INCOME -> CashaSuccess
-        CashflowType.EXPENSE -> CashaBlue
-    }
-}
-
-fun gradientForType(type: CashflowType): Brush {
-    val colors = when (type) {
-        CashflowType.INCOME -> listOf(CashaAccentLight, CashaTeal)
-        CashflowType.EXPENSE -> listOf(CashaBlue, CashaPurple)
-    }
-    return Brush.linearGradient(colors)
-}
-
-fun iconForEntry(entry: CashflowEntry): ImageVector {
-    if (entry.type == CashflowType.INCOME) return Icons.Default.CallMade
-    
-    return when (entry.category.lowercase()) {
-        "food", "food & dining" -> Icons.Default.Restaurant
-        "shopping" -> Icons.Default.ShoppingBag
-        "transport" -> Icons.Default.DirectionsCar
-        "entertainment" -> Icons.Default.Movie
-        "utilities" -> Icons.Default.Bolt
-        "salary" -> Icons.Default.Payments
-        "bonus" -> Icons.Default.AutoAwesome
-        "investment" -> Icons.Default.TrendingUp
-        else -> Icons.Default.CreditCard
     }
 }

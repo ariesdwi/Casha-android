@@ -85,13 +85,33 @@ data class UpdateCategoryRequest(
 @Serializable
 data class IncomeDto(
     val id: String = "",
-    val source: String = "",
+    val name: String = "",
     val amount: Double = 0.0,
-    val category: String = "",
+    val currency: String = "IDR",
     val datetime: String = "",
+    val type: String = "",
+    val source: String? = null,
+    val frequency: String? = null,
+    val isRecurring: Boolean = false,
     val note: String? = null,
+    val assetId: String? = null,
+    val assetName: String? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null
+)
+
+@Serializable
+data class CreateIncomeRequestDto(
+    val id: String? = null,
+    val name: String,
+    val amount: Double,
+    val type: String,
+    val datetime: String,
+    val source: String? = null,
+    val isRecurring: Boolean = false,
+    val frequency: String? = null,
+    val note: String? = null,
+    val assetId: String? = null
 )
 
 @Serializable

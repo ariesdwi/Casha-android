@@ -225,7 +225,7 @@ class TransactionRepositoryImpl @Inject constructor(
         if (local != null) {
             transactionDao.deleteTransaction(local)
             try {
-                apiService.deleteTransaction(id)
+                cashflowApiService.deleteCashflow("EXPENSE", id)
             } catch (e: Exception) {
                 // If remote delete fails, we might need a "deleted_locally" flag for sync
             }
@@ -237,9 +237,9 @@ class TransactionRepositoryImpl @Inject constructor(
         unsynced.forEach { entity ->
             try {
                 if (entity.remoteId != null && entity.remoteId.isNotEmpty()) {
-                    // Update existing transaction
-                    val dto = cashflowApiService.updateCashflow(
-                        type = if (entity.amount < 0 || entity.category == "Income") "INCOME" else "EXPENSE", // Crude type inference since entity lacks type field, but Transaction request doesn't provide it either. Oh wait, this repo serves Transaction which might be legacy. Actually we can use type from elsewhere or just "EXPENSE" if amount < 0
+                    // Update existing cashflow
+                    cashflowApiService.updateCashflow(
+                        type = if (entity.amount >= 0) "INCOME" else "EXPENSE",
                         id = entity.remoteId,
                         request = UpdateTransactionDto(
                             name = entity.name,
@@ -250,9 +250,12 @@ class TransactionRepositoryImpl @Inject constructor(
                     )
                     transactionDao.insertTransaction(entity.copy(isSynced = true))
                 } else {
-                    // Create new transaction
-                    val dto = apiService.createTransaction(entity.toUploadDto())
-                    transactionDao.insertTransaction(entity.copy(isSynced = true, remoteId = dto.id))
+                    // Create new cashflow
+                    val response = cashflowApiService.createCashflow(
+                        type = if (entity.amount >= 0) "INCOME" else "EXPENSE",
+                        request = entity.toUploadDto()
+                    )
+                    transactionDao.insertTransaction(entity.copy(isSynced = true, remoteId = response.data?.id))
                 }
             } catch (e: Exception) {
                 // Keep unsynced
@@ -289,6 +292,7 @@ class TransactionRepositoryImpl @Inject constructor(
     )
 
     private fun TransactionEntity.toUploadDto() = TransactionUploadDto(
+        id = id,
         name = name,
         category = category,
         amount = amount,

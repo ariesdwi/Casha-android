@@ -12,4 +12,6 @@ data class CategoryCasha(
     val userId: String? = null,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date()
-)
+) {
+    val isSystem: Boolean get() = userId == null
+}

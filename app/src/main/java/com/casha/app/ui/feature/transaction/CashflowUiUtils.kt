@@ -1,6 +1,7 @@
 package com.casha.app.ui.feature.transaction
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -8,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
 import com.casha.app.domain.model.TransactionCasha
+import com.casha.app.domain.model.IncomeCasha
 import com.casha.app.ui.theme.*
 
 /**
@@ -19,20 +21,20 @@ object CashflowUiUtils {
     fun colorForType(type: CashflowType): Color {
         return when (type) {
             CashflowType.INCOME -> CashaSuccess
-            CashflowType.EXPENSE -> CashaBlue
+            CashflowType.EXPENSE -> CashaDanger
         }
     }
 
     fun gradientForType(type: CashflowType): Brush {
         val colors = when (type) {
             CashflowType.INCOME -> listOf(CashaAccentLight, CashaTeal)
-            CashflowType.EXPENSE -> listOf(CashaBlue, CashaPurple)
+            CashflowType.EXPENSE -> listOf(CashaDanger, Color(0xFFFF8A80))
         }
         return Brush.linearGradient(colors)
     }
 
     fun iconForEntry(entry: CashflowEntry): ImageVector {
-        if (entry.type == CashflowType.INCOME) return Icons.Default.CallMade
+        if (entry.type == CashflowType.INCOME) return Icons.AutoMirrored.Filled.CallMade
         
         return when (entry.category.lowercase().trim()) {
             "food", "food & drink", "food & dining", "restaurant" -> Icons.Default.Restaurant
@@ -42,7 +44,7 @@ object CashflowUiUtils {
             "utilities", "bill", "electricity", "water" -> Icons.Default.Bolt
             "salary" -> Icons.Default.Payments
             "bonus", "gift" -> Icons.Default.AutoAwesome
-            "investment", "stock", "crypto" -> Icons.Default.TrendingUp
+            "investment", "stock", "crypto" -> Icons.AutoMirrored.Filled.TrendingUp
             "health", "medical", "pharmacy" -> Icons.Default.LocalHospital
             "education" -> Icons.Default.School
             else -> Icons.Default.CreditCard
@@ -80,8 +82,34 @@ object CashflowUiUtils {
             title = this.name,
             amount = this.amount,
             category = this.category,
-            type = if (this.amount < 0) CashflowType.EXPENSE else CashflowType.INCOME,
+            type = CashflowType.EXPENSE,
             date = this.datetime,
+            icon = null
+        )
+    }
+
+    fun IncomeCasha.toTransaction(): TransactionCasha {
+        return TransactionCasha(
+            id = id,
+            name = name,
+            category = type.name,
+            amount = amount,
+            datetime = datetime,
+            note = note,
+            isSynced = true, // Incomes are usually fetched from remote and synced
+            createdAt = createdAt,
+            updatedAt = updatedAt
+        )
+    }
+
+    fun IncomeCasha.toCashflowEntry(): CashflowEntry {
+        return CashflowEntry(
+            id = id,
+            title = name,
+            amount = amount,
+            category = type.name,
+            type = CashflowType.INCOME,
+            date = datetime,
             icon = null
         )
     }

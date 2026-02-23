@@ -32,7 +32,7 @@ import com.casha.app.ui.feature.transaction.subview.TransactionList
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionScreen(
-    onNavigateToAddTransaction: () -> Unit,
+    onNavigate: (String) -> Unit,
     onNavigateToEditTransaction: (String) -> Unit,
     onNavigateToTransactionDetail: (String, String) -> Unit,
     viewModel: TransactionViewModel = hiltViewModel()
@@ -48,6 +48,17 @@ fun TransactionScreen(
     )
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    var showCoordinator by remember { mutableStateOf(false) }
+
+    com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinator(
+        isPresented = showCoordinator,
+        onDismiss = { showCoordinator = false },
+        onNavigate = { route ->
+            onNavigate(route)
+            showCoordinator = false
+        }
+    )
 
     Scaffold(
         modifier = Modifier
@@ -72,7 +83,7 @@ fun TransactionScreen(
         },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = onNavigateToAddTransaction,
+                onClick = { showCoordinator = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {

@@ -8,6 +8,7 @@ import com.casha.app.data.remote.api.CashflowApiService
 import com.casha.app.data.remote.api.GoalApiService
 import com.casha.app.data.remote.api.IncomeApiService
 import com.casha.app.data.remote.api.TransactionApiService
+import com.casha.app.data.remote.api.ChatApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -99,6 +100,12 @@ object NetworkModule {
     @Singleton
     fun provideIncomeApiService(retrofit: Retrofit): IncomeApiService {
         return retrofit.create(IncomeApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideChatApiService(retrofit: Retrofit): com.casha.app.data.remote.api.ChatApiService {
+        return retrofit.create(com.casha.app.data.remote.api.ChatApiService::class.java)
     }
 
     @Provides

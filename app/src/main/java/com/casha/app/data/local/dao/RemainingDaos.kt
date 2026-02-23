@@ -47,6 +47,9 @@ interface CategoryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategories(categories: List<CategoryEntity>)
 
+    @Query("DELETE FROM categories WHERE id = :id")
+    suspend fun deleteById(id: String)
+
     @Query("DELETE FROM categories")
     suspend fun clearAll()
 }
@@ -61,6 +64,9 @@ interface IncomeDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIncomes(incomes: List<IncomeEntity>)
+
+    @Query("DELETE FROM incomes WHERE id = :id")
+    suspend fun deleteById(id: String)
 
     @Query("DELETE FROM incomes")
     suspend fun clearAll()

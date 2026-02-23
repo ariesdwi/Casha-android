@@ -53,6 +53,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import androidx.credentials.CustomCredential
+import androidx.credentials.exceptions.GetCredentialException
+import com.google.android.libraries.identity.googleid.GetSignInWithGoogleOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
+import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import com.casha.app.BuildConfig
+import kotlinx.coroutines.launch
+import android.util.Log
 
 @Composable
 fun LoginScreen(
@@ -65,6 +77,55 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     var passwordVisible by remember { mutableStateOf(false) }
+    
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val credentialManager = remember { CredentialManager.create(context) }
+
+    fun handleGoogleSignIn() {
+        // Use GetSignInWithGoogleOption (full Sign-In flow) instead of
+        // GetGoogleIdOption (One Tap) for better compatibility on emulators.
+        val signInWithGoogleOption = GetSignInWithGoogleOption.Builder(BuildConfig.GOOGLE_WEB_CLIENT_ID)
+            .build()
+
+        val request = GetCredentialRequest.Builder()
+            .addCredentialOption(signInWithGoogleOption)
+            .build()
+
+        scope.launch {
+            try {
+                val result = credentialManager.getCredential(
+                    request = request,
+                    context = context
+                )
+                val credential = result.credential
+                if (credential is CustomCredential &&
+                    credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL
+                ) {
+                    try {
+                        val googleIdTokenCredential = GoogleIdTokenCredential.createFrom(credential.data)
+                        val idToken = googleIdTokenCredential.idToken
+                        Log.d("LoginScreen", "Google Sign-In successful, got idToken")
+                        viewModel.googleLogin(idToken)
+                    } catch (e: GoogleIdTokenParsingException) {
+                        Log.e("LoginScreen", "Failed to parse Google ID token", e)
+                        snackbarHostState.showSnackbar("Failed to parse Google credentials")
+                    }
+                } else {
+                    Log.e("LoginScreen", "Received unexpected credential type: ${credential.type}")
+                    snackbarHostState.showSnackbar("Unexpected login result")
+                }
+            } catch (e: GetCredentialException) {
+                Log.e("LoginScreen", "Credential Manager error: ${e.message}", e)
+                if (e.message?.contains("canceled", ignoreCase = true) == false) {
+                    snackbarHostState.showSnackbar("Google Sign-In failed: ${e.message}")
+                }
+            } catch (e: Exception) {
+                Log.e("LoginScreen", "Unexpected error during Google Sign-In", e)
+                snackbarHostState.showSnackbar("An unexpected error occurred")
+            }
+        }
+    }
 
     LaunchedEffect(uiState.isLoggedIn) {
         if (uiState.isLoggedIn) onLoginSuccess()
@@ -243,43 +304,31 @@ fun LoginScreen(
 
             // ── Social Login ──
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                // Apple Sign In
-                Button(
-                    onClick = { /* TODO: Apple Login */ },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = androidx.compose.ui.graphics.Color.Black
-                    ),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp)
-                ) {
-                    Text(
-                        text = "  Sign in with Apple",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = androidx.compose.ui.graphics.Color.White
-                    )
-                }
-
                 // Google Sign In
                 OutlinedButton(
-                    onClick = {
-                        // TODO: Integrate Google Credential Manager
-                    },
+                    onClick = { handleGoogleSignIn() },
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp)
                 ) {
-                    Text(
-                        text = "🔵  Sign in with Google",
-                        style = MaterialTheme.typography.labelLarge,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        androidx.compose.foundation.Image(
+                            painter = androidx.compose.ui.res.painterResource(id = com.casha.app.R.drawable.ic_google),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = "Sign in with Google",
+                            style = MaterialTheme.typography.labelLarge,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
                 }
             }
 

@@ -73,4 +73,11 @@ class AuthRepositoryImpl @Inject constructor(
             throw Exception(response.message)
         }
     }
+
+    override suspend fun registerPushToken(token: String) {
+        val response = apiService.registerPushToken(com.casha.app.data.remote.dto.RegisterTokenRequestDTO(token))
+        if (response.code != 200 && response.code != 201) {
+            throw Exception(response.message)
+        }
+    }
 }

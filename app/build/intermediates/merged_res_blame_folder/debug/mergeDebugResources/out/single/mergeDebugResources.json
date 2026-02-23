@@ -1,26 +1,26 @@
 [
     {
-        "merged": "com.casha.app-debug-77:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.casha.app-main-79:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.casha.app-debug-84:/drawable_cashalogo.png.flat",
+        "source": "com.casha.app-main-86:/drawable/cashalogo.png"
     },
     {
-        "merged": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-debug-77:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-main-79:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.casha.app-debug-84:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.casha.app-main-86:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.casha.app-debug-77:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.casha.app-main-79:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.casha.app-debug-84:/drawable_ic_google.xml.flat",
+        "source": "com.casha.app-main-86:/drawable/ic_google.xml"
     },
     {
-        "merged": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-debug-77:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-main-79:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.casha.app-debug-84:/mipmap-anydpi-v26_cashalogo.png.flat",
+        "source": "com.casha.app-main-86:/mipmap-anydpi-v26/cashalogo.png"
     },
     {
-        "merged": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-debug-77:/drawable_cashalogo.png.flat",
-        "source": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-main-79:/drawable/cashalogo.png"
+        "merged": "com.casha.app-debug-84:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.casha.app-main-86:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-debug-77:/mipmap-anydpi-v26_cashalogo.png.flat",
-        "source": "/Users/ptsiagaabdiutama/.gradle/daemon/8.13/com.casha.app-main-79:/mipmap-anydpi-v26/cashalogo.png"
+        "merged": "com.casha.app-debug-84:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.casha.app-main-86:/drawable/ic_launcher_foreground.xml"
     }
 ]

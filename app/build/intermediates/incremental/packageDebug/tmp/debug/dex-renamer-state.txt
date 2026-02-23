@@ -1,4 +1,4 @@
-#Sun Feb 22 15:52:46 WIB 2026
+#Mon Feb 23 11:41:59 WIB 2026
 base.0=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes.dex
 base.1=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/0/classes.dex
 base.10=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/3/classes.dex
@@ -10,6 +10,7 @@ base.15=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/
 base.16=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/9/classes.dex
 base.17=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes2.dex
 base.18=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes3.dex
+base.19=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeExtDexDebug/classes4.dex
 base.2=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/1/classes.dex
 base.3=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/10/classes.dex
 base.4=/Users/ptsiagaabdiutama/Documents/Casha-android/app/build/intermediates/dex/debug/mergeProjectDexDebug/11/classes.dex
@@ -29,6 +30,7 @@ path.15=8/classes.dex
 path.16=9/classes.dex
 path.17=classes2.dex
 path.18=classes3.dex
+path.19=classes4.dex
 path.2=1/classes.dex
 path.3=10/classes.dex
 path.4=11/classes.dex
@@ -48,6 +50,7 @@ renamed.15=classes16.dex
 renamed.16=classes17.dex
 renamed.17=classes18.dex
 renamed.18=classes19.dex
+renamed.19=classes20.dex
 renamed.2=classes3.dex
 renamed.3=classes4.dex
 renamed.4=classes5.dex

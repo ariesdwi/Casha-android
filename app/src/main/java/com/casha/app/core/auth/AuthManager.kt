@@ -25,6 +25,9 @@ class AuthManager @Inject constructor(
         private val KEY_ACCESS_TOKEN = stringPreferencesKey("access_token")
         private val KEY_CURRENCY = stringPreferencesKey("selected_currency")
         private val KEY_USER_ID = stringPreferencesKey("user_id")
+        private val KEY_NAME = stringPreferencesKey("user_name")
+        private val KEY_EMAIL = stringPreferencesKey("user_email")
+        private val KEY_AVATAR = stringPreferencesKey("user_avatar")
     }
 
     // ── Token ──
@@ -38,7 +41,6 @@ class AuthManager @Inject constructor(
             prefs[KEY_ACCESS_TOKEN] = token
         }
     }
-
     // ── Currency ──
 
     val selectedCurrency: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -48,6 +50,20 @@ class AuthManager @Inject constructor(
     suspend fun saveCurrency(currency: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_CURRENCY] = currency
+        }
+    }
+
+    // ── Profile Caching ──
+
+    val userName: Flow<String?> = context.dataStore.data.map { it[KEY_NAME] }
+    val userEmail: Flow<String?> = context.dataStore.data.map { it[KEY_EMAIL] }
+    val userAvatar: Flow<String?> = context.dataStore.data.map { it[KEY_AVATAR] }
+
+    suspend fun saveProfileInfo(name: String, email: String, avatar: String?) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_NAME] = name
+            prefs[KEY_EMAIL] = email
+            if (avatar != null) prefs[KEY_AVATAR] = avatar else prefs.remove(KEY_AVATAR)
         }
     }
 

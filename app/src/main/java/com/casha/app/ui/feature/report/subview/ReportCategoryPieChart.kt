@@ -78,7 +78,9 @@ fun ReportCategoryPieChart(
             ) {
                 Canvas(modifier = Modifier.fillMaxSize()) {
                     var startAngle = -90f
-                    val strokeWidth = size.width * 0.25f // Donut hole size control
+                    val strokeWidth = size.width * 0.22f // Optimized ring width
+                    val arcSize = size.width - strokeWidth
+                    val arcTopLeft = Offset(strokeWidth / 2, strokeWidth / 2)
                     
                     data.forEachIndexed { index, item ->
                         val sweepAngle = (item.total / totalSpending * 360).toFloat()
@@ -86,16 +88,18 @@ fun ReportCategoryPieChart(
                         
                         drawArc(
                             color = sliceColor,
-                            startAngle = startAngle + 1.5f, // Angular inset
-                            sweepAngle = sweepAngle - 3f,    // Angular inset
+                            startAngle = startAngle + 1.5f,
+                            sweepAngle = sweepAngle - 3f,
                             useCenter = false,
+                            topLeft = arcTopLeft,
+                            size = Size(arcSize, arcSize),
                             style = Stroke(width = strokeWidth, cap = StrokeCap.Butt)
                         )
                         
                         // Draw percentage text overlay if slice is large enough
                         if (item.percentage >= 0.05) {
                             val middleAngle = (startAngle + sweepAngle / 2) * (Math.PI / 180).toFloat()
-                            val radius = (size.width - strokeWidth) / 2
+                            val radius = arcSize / 2 // Position text exactly in the middle of the stroke
                             val x = (size.width / 2) + cos(middleAngle) * radius
                             val y = (size.height / 2) + sin(middleAngle) * radius
                             
@@ -104,12 +108,14 @@ fun ReportCategoryPieChart(
                             drawContext.canvas.nativeCanvas.apply {
                                 val paint = android.graphics.Paint().apply {
                                     this.color = android.graphics.Color.WHITE
-                                    textSize = 30f
+                                    textSize = 32f // Slightly larger for readability
                                     typeface = android.graphics.Typeface.DEFAULT_BOLD
                                     textAlign = android.graphics.Paint.Align.CENTER
                                     setShadowLayer(5f, 0f, 2f, android.graphics.Color.argb(76, 0, 0, 0))
                                 }
-                                drawText(percentageText, x, y + 10f, paint)
+                                // Center vertically using FontMetrics
+                                val verticalOffset = (paint.descent() + paint.ascent()) / 2
+                                drawText(percentageText, x, y - verticalOffset, paint)
                             }
                         }
                         

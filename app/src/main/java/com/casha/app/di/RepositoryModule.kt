@@ -8,6 +8,8 @@ import com.casha.app.domain.repository.TransactionRepository
 import com.casha.app.domain.repository.CashflowRepository
 import com.casha.app.domain.repository.IncomeRepository
 import com.casha.app.domain.repository.GoalRepository
+import com.casha.app.data.remote.impl.ChatRepositoryImpl
+import com.casha.app.domain.repository.ChatRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -46,4 +48,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindBudgetRepository(impl: com.casha.app.data.remote.impl.BudgetRepositoryImpl): com.casha.app.domain.repository.BudgetRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindChatRepository(impl: ChatRepositoryImpl): ChatRepository
 }

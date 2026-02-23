@@ -53,8 +53,7 @@ class CategoryRepositoryImpl @Inject constructor(
     override suspend fun deleteCategory(id: String) {
         // Remote-first: API must succeed before removing locally
         apiService.deleteCategory(id)
-        // Note: CategoryDao doesn't have deleteById, so we skip local delete
-        // The next sync will refresh the list
+        categoryDao.deleteById(id)
     }
 
     // ── Mapper ──

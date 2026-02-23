@@ -26,7 +26,6 @@ data class RegisterRequestDTO(
 
 @Serializable
 data class GoogleLoginRequestDTO(
-    @SerialName("id_token")
     val idToken: String
 )
 

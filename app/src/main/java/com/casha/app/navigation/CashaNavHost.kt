@@ -36,10 +36,40 @@ import kotlinx.coroutines.flow.firstOrNull
 @Composable
 fun CashaNavHost(
     authManager: AuthManager,
-    deleteAllLocalDataUseCase: DeleteAllLocalDataUseCase
+    deleteAllLocalDataUseCase: DeleteAllLocalDataUseCase,
+    notificationManager: com.casha.app.core.notification.NotificationManager
 ) {
     val navController = rememberNavController()
     val context = LocalContext.current
+
+    // ── Handle Global Notifications & Deep Linking ──
+    LaunchedEffect(notificationManager) {
+        notificationManager.notifications.collect { notification ->
+            // Determine the target route based on notification type
+            val route = when (notification.type) {
+                com.casha.app.domain.model.NotificationType.TRANSACTION_ADDED -> {
+                    val id = notification.data["transactionId"]
+                    val type = notification.data["cashflowType"] ?: "EXPENSE"
+                    if (id != null) NavRoutes.TransactionDetail.createRoute(id, type) else null
+                }
+                com.casha.app.domain.model.NotificationType.BUDGET_ALERT,
+                com.casha.app.domain.model.NotificationType.BUDGET_CREATED -> NavRoutes.Budget.route
+                com.casha.app.domain.model.NotificationType.MONTHLY_SUMMARY -> NavRoutes.Report.route
+                else -> null
+            }
+
+            route?.let {
+                // If we're not logged in, we shouldn't navigate to app content
+                val token = authManager.accessToken.firstOrNull()
+                if (!token.isNullOrBlank()) {
+                    navController.navigate(it) {
+                        // Avoid multiple copies of the same screen
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
+    }
 
     // ── Determine start destination based on stored token ──
     var startDestination by remember { mutableStateOf<String?>(null) }

@@ -39,3 +39,14 @@ data class UpdateTransactionRequest(
     val category: String?,
     val datetime: String
 )
+
+enum class ChatParseIntent(val rawValue: String) {
+    EXPENSE("EXPENSE"), 
+    INCOME("INCOME"), 
+    PAYMENT("PAYMENT")
+}
+
+data class ChatParseResult(
+    val intent: ChatParseIntent,
+    val message: String
+)
