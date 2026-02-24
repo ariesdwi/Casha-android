@@ -59,6 +59,27 @@ interface GoalApiService {
 
     @GET("goals/categories")
     suspend fun getGoalsCategories(): BaseResponse<List<GoalCategoryDto>>
+
+    @POST("goals")
+    suspend fun createGoal(@Body request: CreateGoalApiRequest): BaseResponse<GoalDto>
+
+    @GET("goals/{id}")
+    suspend fun getGoal(@Path("id") id: String): BaseResponse<GoalDto>
+
+    @PATCH("goals/{id}")
+    suspend fun updateGoal(
+        @Path("id") id: String,
+        @Body request: CreateGoalApiRequest
+    ): BaseResponse<GoalDto>
+
+    @DELETE("goals/{id}")
+    suspend fun deleteGoal(@Path("id") id: String): BaseResponse<Unit>
+
+    @POST("goals/{id}/contributions")
+    suspend fun addContribution(
+        @Path("id") id: String,
+        @Body request: AddContributionApiRequest
+    ): BaseResponse<GoalContributionDto>
 }
 
 interface CategoryApiService {

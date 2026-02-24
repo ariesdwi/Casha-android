@@ -56,6 +56,12 @@ interface IncomeRepository {
 interface GoalRepository {
     suspend fun getGoals(): List<com.casha.app.domain.model.Goal>
     suspend fun getSummary(): com.casha.app.domain.model.GoalSummary
+    suspend fun createGoal(request: com.casha.app.domain.model.CreateGoalRequest)
+    suspend fun fetchGoalCategories(): List<com.casha.app.domain.model.GoalCategory>
+    suspend fun getGoal(id: String): com.casha.app.domain.model.Goal?
+    suspend fun updateGoal(id: String, request: com.casha.app.domain.model.CreateGoalRequest)
+    suspend fun deleteGoal(id: String)
+    suspend fun addContribution(goalId: String, amount: Double, note: String?)
 }
 
 /**

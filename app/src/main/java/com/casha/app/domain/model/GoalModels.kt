@@ -63,3 +63,14 @@ data class GoalSummary(
     val overallProgress: Double,
     val nearestDeadline: NearestDeadline? = null
 )
+
+data class CreateGoalRequest(
+    val name: String,
+    val targetAmount: Double,
+    val category: GoalCategory,
+    val deadline: Date?,
+    val assetId: String?,
+    val icon: String?,
+    val color: String?,
+    val note: String?
+)

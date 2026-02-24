@@ -208,6 +208,28 @@ fun MainScreen(
                         onNavigateToGoalDetail = { goalId -> navController.navigate(NavRoutes.GoalTrackerDetail.createRoute(goalId)) }
                     )
                 }
+                composable(
+                    route = NavRoutes.GoalTrackerDetail.route,
+                    arguments = listOf(navArgument("goalId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val goalId = backStackEntry.arguments?.getString("goalId") ?: ""
+                    val viewModel: com.casha.app.ui.feature.goaltracker.GoalTrackerViewModel = hiltViewModel()
+                    com.casha.app.ui.feature.goaltracker.GoalTrackerDetailScreen(
+                        goalId = goalId,
+                        viewModel = viewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+               composable(NavRoutes.AddGoal.route) { backStackEntry ->
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry(NavRoutes.GoalTracker.route)
+                    }
+                    val viewModel: com.casha.app.ui.feature.goaltracker.GoalTrackerViewModel = hiltViewModel(parentEntry)
+                    com.casha.app.ui.feature.goaltracker.AddGoalScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
                 composable(NavRoutes.Transactions.route) {
                     TransactionScreen(
                         onNavigate = { route -> 

@@ -189,6 +189,24 @@ data class GoalSummaryDto(
     val nearestDeadline: NearestDeadlineDto? = null
 )
 
+@Serializable
+data class CreateGoalApiRequest(
+    val name: String,
+    val targetAmount: Double,
+    val category: String,
+    val deadline: String?,
+    val assetId: String?,
+    val icon: String?,
+    val color: String?,
+    val note: String?
+)
+
+@Serializable
+data class AddContributionApiRequest(
+    val amount: Double,
+    val note: String? = null
+)
+
 // ── Budget DTOs ──
 
 @Serializable

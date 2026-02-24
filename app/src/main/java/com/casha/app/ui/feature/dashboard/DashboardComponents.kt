@@ -50,42 +50,45 @@ fun CardBalanceSection(
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(elevation = 8.dp, shape = RoundedCornerShape(32.dp)),
+            shape = RoundedCornerShape(32.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
-            ),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            )
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 24.dp, horizontal = 16.dp),
+                    .padding(vertical = 28.dp, horizontal = 20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Label
                 Text(
                     text = "Net Cashflow", // TODO: Localize "dashboard.balance.net_cashflow"
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     fontWeight = FontWeight.Medium
                 )
 
                 // Amount Section
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier.padding(vertical = 4.dp)
                 ) {
                     Text(
                         text = if (isBalanceVisible) CurrencyFormatter.format(summary?.netBalance ?: 0.0) else "••••••••",
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.displayMedium,
                         color = amountColor,
-                        fontWeight = FontWeight.Bold,
-                        maxLines = 1,
-                        modifier = Modifier.weight(1f, fill = false)
+                        fontWeight = FontWeight.Black,
+                        maxLines = 1
                     )
                     
+                    Spacer(modifier = Modifier.width(12.dp))
+
                     IconButton(
                         onClick = { isBalanceVisible = !isBalanceVisible },
                         modifier = Modifier.size(24.dp)
@@ -93,39 +96,45 @@ fun CardBalanceSection(
                         Icon(
                             imageVector = if (isBalanceVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
                             contentDescription = "Toggle Balance",
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            modifier = Modifier.size(16.dp)
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
+                            modifier = Modifier.size(20.dp)
                         )
                     }
                 }
 
                 // Period Selector Button
-                TextButton(
+                Surface(
                     onClick = { showPeriodPicker = true },
-                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    shape = RoundedCornerShape(50.dp),
+                    color = Color.Transparent
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
                         Text(
                             text = getPeriodTitle(selectedPeriod),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.SemiBold
+                            style = MaterialTheme.typography.labelLarge,
+                            color = CashaSuccess,
+                            fontWeight = FontWeight.Bold
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = null,
-                            modifier = Modifier.size(10.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            modifier = Modifier.size(16.dp),
+                            tint = CashaSuccess
                         )
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
 
                 // Mini Stats
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     MiniStatItem(
                         title = "In", // TODO: Localize "dashboard.balance.in"
@@ -136,9 +145,11 @@ fun CardBalanceSection(
                         modifier = Modifier.weight(1f)
                     )
 
-                    VerticalDivider(
-                        modifier = Modifier.height(30.dp),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                    Box(
+                        modifier = Modifier
+                            .height(40.dp)
+                            .width(1.dp)
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
                     )
 
                     MiniStatItem(
@@ -178,25 +189,25 @@ fun MiniStatItem(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(14.dp),
+            modifier = Modifier.size(20.dp),
             tint = color
         )
         Text(
             text = title,
             style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
             fontWeight = FontWeight.Medium
         )
         Text(
             text = if (isVisible) CurrencyFormatter.format(amount) else "••••",
-            style = MaterialTheme.typography.titleSmall,
+            style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurface,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Black,
             maxLines = 1
         )
     }

@@ -28,6 +28,62 @@ class GoalRepositoryImpl @Inject constructor(
         return response.data?.toDomain() ?: GoalSummary(0, 0, 0, 0.0, 0.0, 0.0)
     }
 
+    override suspend fun createGoal(request: CreateGoalRequest) {
+        val mappedRequest = CreateGoalApiRequest(
+            name = request.name,
+            targetAmount = request.targetAmount,
+            category = request.category.id, // the backend trace expects the category UUID string
+            deadline = request.deadline?.let { dateFormat.format(it) },
+            assetId = request.assetId,
+            icon = request.icon,
+            color = request.color,
+            note = request.note
+        )
+        apiService.createGoal(mappedRequest)
+    }
+
+    override suspend fun fetchGoalCategories(): List<GoalCategory> {
+        val response = apiService.getGoalsCategories()
+        return response.data?.map { dto ->
+            GoalCategory(
+                id = dto.id,
+                name = dto.name.replace("_", " ").lowercase().replaceFirstChar { char -> char.uppercase() },
+                icon = dto.icon,
+                color = dto.color,
+                isActive = dto.isActive,
+                userId = dto.userId
+            )
+        } ?: emptyList()
+    }
+
+    override suspend fun getGoal(id: String): Goal? {
+        val response = apiService.getGoal(id)
+        return response.data?.toDomain()
+    }
+
+    override suspend fun updateGoal(id: String, request: CreateGoalRequest) {
+        val mappedRequest = CreateGoalApiRequest(
+            name = request.name,
+            targetAmount = request.targetAmount,
+            category = request.category.id,
+            deadline = request.deadline?.let { dateFormat.format(it) },
+            assetId = request.assetId,
+            icon = request.icon,
+            color = request.color,
+            note = request.note
+        )
+        apiService.updateGoal(id, mappedRequest)
+    }
+
+    override suspend fun deleteGoal(id: String) {
+        apiService.deleteGoal(id)
+    }
+
+    override suspend fun addContribution(goalId: String, amount: Double, note: String?) {
+        val request = AddContributionApiRequest(amount, note)
+        apiService.addContribution(goalId, request)
+    }
+
     private fun GoalDto.toDomain() = Goal(
         id = id,
         name = name,
