@@ -1,3 +1,41 @@
 <resources>
     <string name="app_name">Casha</string>
+
+    <!-- Subscription -->
+    <string name="subscription_title_get_premium">Get Premium</string>
+    <string name="subscription_subtitle_join_users">Join thousands of users who are taking control of their finances with Casha Premium.</string>
+    
+    <string name="subscription_feature_ai_advisor_title">AI Financial Advisor</string>
+    <string name="subscription_feature_ai_advisor_subtitle">Get personalized insights and advice based on your spending habits.</string>
+    
+    <string name="subscription_feature_receipt_scanner_title">Smart Receipt Scanner</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">Extract transaction details automatically from your receipts.</string>
+    
+    <string name="subscription_feature_advanced_analytics_title">Advanced Analytics</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">Deep dive into your financial data with beautiful charts.</string>
+    
+    <string name="subscription_feature_smart_alerts_title">Smart Budget Alerts</string>
+    <string name="subscription_feature_smart_alerts_subtitle">Stay on track with intelligent notifications before you overspend.</string>
+    
+    <string name="subscription_button_get_premium">Get Premium</string>
+    <string name="subscription_button_start_trial">Start Free Trial</string>
+    <string name="subscription_button_lifetime">Lifetime Access</string>
+    <string name="subscription_button_processing">Processing...</string>
+    <string name="subscription_button_select_plan">Select a Plan</string>
+    
+    <string name="subscription_link_restore">Restore Purchases</string>
+    <string name="subscription_link_terms">Terms of Service</string>
+    <string name="subscription_link_privacy">Privacy Policy</string>
+    
+    <string name="subscription_footer_cancel_anytime">Cancel anytime in your App Store settings. Managed by Google Play.</string>
+    
+    <string name="subscription_overlay_securing_access">Securing your access…</string>
+    
+    <string name="subscription_success_welcome">Welcome to Premium!</string>
+    <string name="subscription_success_subtitle">You now have unlimited access to all features. Enjoy your financial journey!</string>
+    
+    <string name="subscription_label_best_value">BEST VALUE</string>
+    <string name="subscription_label_per_month">/ month</string>
+    <string name="subscription_label_one_time">one-time</string>
+
 </resources>

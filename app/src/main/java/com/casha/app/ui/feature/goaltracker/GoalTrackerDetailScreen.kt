@@ -81,18 +81,15 @@ fun GoalTrackerDetailScreen(
     Scaffold(
         containerColor = Color(0xFFF8F9FA)
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (goal != null) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
-                        .padding(bottom = 32.dp)
-                ) {
+        if (goal != null) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0xFFF8F9FA))
+                    .padding(bottom = paddingValues.calculateBottomPadding())
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
                     // Custom Header
                     DetailHeader(
                         title = if (isEditMode) "Edit Goal" else goal.name,
@@ -178,6 +175,8 @@ fun GoalTrackerDetailScreen(
                             }
                         }
                     }
+                    
+                    Spacer(modifier = Modifier.height(84.dp))
                 }
             } else if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -189,7 +188,7 @@ fun GoalTrackerDetailScreen(
                 }
             }
         }
-    }
+
 
     if (showingAddContribution && goal != null) {
         AddContributionSheet(
@@ -257,7 +256,7 @@ fun DetailHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
