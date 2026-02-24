@@ -250,6 +250,8 @@ fun AddGoalScreen(
                 }
             }
             } // End of inner padded column
+            
+            Spacer(modifier = Modifier.height(120.dp))
         }
     }
 

@@ -26,6 +26,7 @@ import com.casha.app.domain.model.GoalContribution
 import com.casha.app.domain.model.CreateGoalRequest
 import com.casha.app.domain.usecase.goal.CreateGoalUseCase
 import com.casha.app.domain.usecase.goal.GetGoalCategoriesUseCase
+import com.casha.app.core.network.SyncEventBus
 
 data class GoalTrackerUiState(
     val goals: List<Goal> = emptyList(),
@@ -46,7 +47,8 @@ class GoalTrackerViewModel @Inject constructor(
     private val getGoalUseCase: GetGoalUseCase,
     private val updateGoalUseCase: UpdateGoalUseCase,
     private val deleteGoalUseCase: DeleteGoalUseCase,
-    private val addGoalContributionUseCase: AddGoalContributionUseCase
+    private val addGoalContributionUseCase: AddGoalContributionUseCase,
+    private val syncEventBus: SyncEventBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(GoalTrackerUiState())
@@ -135,6 +137,7 @@ class GoalTrackerViewModel @Inject constructor(
                 )
                 // Refresh list on success
                 fetchAllData()
+                syncEventBus.emitSyncCompleted()
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -169,6 +172,7 @@ class GoalTrackerViewModel @Inject constructor(
                 )
             )
             fetchAllData()
+            syncEventBus.emitSyncCompleted()
             true
         } catch (e: Exception) {
             _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -181,6 +185,7 @@ class GoalTrackerViewModel @Inject constructor(
         return try {
             deleteGoalUseCase.execute(id)
             fetchAllData()
+            syncEventBus.emitSyncCompleted()
             true
         } catch (e: Exception) {
             _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -193,6 +198,7 @@ class GoalTrackerViewModel @Inject constructor(
         try {
             addGoalContributionUseCase.execute(goalId, amount, note)
             fetchGoalDetails(goalId)
+            syncEventBus.emitSyncCompleted()
         } catch (e: Exception) {
             _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
         }
