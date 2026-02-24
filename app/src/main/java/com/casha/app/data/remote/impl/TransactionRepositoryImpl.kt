@@ -37,6 +37,15 @@ class TransactionRepositoryImpl @Inject constructor(
             val response = apiService.getTransactions()
             val entities = response.transactions.map { it.toEntity() }
             transactionDao.insertTransactions(entities)
+            
+            // Reconcile: delete synced transactions that are no longer on the server
+            val remoteIds = entities.map { it.id }
+            if (remoteIds.isNotEmpty()) {
+                transactionDao.deleteSyncedTransactionsNotIn(remoteIds)
+            } else {
+                // If the remote list is actually empty, delete all synced transactions
+                transactionDao.clearAllSynced()
+            }
         } catch (e: Exception) {
             // Log or handle fetch error
         }
@@ -225,13 +234,35 @@ class TransactionRepositoryImpl @Inject constructor(
 
     override suspend fun deleteTransaction(id: String) {
         val local = transactionDao.getTransactionById(id)
+        val remoteId = local?.remoteId ?: id
+        
+        // 1. Remote-First Failsafe: Try deleting from API
+        // If this fails (e.g. offline), it will throw an Exception, completely skipping local deletion.
+        cashflowApiService.deleteCashflow("EXPENSE", remoteId)
+        
+        // 2. Only if the remote call succeeds, delete locally
         if (local != null) {
             transactionDao.deleteTransaction(local)
-            try {
-                cashflowApiService.deleteCashflow("EXPENSE", local.remoteId ?: id)
-            } catch (e: Exception) {
-                // If remote delete fails, we might need a "deleted_locally" flag for sync
-            }
+        }
+    }
+    
+    override suspend fun updateTransaction(id: String, request: UpdateTransactionDto) {
+        val local = transactionDao.getTransactionById(id)
+        val remoteId = local?.remoteId ?: id
+        
+        // 1. Remote-First Failsafe: Try updating API
+        cashflowApiService.updateCashflow("EXPENSE", remoteId, request)
+        
+        // 2. Only if the remote call succeeds, update local entity
+        if (local != null) {
+            val updatedEntity = local.copy(
+                name = request.name,
+                amount = request.amount,
+                category = request.category ?: local.category,
+                datetime = dateFormat.parse(request.datetime) ?: local.datetime,
+                isSynced = true
+            )
+            transactionDao.insertTransaction(updatedEntity)
         }
     }
 

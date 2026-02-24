@@ -12,6 +12,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import com.casha.app.core.utils.ImageUtils
+import kotlinx.coroutines.delay
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.CloudUpload
 import javax.inject.Inject
 
 enum class PresentationState {
@@ -27,7 +32,7 @@ enum class PresentationState {
 data class CoordinatorUiState(
     val presentationState: PresentationState = PresentationState.IDLE,
     val isPremium: Boolean = false, // Mocked for now
-    val isLoading: Boolean = false,
+    val progressState: ProgressState = ProgressState(),
     val errorMessage: String? = null
 )
 
@@ -75,7 +80,32 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
 
     fun uploadImage(imageUri: Uri) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { 
+                it.copy(
+                    progressState = ProgressState(
+                        isVisible = true,
+                        currentProcessingStatus = "Analyzing Receipt...",
+                        currentIcon = Icons.Default.CloudUpload,
+                        processingProgress = 0f,
+                        isCompleted = false
+                    ),
+                    errorMessage = null 
+                ) 
+            }
+            
+            // Loop to fake smooth progress up to 90%
+            val progressJob = launch {
+                var currentProgress = 0f
+                while (currentProgress < 0.9f) {
+                    delay(50)
+                    currentProgress += 0.02f
+                    _uiState.update { state ->
+                        state.copy(
+                            progressState = state.progressState.copy(processingProgress = currentProgress)
+                        )
+                    }
+                }
+            }
             
             try {
                 // Compress URI to a temporary optimized JPEG file
@@ -91,12 +121,34 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
                 // Clean up temp file
                 try { tempFile.delete() } catch (e: Exception) { /* ignore */ }
                 
+                progressJob.cancel()
+                
+                // Show success state
+                _uiState.update { state -> 
+                    state.copy(
+                        progressState = state.progressState.copy(
+                            processingProgress = 1f,
+                            isCompleted = true,
+                            currentIcon = Icons.Default.CheckCircle,
+                            currentProcessingStatus = "Recording Transaction..."
+                        )
+                    ) 
+                }
+                
+                delay(1200) // Brief pause to show success checkmark
+                
                 // On success, close the modal completely (Flow A)
-                _uiState.update { it.copy(isLoading = false, presentationState = PresentationState.IDLE) }
-            } catch (e: Exception) {
                 _uiState.update { 
                     it.copy(
-                        isLoading = false, 
+                        progressState = ProgressState(), 
+                        presentationState = PresentationState.IDLE
+                    ) 
+                }
+            } catch (e: Exception) {
+                progressJob.cancel()
+                _uiState.update { 
+                    it.copy(
+                        progressState = ProgressState(), 
                         errorMessage = e.localizedMessage ?: "Failed to upload image"
                     ) 
                 }

@@ -80,6 +80,16 @@ class IncomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateIncome(id: String, request: CreateIncomeRequest) {
+        // 1. Remote-First Failsafe: Try syncing to remote
+        val dto = UpdateTransactionDto(
+            name = request.name,
+            category = request.type.name,
+            amount = request.amount,
+            datetime = dateFormat.format(request.datetime)
+        )
+        cashflowApiService.updateCashflow("INCOME", id, dto) 
+        
+        // 2. Only if remote succeeds, save locally
         val entity = IncomeEntity(
             id = id,
             name = request.name,
@@ -94,28 +104,14 @@ class IncomeRepositoryImpl @Inject constructor(
             updatedAt = Date()
         )
         incomeDao.insertIncome(entity)
-
-        // Try syncing to remote
-        try {
-            val dto = UpdateTransactionDto(
-                name = request.name,
-                category = request.type.name,
-                amount = request.amount,
-                datetime = dateFormat.format(request.datetime)
-            )
-            cashflowApiService.updateCashflow("INCOME", id, dto) 
-        } catch (e: Exception) {
-            // Log error
-        }
     }
 
     override suspend fun deleteIncome(id: String) {
+        // 1. Remote-First Failsafe: Try deleting from API
+        cashflowApiService.deleteCashflow("INCOME", id)
+        
+        // 2. Only if remote succeeds, delete locally
         incomeDao.deleteById(id)
-        try {
-            cashflowApiService.deleteCashflow("INCOME", id)
-        } catch (e: Exception) {
-            // Log error
-        }
     }
 
     private fun IncomeDto.toDomain() = IncomeCasha(

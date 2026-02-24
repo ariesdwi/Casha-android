@@ -25,6 +25,7 @@ interface TransactionRepository {
     
     // Command
     suspend fun saveTransaction(transaction: TransactionCasha)
+    suspend fun updateTransaction(id: String, request: com.casha.app.data.remote.dto.UpdateTransactionDto)
     suspend fun deleteTransaction(id: String)
     suspend fun syncTransactions()
 }

@@ -100,20 +100,10 @@ fun AddTransactionCoordinator(
         }
     }
 
-    if (uiState.isLoading) {
-        Dialog(onDismissRequest = {}) {
-            Box(
-                modifier = Modifier
-                    .size(100.dp)
-                    .background(Color.White, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-            }
-        }
-    }
+    // New custom animated ProgressOverlay matching iOS
+    ProgressOverlay(progressState = uiState.progressState)
     
-    if (uiState.presentationState == PresentationState.ACTION_SHEET && !uiState.isLoading) {
+    if (uiState.presentationState == PresentationState.ACTION_SHEET && !uiState.progressState.isVisible) {
         Dialog(onDismissRequest = { 
             viewModel.close()
             onDismiss()

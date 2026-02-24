@@ -23,6 +23,9 @@ interface TransactionDao {
 
     @Delete
     suspend fun deleteTransaction(transaction: TransactionEntity)
+    
+    @Query("DELETE FROM transactions WHERE isSynced = 1 AND id NOT IN (:remoteIds)")
+    suspend fun deleteSyncedTransactionsNotIn(remoteIds: List<String>)
 
     // ── Spending Analytics ──
 
@@ -43,6 +46,9 @@ interface TransactionDao {
 
     @Query("DELETE FROM transactions")
     suspend fun clearAll()
+
+    @Query("DELETE FROM transactions WHERE isSynced = 1")
+    suspend fun clearAllSynced()
 }
 
 data class CategoryTotal(
