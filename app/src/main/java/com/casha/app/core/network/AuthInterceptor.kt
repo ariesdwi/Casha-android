@@ -26,7 +26,7 @@ class AuthInterceptor @Inject constructor(
         val locale = Locale.getDefault().toLanguageTag()
 
         val newRequest = originalRequest.newBuilder().apply {
-            header("Content-Type", "application/json")
+            header("Accept", "application/json")
             header("Accept-Language", locale)
             if (!token.isNullOrBlank()) {
                 header("Authorization", "Bearer $token")

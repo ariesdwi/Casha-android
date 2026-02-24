@@ -55,10 +55,8 @@ class IncomeRepositoryImpl @Inject constructor(
             createdAt = Date(),
             updatedAt = Date()
         )
-        // Local save
-        incomeDao.insertIncome(entity)
 
-        // Try syncing to remote
+        // Try syncing to remote first
         try {
             val dto = CreateIncomeRequestDto(
                 name = request.name,
@@ -71,9 +69,13 @@ class IncomeRepositoryImpl @Inject constructor(
                 note = request.note,
                 assetId = request.assetId
             )
+            // Backend call
             apiService.createIncome(dto)
+            // If success, store locally
+            incomeDao.insertIncome(entity)
         } catch (e: Exception) {
-            // Keep it locally, fail remote silently for now
+            // Keep it locally as an offline fallback
+            incomeDao.insertIncome(entity)
         }
     }
 

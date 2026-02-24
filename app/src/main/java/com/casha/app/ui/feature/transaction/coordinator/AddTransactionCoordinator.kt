@@ -13,6 +13,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.background
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.navigation.NavRoutes
 
@@ -35,10 +37,17 @@ fun AddTransactionCoordinator(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            val encodedUri = URLEncoder.encode(it.toString(), StandardCharsets.UTF_8.toString())
-            onNavigate(NavRoutes.Chat.createRoute(encodedUri))
-            onDismiss()
-            viewModel.close()
+            // Persist the read permission so the ChatScreen can read it later
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Ignore if provider doesn't support persistable permissions
+            }
+            // Pass the URI to the ViewModel to upload directly (Scan & Go flow)
+            viewModel.uploadImage(it)
         }
     }
     val uiState by viewModel.uiState.collectAsState()
@@ -60,7 +69,7 @@ fun AddTransactionCoordinator(
                 viewModel.close()
             }
             PresentationState.CHAT -> {
-                onNavigate(NavRoutes.Chat.route)
+                onNavigate(NavRoutes.Chat.createRoute())
                 onDismiss()
                 viewModel.close()
             }
@@ -85,7 +94,26 @@ fun AddTransactionCoordinator(
         }
     }
 
-    if (uiState.presentationState == PresentationState.ACTION_SHEET) {
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { msg ->
+            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
+        }
+    }
+
+    if (uiState.isLoading) {
+        Dialog(onDismissRequest = {}) {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .background(Color.White, shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            }
+        }
+    }
+    
+    if (uiState.presentationState == PresentationState.ACTION_SHEET && !uiState.isLoading) {
         Dialog(onDismissRequest = { 
             viewModel.close()
             onDismiss()

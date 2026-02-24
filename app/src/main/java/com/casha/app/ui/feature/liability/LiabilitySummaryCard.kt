@@ -16,6 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.casha.app.R
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.LiabilitySummary
 import java.text.NumberFormat
 import java.util.*
@@ -62,10 +63,15 @@ fun LiabilitySummaryCard(
                         )
                     } else if (summary != null) {
                         Text(
-                            text = formatCurrency(summary.totalDebt, summary.currency ?: "IDR"),
+                            text = CurrencyFormatter.format(summary.totalDebt, summary.currency ?: CurrencyFormatter.defaultCurrency),
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFFFF3B30) // iOS explicit red
+                        )
+                        Text(
+                            text = "Remaining Payoff: ${CurrencyFormatter.format(summary.totalCurrentBalance, summary.currency ?: CurrencyFormatter.defaultCurrency)}",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color(0xFF8E8E93)
                         )
                     } else {
                         Text(
@@ -86,11 +92,4 @@ fun LiabilitySummaryCard(
             }
         }
     }
-}
-
-private fun formatCurrency(amount: Double, currencyCode: String): String {
-    val format = NumberFormat.getCurrencyInstance(Locale.getDefault())
-    format.currency = Currency.getInstance(currencyCode)
-    format.maximumFractionDigits = 0
-    return format.format(amount)
 }

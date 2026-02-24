@@ -24,6 +24,8 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.NewBudgetRequest
+import com.casha.app.core.util.CurrencyFormatter
+import androidx.compose.ui.focus.onFocusChanged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -38,6 +40,7 @@ fun AddBudgetSheet(
     // Form State
     var selectedCategoryName by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
+    var isAmountFocused by remember { mutableStateOf(false) }
     var selectedMonthYear by remember { mutableStateOf(uiState.currentMonthYear ?: DateHelper.generateMonthYearOptions().firstOrNull() ?: "") }
     
     var showCategoryDropdown by remember { mutableStateOf(false) }
@@ -58,7 +61,7 @@ fun AddBudgetSheet(
 
     val isValid = selectedCategoryName.isNotEmpty() && (amountText.toDoubleOrNull() ?: 0.0) > 0
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -67,6 +70,7 @@ fun AddBudgetSheet(
         containerColor = Color(0xFFF2F2F7)
     ) {
         Scaffold(
+            modifier = Modifier.fillMaxHeight(0.9f),
             containerColor = Color(0xFFF2F2F7), // iOS grouped background color
         topBar = {
             CenterAlignedTopAppBar(
@@ -150,14 +154,14 @@ fun AddBudgetSheet(
                                 .padding(horizontal = 16.dp, vertical = 14.dp)
                         ) {
                             BasicTextField(
-                                value = amountText,
+                                value = if (isAmountFocused) amountText else if (amountText.isNotEmpty()) CurrencyFormatter.formatInput(amountText) else "",
                                 onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) amountText = it },
                                 textStyle = TextStyle(
                                     fontSize = 17.sp,
                                     color = Color.Black
                                 ),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                modifier = Modifier.fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
                                 decorationBox = { innerTextField ->
                                     if (amountText.isEmpty()) {
                                         Text(

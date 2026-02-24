@@ -16,7 +16,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.GoalSummary
@@ -72,13 +74,13 @@ fun GoalTrackerScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp),
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 120.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // 1. Summary Grid
             uiState.goalSummary?.let { summary ->
                 item {
-                    GoalSummaryGrid(summary = summary, currency = "IDR") // TODO: Dynamic currency
+                    GoalSummaryGrid(summary = summary, currency = CurrencyFormatter.defaultCurrency) // TODO: Dynamic currency pulled directly
                 }
             }
 

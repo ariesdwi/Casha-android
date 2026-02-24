@@ -91,35 +91,39 @@ class TransactionViewModel @Inject constructor(
 
     fun fetchHistory() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            try {
-                var targetMonth: String? = null
-                var targetYear: String? = null
-                val selected = _uiState.value.selectedMonth
-                
-                when {
-                    selected == "This month" -> {
-                        targetMonth = com.casha.app.core.util.DateHelper.generateMonthYearOptions().firstOrNull()
-                    }
-                    selected == "This year" -> {
-                        targetYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR).toString()
-                    }
-                    selected.matches(Regex("\\d{4}-\\d{2}")) -> {
-                        targetMonth = selected
-                    }
-                }
+            loadHistoryInternal()
+        }
+    }
 
-                // Fetch up to 100 for better client side grouping
-                val response = getCashflowHistoryUseCase.execute(targetMonth, targetYear, 1, 100)
-                val sections = groupTransactionsByDate(response.entries)
-                _uiState.update { it.copy(
-                    transactions = response.entries,
-                    cashflowSections = sections,
-                    isLoading = false
-                ) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = e.message, isLoading = false) }
+    private suspend fun loadHistoryInternal() {
+        _uiState.update { it.copy(isLoading = true) }
+        try {
+            var targetMonth: String? = null
+            var targetYear: String? = null
+            val selected = _uiState.value.selectedMonth
+            
+            when {
+                selected == "This month" -> {
+                    targetMonth = com.casha.app.core.util.DateHelper.generateMonthYearOptions().firstOrNull()
+                }
+                selected == "This year" -> {
+                    targetYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR).toString()
+                }
+                selected.matches(Regex("\\d{4}-\\d{2}")) -> {
+                    targetMonth = selected
+                }
             }
+
+            // Fetch up to 100 for better client side grouping
+            val response = getCashflowHistoryUseCase.execute(targetMonth, targetYear, 1, 100)
+            val sections = groupTransactionsByDate(response.entries)
+            _uiState.update { it.copy(
+                transactions = response.entries,
+                cashflowSections = sections,
+                isLoading = false
+            ) }
+        } catch (e: Exception) {
+            _uiState.update { it.copy(errorMessage = e.message, isLoading = false) }
         }
     }
     
@@ -162,7 +166,7 @@ class TransactionViewModel @Inject constructor(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 syncTransactionsUseCase()
-                fetchHistory()
+                loadHistoryInternal()
             } catch (e: Exception) {
                 _uiState.update { it.copy(errorMessage = e.message) }
             } finally {

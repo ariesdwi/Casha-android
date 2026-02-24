@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.LiabilityStatement
 import com.casha.app.domain.model.LiabilityTransaction
@@ -37,7 +38,7 @@ fun StatementDetailView(
     onTransactionClick: (LiabilityTransaction) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val userCurrency = "IDR" // Replace with App Settings in actual usage
+    val userCurrency = CurrencyFormatter.defaultCurrency
     
     val currentStatement = liabilityState.selectedStatementDetail ?: statement
 

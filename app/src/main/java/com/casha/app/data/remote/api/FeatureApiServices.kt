@@ -25,9 +25,8 @@ interface CashflowApiService {
         @Body request: UpdateTransactionDto
     ): BaseResponse<CashflowDto>
     
-    @POST("cashflow/{type}")
-    suspend fun createCashflow(
-        @Path("type") type: String,
+    @POST("transactions/create")
+    suspend fun createTransaction(
         @Body request: TransactionUploadDto
     ): BaseResponse<CashflowDto>
     

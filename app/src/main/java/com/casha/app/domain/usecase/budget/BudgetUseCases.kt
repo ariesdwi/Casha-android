@@ -145,7 +145,7 @@ class BudgetSyncUseCase @Inject constructor(
                 startDate = Date(),
                 endDate = Date(),
                 category = request.category,
-                currency = "IDR",
+                currency = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
                 isSynced = false,
                 createdAt = Date(),
                 updatedAt = Date()

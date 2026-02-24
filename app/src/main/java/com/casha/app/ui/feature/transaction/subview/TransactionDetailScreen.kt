@@ -312,7 +312,7 @@ private fun AmountStatusSection(transaction: TransactionCasha, type: CashflowTyp
             fontWeight = FontWeight.Medium
         )
         Text(
-            text = CurrencyFormatter.format(transaction.amount, "IDR").replace("-",""), // Remove negative sign for display
+            text = CurrencyFormatter.format(transaction.amount, CurrencyFormatter.defaultCurrency).replace("-",""), // Remove negative sign for display
             fontSize = 36.sp,
             fontWeight = FontWeight.Bold,
             color = color

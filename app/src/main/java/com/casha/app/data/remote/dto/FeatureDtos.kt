@@ -50,7 +50,7 @@ data class CashflowTotalDto(
 @Serializable
 data class CashflowSummaryDto(
     val period: String = "",
-    val currency: String = "IDR",
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
     val income: CashflowTotalDto? = null,
     val expense: CashflowTotalDto? = null,
     @SerialName("liabilityPayment")
@@ -87,7 +87,7 @@ data class IncomeDto(
     val id: String = "",
     val name: String = "",
     val amount: Double = 0.0,
-    val currency: String = "IDR",
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
     val datetime: String = "",
     val type: String = "",
     val source: String? = null,
@@ -155,7 +155,7 @@ data class GoalDto(
     val name: String = "",
     val targetAmount: Double = 0.0,
     val currentAmount: Double = 0.0,
-    val currency: String = "IDR",
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
     val category: String? = null,
     val categoryId: String? = null,
     val categoryDetail: GoalCategoryDto? = null,
@@ -218,7 +218,7 @@ data class BudgetSummaryDto(
     val totalBudget: Double = 0.0,
     val totalSpent: Double = 0.0,
     val totalRemaining: Double = 0.0,
-    val currency: String = "IDR"
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency
 )
 
 @Serializable

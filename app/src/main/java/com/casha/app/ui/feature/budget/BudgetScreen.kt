@@ -171,7 +171,7 @@ fun BudgetScreen(
                 isRefreshing = uiState.isLoading,
                 onRefresh = { viewModel.refreshBudgetData() },
                 state = pullToRefreshState,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.weight(1f)
             ) {
                 BudgetList(
                     budgets = uiState.budgets,

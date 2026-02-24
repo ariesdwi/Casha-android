@@ -34,7 +34,7 @@ data class CashflowSummary(
     val totalExpense: Double,
     val netBalance: Double,
     val periodLabel: String,
-    val currency: String = "IDR",
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
     val incomeBreakdown: Map<String, Double> = emptyMap(),
     val expenseBreakdown: Map<String, Double> = emptyMap(),
     val liabilityBreakdown: Map<String, Double> = emptyMap()

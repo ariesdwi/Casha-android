@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.focus.onFocusChanged
+import com.casha.app.core.util.CurrencyFormatter
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -172,13 +174,13 @@ fun CreateLiabilityScreen(
             
             // Amounts section
             if (isCreditCard) {
+                var isCreditLimitFocused by remember { mutableStateOf(false) }
                 InputCard(title = "Credit Limit") {
                     OutlinedTextField(
-                        value = creditLimit,
+                        value = if (isCreditLimitFocused) creditLimit else if (creditLimit.isNotEmpty()) CurrencyFormatter.formatInput(creditLimit) else "",
                         onValueChange = { creditLimit = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        prefix = { Text("Rp ") },
+                        modifier = Modifier.fillMaxWidth().onFocusChanged { isCreditLimitFocused = it.isFocused },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFF3F4F6),
@@ -189,13 +191,13 @@ fun CreateLiabilityScreen(
                     )
                 }
                 
+                var isCurrentBalanceFocused by remember { mutableStateOf(false) }
                 InputCard(title = "Current Balance") {
                     OutlinedTextField(
-                        value = currentBalance,
+                        value = if (isCurrentBalanceFocused) currentBalance else if (currentBalance.isNotEmpty()) CurrencyFormatter.formatInput(currentBalance) else "",
                         onValueChange = { currentBalance = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        prefix = { Text("Rp ") },
+                        modifier = Modifier.fillMaxWidth().onFocusChanged { isCurrentBalanceFocused = it.isFocused },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFF3F4F6),
@@ -253,13 +255,13 @@ fun CreateLiabilityScreen(
                     )
                 }
             } else {
+                var isPrincipalFocused by remember { mutableStateOf(false) }
                 InputCard(title = "Principal Amount") {
                     OutlinedTextField(
-                        value = principal,
+                        value = if (isPrincipalFocused) principal else if (principal.isNotEmpty()) CurrencyFormatter.formatInput(principal) else "",
                         onValueChange = { principal = it },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth(),
-                        prefix = { Text("Rp ") },
+                        modifier = Modifier.fillMaxWidth().onFocusChanged { isPrincipalFocused = it.isFocused },
                         shape = RoundedCornerShape(12.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = Color(0xFFF3F4F6),
@@ -441,7 +443,7 @@ fun CreateLiabilityScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(120.dp))
         }
 
         // Category Picker Dialog

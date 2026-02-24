@@ -219,13 +219,13 @@ fun CurrencySearchSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         Column(
             modifier = Modifier
-                .fillMaxHeight(0.85f)
+                .fillMaxHeight(0.9f)
                 .fillMaxWidth()
                 .padding(horizontal = 24.dp)
         ) {

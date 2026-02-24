@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.File
+import com.casha.app.core.utils.ImageUtils
 import java.util.Date
 import javax.inject.Inject
 
@@ -29,7 +33,8 @@ data class AddMessageUiState(
 @HiltViewModel
 class AddMessageViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
-    private val syncEventBus: SyncEventBus
+    private val syncEventBus: SyncEventBus,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddMessageUiState())
@@ -83,16 +88,26 @@ class AddMessageViewModel @Inject constructor(
             }
             
             try {
-                // MOCK DELAY AND RESPONSE FOR NOW
-                delay(2000)
+                // Compress & Copy URI to a temporary optimized file
+                val tempFile = ImageUtils.compressImage(context, imageUri, "chat_upload.jpg")
+                
+                if (tempFile == null || !tempFile.exists()) {
+                    throw Exception("Failed to process image")
+                }
+
+                val result = chatRepository.parseImage(tempFile)
+                syncEventBus.emitSyncCompleted()
+                
+                // Clean up temp file
+                try { tempFile.delete() } catch (e: Exception) { /* ignore */ }
                 
                 _uiState.update {
                     it.copy(
                         isSending = false,
                         showConfirmation = true,
                         transactionSuccess = true,
-                        aiResponseMessage = "Saved receipt for Rp150,000",
-                        lastIntent = ChatParseIntent.EXPENSE.rawValue
+                        aiResponseMessage = result.message,
+                        lastIntent = result.intent.rawValue
                     )
                 }
             } catch (e: Exception) {

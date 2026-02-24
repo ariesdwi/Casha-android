@@ -27,6 +27,13 @@ class MainActivity : ComponentActivity() {
         // Handle notification click if app was cold started
         handleNotificationIntent(intent)
 
+        // Observe user currency globally to maintain a single source of truth
+        lifecycleScope.launch {
+            authManager.selectedCurrency.collect { currency ->
+                com.casha.app.core.util.CurrencyFormatter.defaultCurrency = currency ?: "IDR"
+            }
+        }
+
         setContent {
             CashaTheme {
                 CashaNavHost(

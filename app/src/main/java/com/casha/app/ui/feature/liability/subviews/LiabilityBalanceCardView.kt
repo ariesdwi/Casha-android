@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.sp
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.LiabilityCategory
 import com.casha.app.domain.model.LiabilityStatement
+import com.casha.app.core.util.CurrencyFormatter
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
@@ -65,7 +66,7 @@ fun LiabilityBalanceCardView(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = formatLiabilityCurrency(liability.currentBalance, userCurrency),
+                        text = CurrencyFormatter.format(liability.currentBalance, userCurrency),
                         fontSize = 30.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -87,7 +88,7 @@ fun LiabilityBalanceCardView(
                         val limit = liability.creditLimit
                         val available = liability.availableCredit ?: (limit - liability.currentBalance)
                         Text(
-                            text = formatLiabilityCurrency(available, userCurrency),
+                            text = CurrencyFormatter.format(available, userCurrency),
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary
@@ -165,7 +166,7 @@ fun LiabilityBalanceCardView(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = formatLiabilityCurrency(latestStatement.statementBalance, userCurrency),
+                            text = CurrencyFormatter.format(latestStatement.statementBalance, userCurrency),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.ExtraBold,
                             color = MaterialTheme.colorScheme.onSurface
@@ -207,9 +208,7 @@ fun LiabilityBalanceCardView(
 }
 
 // Renamed helper functions to avoid clashes with other files in the same package
-internal fun formatLiabilityCurrency(amount: Double, currencyCode: String): String {
-    val format = NumberFormat.getCurrencyInstance(Locale("id", "ID"))
-    format.currency = Currency.getInstance(currencyCode)
-    format.maximumFractionDigits = 0
-    return format.format(amount).replace("Rp", "Rp ")
+internal fun formatLiabilityDate(date: Date): String {
+    val formatter = SimpleDateFormat("dd MMM yyyy", Locale("id", "ID"))
+    return formatter.format(date)
 }

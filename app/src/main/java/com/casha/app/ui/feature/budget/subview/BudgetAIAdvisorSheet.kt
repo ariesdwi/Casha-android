@@ -13,6 +13,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,7 +58,7 @@ fun BudgetAIAdvisorSheet(
     val fixedExpenses = remember { mutableStateMapOf<String, Double>() }
     var showCategoryMenu by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -66,6 +67,7 @@ fun BudgetAIAdvisorSheet(
         containerColor = ProfessionalBackground
     ) {
         Scaffold(
+            modifier = Modifier.fillMaxHeight(0.9f),
             topBar = {
                 TopAppBar(
                     title = {
@@ -246,6 +248,7 @@ private fun IncomeInputSection(
     onIncomeChange: (String) -> Unit,
     onAnalyze: () -> Unit
 ) {
+    var isFocused by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Monthly Income Allocation", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         
@@ -260,11 +263,11 @@ private fun IncomeInputSection(
             Text(CurrencyFormatter.symbol(), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(8.dp))
             OutlinedTextField(
-                value = incomeText,
+                value = if (isFocused) incomeText else if (incomeText.isNotEmpty()) CurrencyFormatter.formatInput(incomeText) else "",
                 onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onIncomeChange(it) },
                 placeholder = { Text("Amount to allocate") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(1f).onFocusChanged { isFocused = it.isFocused },
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
@@ -300,6 +303,7 @@ private fun FixedExpensesSection(
     onAddExpense: () -> Unit,
     onRemoveExpense: (String) -> Unit
 ) {
+    var isAmountFocused by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text("Fixed Spending (Optional)", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         
@@ -352,10 +356,10 @@ private fun FixedExpensesSection(
                 }
                 
                 OutlinedTextField(
-                    value = fixedAmountText,
+                    value = if (isAmountFocused) fixedAmountText else if (fixedAmountText.isNotEmpty()) CurrencyFormatter.formatInput(fixedAmountText) else "",
                     onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onAmountChange(it) },
                     placeholder = { Text("Amount", fontSize = 12.sp) },
-                    modifier = Modifier.weight(1f),
+                    modifier = Modifier.weight(1f).onFocusChanged { isAmountFocused = it.isFocused },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = OutlinedTextFieldDefaults.colors(

@@ -11,6 +11,7 @@ import com.casha.app.domain.usecase.goal.GetGoalsUseCase
 import com.casha.app.domain.usecase.goal.GetGoalSummaryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import com.casha.app.core.network.SyncEventBus
@@ -97,7 +98,12 @@ class DashboardViewModel @Inject constructor(
         lastDashboardRefresh = now
 
         viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true, errorMessage = null) }
+            refreshDashboardInternal()
+        }
+    }
+
+    private suspend fun refreshDashboardInternal() {
+        _uiState.update { it.copy(isSyncing = true, errorMessage = null) }
             
             val period = _uiState.value.selectedPeriod
             val (startDate, endDate) = period.dateRange()
@@ -119,60 +125,63 @@ class DashboardViewModel @Inject constructor(
             val periodLabel = getPeriodTitle(period)
 
             try {
-                if (_uiState.value.isOnline) {
-                    cashflowSyncUseCase.syncAndFetch()
-                }
-
-                val spendingTask = async { getTotalSpendingUseCase.execute(period) }
-                val reportsTask = async { getSpendingReportUseCase.execute() }
-                val unsyncedTask = async { getUnsyncTransactionCountUseCase.execute() }
-                
-                val historyTask = async {
+                coroutineScope {
                     if (_uiState.value.isOnline) {
-                        getCashflowHistoryUseCase.execute(monthStr, yearStr, 1, 5).entries
-                    } else {
-                        cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
+                        cashflowSyncUseCase.syncAndFetch()
                     }
-                }
-                
-                val summaryTask = async {
-                    if (_uiState.value.isOnline) {
-                        getCashflowSummaryUseCase.execute(monthStr, yearStr)
-                    } else {
-                        cashflowSyncUseCase.calculateSummaryFromLocal(startDate, endDate ?: Date(), periodLabel)
-                    }
-                }
-                
-                val goalsTask = async { getGoalsUseCase.execute() }
-                val goalSummaryTask = async { getGoalSummaryUseCase.execute() }
 
-                _uiState.update { it.copy(
-                    totalSpending = spendingTask.await(),
-                    report = reportsTask.await().firstOrNull() ?: it.report,
-                    unsyncedCount = unsyncedTask.await(),
-                    recentTransactions = historyTask.await(),
-                    cashflowSummary = summaryTask.await(),
-                    goals = goalsTask.await(),
-                    goalSummary = goalSummaryTask.await(),
-                    isSyncing = false
-                ) }
+                    val spendingTask = async { getTotalSpendingUseCase.execute(period) }
+                    val reportsTask = async { getSpendingReportUseCase.execute() }
+                    val unsyncedTask = async { getUnsyncTransactionCountUseCase.execute() }
+                    
+                    val historyTask = async {
+                        if (_uiState.value.isOnline) {
+                            getCashflowHistoryUseCase.execute(monthStr, yearStr, 1, 5).entries
+                        } else {
+                            cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
+                        }
+                    }
+                    
+                    val summaryTask = async {
+                        if (_uiState.value.isOnline) {
+                            getCashflowSummaryUseCase.execute(monthStr, yearStr)
+                        } else {
+                            cashflowSyncUseCase.calculateSummaryFromLocal(startDate, endDate ?: Date(), periodLabel)
+                        }
+                    }
+                    
+                    val goalsTask = async { getGoalsUseCase.execute() }
+                    val goalSummaryTask = async { getGoalSummaryUseCase.execute() }
+
+                    _uiState.update { it.copy(
+                        totalSpending = spendingTask.await(),
+                        report = reportsTask.await().firstOrNull() ?: it.report,
+                        unsyncedCount = unsyncedTask.await(),
+                        recentTransactions = historyTask.await(),
+                        cashflowSummary = summaryTask.await(),
+                        goals = goalsTask.await(),
+                        goalSummary = goalSummaryTask.await(),
+                        isSyncing = false
+                    ) }
+                }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isSyncing = false, errorMessage = "Dashboard refresh failed: ${e.message}") }
             }
-        }
     }
 
     fun syncData() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true) }
-            try {
-                cashflowSyncUseCase.syncAndFetch()
-                refreshDashboard(force = true)
-            } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Sync failed: ${e.message}") }
-            } finally {
-                _uiState.update { it.copy(isSyncing = false) }
-            }
+            syncDataInternal()
+        }
+    }
+
+    private suspend fun syncDataInternal() {
+        _uiState.update { it.copy(isSyncing = true) }
+        try {
+            cashflowSyncUseCase.syncAndFetch()
+            refreshDashboardInternal()
+        } catch (e: Exception) {
+            _uiState.update { it.copy(errorMessage = "Sync failed: ${e.message}", isSyncing = false) }
         }
     }
 
@@ -185,11 +194,9 @@ class DashboardViewModel @Inject constructor(
             _uiState.update { it.copy(isSyncing = true) }
             try {
                 transactionSyncUseCase.syncLocalTransactionsToRemote()
-                syncData()
+                syncDataInternal()
             } catch (e: Exception) {
-                _uiState.update { it.copy(errorMessage = "Auto-sync failed: ${e.message}") }
-            } finally {
-                _uiState.update { it.copy(isSyncing = false) }
+                _uiState.update { it.copy(errorMessage = "Auto-sync failed: ${e.message}", isSyncing = false) }
             }
         }
     }

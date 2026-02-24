@@ -209,14 +209,17 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveTransaction(transaction: TransactionCasha) {
-        // Local first
-        transactionDao.insertTransaction(transaction.toEntity())
-        
-        // Background sync (simplified for now)
         try {
-            syncTransactions()
+            // Attempt to sync to remote immediately
+            val response = cashflowApiService.createTransaction(
+                request = transaction.toEntity().toUploadDto()
+            )
+            // If successful, save locally as synced with remote ID
+            val remoteId = response.data?.id
+            transactionDao.insertTransaction(transaction.copy(isSynced = true, remoteId = remoteId).toEntity())
         } catch (e: Exception) {
-            // Log sync error, keep it unsynced locally
+            // If offline or network fails, save locally as unsynced
+            transactionDao.insertTransaction(transaction.copy(isSynced = false).toEntity())
         }
     }
 
@@ -225,7 +228,7 @@ class TransactionRepositoryImpl @Inject constructor(
         if (local != null) {
             transactionDao.deleteTransaction(local)
             try {
-                cashflowApiService.deleteCashflow("EXPENSE", id)
+                cashflowApiService.deleteCashflow("EXPENSE", local.remoteId ?: id)
             } catch (e: Exception) {
                 // If remote delete fails, we might need a "deleted_locally" flag for sync
             }
@@ -239,7 +242,7 @@ class TransactionRepositoryImpl @Inject constructor(
                 if (entity.remoteId != null && entity.remoteId.isNotEmpty()) {
                     // Update existing cashflow
                     cashflowApiService.updateCashflow(
-                        type = if (entity.amount >= 0) "INCOME" else "EXPENSE",
+                        type = "EXPENSE",
                         id = entity.remoteId,
                         request = UpdateTransactionDto(
                             name = entity.name,
@@ -251,8 +254,7 @@ class TransactionRepositoryImpl @Inject constructor(
                     transactionDao.insertTransaction(entity.copy(isSynced = true))
                 } else {
                     // Create new cashflow
-                    val response = cashflowApiService.createCashflow(
-                        type = if (entity.amount >= 0) "INCOME" else "EXPENSE",
+                    val response = cashflowApiService.createTransaction(
                         request = entity.toUploadDto()
                     )
                     transactionDao.insertTransaction(entity.copy(isSynced = true, remoteId = response.data?.id))

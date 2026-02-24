@@ -42,6 +42,7 @@ fun EditBudgetSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.9f)
                 .padding(horizontal = 24.dp)
                 .padding(bottom = 40.dp),
             horizontalAlignment = Alignment.CenterHorizontally,

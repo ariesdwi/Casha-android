@@ -209,7 +209,7 @@ fun PeriodPickerBottomSheet(
     onPeriodSelected: (SpendingPeriod) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -220,6 +220,7 @@ fun PeriodPickerBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.9f)
                 .padding(bottom = 32.dp)
         ) {
             Text(

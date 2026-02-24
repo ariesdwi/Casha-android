@@ -53,11 +53,28 @@ fun AddMessageScreen(
     val coroutineScope = rememberCoroutineScope()
 
     var showSourceSelection by remember { mutableStateOf(false) }
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        uri?.let { viewModel.sendImage(it) }
+        uri?.let {
+            // Persist the read permission so the ViewModel can read it later
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                // Ignore if provider doesn't support persistable permissions
+            }
+            viewModel.sendImage(it) 
+        }
+    }
+
+    // Clear any previous state when opening the screen
+    LaunchedEffect(Unit) {
+        viewModel.resetState()
     }
 
     // Process initial image if passed from coordinator
@@ -536,28 +553,33 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                if (isSuccess && intent.isNotEmpty()) {
-                    Surface(
-                        color = badgeColor.copy(alpha = 0.1f),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = intent.uppercase(),
-                            color = badgeColor,
-                            style = MaterialTheme.typography.labelSmall,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                        )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = if (isSuccess) "Transaction Logged" else "Something went wrong",
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1A2E)
+                    )
+                    
+                    if (isSuccess && intent.isNotEmpty()) {
+                        Surface(
+                            color = badgeColor.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = intent.uppercase(),
+                                color = badgeColor,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
                     }
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                
-                Text(
-                    text = if (isSuccess) "Transaction Logged" else "Something went wrong",
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A2E)
-                )
                 
                 Spacer(modifier = Modifier.height(4.dp))
                 

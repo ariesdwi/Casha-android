@@ -16,7 +16,7 @@ fun AddEditCategoryBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: (name: String, isActive: Boolean) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var name by remember { mutableStateOf(category?.name ?: "") }
     var isActive by remember { mutableStateOf(category?.isActive ?: true) }
 
@@ -29,6 +29,7 @@ fun AddEditCategoryBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.9f)
                 .padding(24.dp)
                 .padding(bottom = 32.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)

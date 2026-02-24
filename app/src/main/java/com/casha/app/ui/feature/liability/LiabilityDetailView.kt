@@ -23,6 +23,7 @@ import com.casha.app.ui.feature.liability.subviews.LiabilityBalanceCardView
 import com.casha.app.ui.feature.liability.subviews.LiabilityCreditCardSectionsView
 import com.casha.app.ui.feature.liability.subviews.LiabilityInfoDetailsView
 import com.casha.app.ui.feature.liability.subviews.LiabilityQuickActionsView
+import com.casha.app.core.util.CurrencyFormatter
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,7 @@ fun LiabilityDetailView(
     onStatementClick: (LiabilityStatement) -> Unit
 ) {
     val liability = liabilityState.liabilities.firstOrNull { it.id == initialLiability.id } ?: initialLiability
-    val userCurrency = "IDR" // Replace with actual user settings if available
+    val userCurrency = CurrencyFormatter.defaultCurrency
     val scrollState = rememberScrollState()
 
     var showingRecordPayment by remember { mutableStateOf(false) }
@@ -125,7 +126,7 @@ fun LiabilityDetailView(
                 )
             }
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(84.dp))
         }
 
         // Action Sheets can be implemented using Modals/Dialogs here based on showingRecordPayment state

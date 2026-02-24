@@ -34,7 +34,7 @@ data class Goal(
     val name: String,
     val targetAmount: Double,
     val currentAmount: Double,
-    val currency: String = "IDR",
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
     val category: GoalCategory,
     val icon: String? = null,
     val color: String? = null,

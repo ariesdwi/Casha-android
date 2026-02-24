@@ -13,6 +13,10 @@ import com.casha.app.domain.model.ChatParseResult
 import com.casha.app.domain.repository.ChatRepository
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody.Companion.asRequestBody
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -34,6 +38,19 @@ class ChatRepositoryImpl @Inject constructor(
 
     override suspend fun parseChat(input: String): ChatParseResult {
         val response = apiService.parseChat(ChatRequestDto(input = input))
+        return processChatResponse(response)
+    }
+
+    override suspend fun parseImage(file: File): ChatParseResult {
+        // Many backends (like multer) reject wildcard mime types. Use explicit image/jpeg.
+        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+        val inputBody = okhttp3.RequestBody.Companion.create("text/plain".toMediaTypeOrNull(), "")
+        val response = apiService.parseImage(body, inputBody)
+        return processChatResponse(response)
+    }
+
+    private suspend fun processChatResponse(response: com.casha.app.data.remote.dto.ChatResponseDto): ChatParseResult {
         val parseData = response.data ?: throw Exception("No data returned from API: ${response.message}")
         
         val intentString = parseData.intent

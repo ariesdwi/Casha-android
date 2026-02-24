@@ -224,7 +224,7 @@ fun TransactionScreen(
                 PullToRefreshBox(
                     isRefreshing = uiState.isLoading,
                     onRefresh = { viewModel.syncData() },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.weight(1f)
                 ) {
                     val sectionsToDisplay = if (uiState.isSearching) uiState.filteredTransactions else uiState.cashflowSections
                     

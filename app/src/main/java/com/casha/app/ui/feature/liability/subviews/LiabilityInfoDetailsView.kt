@@ -20,6 +20,7 @@ import com.casha.app.domain.model.LiabilityCategory
 import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.util.CurrencyFormatter
 
 @Composable
 fun LiabilityInfoDetailsView(
@@ -50,7 +51,7 @@ fun LiabilityInfoDetailsView(
                         icon = Icons.Default.CreditCard,
                         iconColor = Color(0xFF6750A4), // Modern Purple
                         label = "Credit Limit",
-                        value = formatLiabilityCurrency(liability.creditLimit ?: 0.0, userCurrency)
+                        value = CurrencyFormatter.format(liability.creditLimit ?: 0.0, userCurrency)
                     )
                     DividerRow()
                     DetailRow(
@@ -78,7 +79,7 @@ fun LiabilityInfoDetailsView(
                         icon = Icons.Default.AccountBalanceWallet,
                         iconColor = Color(0xFF1E88E5), // Material Blue
                         label = "Principal",
-                        value = formatLiabilityCurrency(liability.principal ?: 0.0, userCurrency)
+                        value = CurrencyFormatter.format(liability.principal ?: 0.0, userCurrency)
                     )
                     liability.monthlyPayment?.let { monthlyPayment ->
                         DividerRow()
@@ -86,7 +87,7 @@ fun LiabilityInfoDetailsView(
                             icon = Icons.Default.EventRepeat,
                             iconColor = Color(0xFF43A047),
                             label = "Monthly Payment",
-                            value = formatLiabilityCurrency(monthlyPayment, userCurrency)
+                            value = CurrencyFormatter.format(monthlyPayment, userCurrency)
                         )
                     }
                 }
@@ -204,14 +205,4 @@ private fun DividerRow() {
         modifier = Modifier.padding(start = 52.dp, top = 4.dp, bottom = 4.dp),
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
     )
-}
-
-// Renamed helper functions to avoid clashes with other files in the same package
-internal fun formatLiabilityDate(date: Date): String {
-    return try {
-        val formatter = SimpleDateFormat("MMM dd, yyyy", Locale.getDefault())
-        formatter.format(date)
-    } catch (e: Exception) {
-        date.toString()
-    }
 }

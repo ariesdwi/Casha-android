@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import java.text.SimpleDateFormat
 import java.util.*
@@ -71,7 +72,7 @@ private fun PaymentSection(
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(text = "Minimum Payment", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
-                    text = formatLiabilityCurrency(liabilityState.latestStatement?.minimumPayment ?: 0.0, userCurrency),
+                    text = CurrencyFormatter.format(liabilityState.latestStatement?.minimumPayment ?: 0.0, userCurrency),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -320,9 +321,9 @@ private fun CreditLimitProgressSection(liability: Liability, userCurrency: Strin
                 }
 
                 Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    DetailInfoRow(Icons.Default.ArrowUpward, "Terpakai", formatLiabilityCurrency(liability.currentBalance, userCurrency))
-                    DetailInfoRow(Icons.Default.ArrowDownward, "Tersisa", formatLiabilityCurrency(limit - liability.currentBalance, userCurrency))
-                    DetailInfoRow(Icons.Default.Lock, "Limit", formatLiabilityCurrency(limit, userCurrency))
+                    DetailInfoRow(Icons.Default.ArrowUpward, "Terpakai", CurrencyFormatter.format(liability.currentBalance, userCurrency))
+                    DetailInfoRow(Icons.Default.ArrowDownward, "Tersisa", CurrencyFormatter.format(limit - liability.currentBalance, userCurrency))
+                    DetailInfoRow(Icons.Default.Lock, "Limit", CurrencyFormatter.format(limit, userCurrency))
                 }
             }
         }
@@ -388,7 +389,7 @@ private fun transactionAmountText(transaction: LiabilityTransaction, userCurrenc
     val isCredit = isTransactionCredit(transaction)
     val displayAmount = Math.abs(transaction.amount)
     val prefix = if (isCredit) "+" else "-"
-    return "$prefix${formatLiabilityCurrency(displayAmount, userCurrency)}"
+    return "$prefix${CurrencyFormatter.format(displayAmount, userCurrency)}"
 }
 
 private fun transactionAmountColor(transaction: LiabilityTransaction): Color {

@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.LiabilityCategory
+import com.casha.app.core.util.CurrencyFormatter
 import java.text.NumberFormat
 import java.util.*
 
@@ -161,7 +162,7 @@ fun LiabilityRow(
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
-                    text = formatCurrency(liability.currentBalance, liability.currency ?: "IDR"),
+                    text = CurrencyFormatter.format(liability.currentBalance, liability.currency ?: "IDR"),
                     fontSize = 17.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.error
@@ -180,7 +181,7 @@ fun LiabilityRow(
                                 tint = Color(0xFF4CAF50)
                             )
                             Text(
-                                text = formatCurrency(available, liability.currency ?: "IDR"),
+                                text = CurrencyFormatter.format(available, liability.currency ?: "IDR"),
                                 fontSize = 10.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -248,11 +249,4 @@ private fun getCategoryIcon(category: LiabilityCategory): ImageVector {
         LiabilityCategory.PAY_LATER -> Icons.Default.ShoppingCart
         LiabilityCategory.OTHER -> Icons.Default.Money
     }
-}
-
-private fun formatCurrency(amount: Double, currencyCode: String): String {
-    val format = NumberFormat.getCurrencyInstance(Locale.getDefault())
-    format.currency = Currency.getInstance(currencyCode)
-    format.maximumFractionDigits = 0
-    return format.format(amount)
 }

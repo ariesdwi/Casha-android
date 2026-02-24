@@ -23,6 +23,10 @@ import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.TransactionRequest
 import java.text.SimpleDateFormat
 import java.util.*
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
+import com.casha.app.core.util.CurrencyFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +36,7 @@ fun EditTransactionBottomSheet(
     onDismissRequest: () -> Unit,
     onSave: (TransactionRequest) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
     // Form States
     var name by remember { mutableStateOf(transaction.name) }
@@ -51,6 +55,7 @@ fun EditTransactionBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .fillMaxHeight(0.9f)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
@@ -120,18 +125,19 @@ fun EditTransactionBottomSheet(
                         )
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
                         
+                        var isAmountFocused by remember { mutableStateOf(false) }
                         // Amount Input
                         TextField(
-                            value = amount,
+                            value = if (isAmountFocused) amount else if (amount.isNotEmpty()) CurrencyFormatter.formatInput(amount) else "",
                             onValueChange = { amount = it },
-                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                            modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
                             colors = TextFieldDefaults.colors(
                                 focusedContainerColor = Color.Transparent,
                                 unfocusedContainerColor = Color.Transparent,
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent
                             ),
-                            leadingIcon = { Text("Rp ", style = MaterialTheme.typography.bodyLarge) },
                             placeholder = { Text("0") },
                             textStyle = MaterialTheme.typography.bodyLarge
                         )

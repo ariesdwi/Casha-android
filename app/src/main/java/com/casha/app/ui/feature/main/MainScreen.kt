@@ -129,12 +129,12 @@ fun MainScreen(
     }
 
     var showCoordinator by remember { mutableStateOf(false) }
+    var showAddTransactionSheet by remember { mutableStateOf(false) }
+    var editTransactionId by remember { mutableStateOf<String?>(null) }
 
     val currentRoute = navBackStackEntry?.destination?.route
 
     val hideBottomBar = remember(currentRoute) {
-        currentRoute == NavRoutes.AddTransaction.route ||
-        currentRoute == NavRoutes.EditTransaction.route ||
         currentRoute == NavRoutes.Chat.route ||
         currentRoute == NavRoutes.ReceiptCamera.route
     }
@@ -170,10 +170,22 @@ fun MainScreen(
             isPresented = showCoordinator,
             onDismiss = { showCoordinator = false },
             onNavigate = { route ->
-                navController.navigate(route)
+                if (route == NavRoutes.AddTransaction.route) {
+                    editTransactionId = null
+                    showAddTransactionSheet = true
+                } else {
+                    navController.navigate(route)
+                }
                 showCoordinator = false
             }
         )
+
+        if (showAddTransactionSheet) {
+            AddTransactionScreen(
+                transactionId = editTransactionId,
+                onNavigateBack = { showAddTransactionSheet = false }
+            )
+        }
 
         // We use innerPadding.calculateTopPadding() but ignore bottom padding 
         // to allow content to scroll behind the floating transparent TabBar.
@@ -198,21 +210,19 @@ fun MainScreen(
                 }
                 composable(NavRoutes.Transactions.route) {
                     TransactionScreen(
-                        onNavigate = { route -> navController.navigate(route) },
-                        onNavigateToEditTransaction = { id -> navController.navigate(NavRoutes.EditTransaction.createRoute(id)) },
+                        onNavigate = { route -> 
+                            if (route == NavRoutes.AddTransaction.route) {
+                                editTransactionId = null
+                                showAddTransactionSheet = true
+                            } else {
+                                navController.navigate(route)
+                            }
+                        },
+                        onNavigateToEditTransaction = { id -> 
+                            editTransactionId = id
+                            showAddTransactionSheet = true
+                        },
                         onNavigateToTransactionDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) }
-                    )
-                }
-                composable(NavRoutes.AddTransaction.route) {
-                    AddTransactionScreen(
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
-                composable(NavRoutes.EditTransaction.route) { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("transactionId")
-                    AddTransactionScreen(
-                        transactionId = id,
-                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 composable(
@@ -234,7 +244,8 @@ fun MainScreen(
                         cashflowType = cashflowType,
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToEdit = { editId ->
-                            navController.navigate(NavRoutes.EditTransaction.createRoute(editId))
+                            editTransactionId = editId
+                            showAddTransactionSheet = true
                         }
                     )
                 }
