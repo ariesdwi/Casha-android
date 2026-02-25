@@ -311,21 +311,38 @@ fun MainScreen(
 
                 composable(NavRoutes.Liabilities.route) {
                     val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    var showCategoryPicker by remember { mutableStateOf(false) }
+                    var showCreateLiability by remember { mutableStateOf(false) }
+                    var selectedCategory by remember { mutableStateOf<com.casha.app.domain.model.LiabilityCategory?>(null) }
+
                     com.casha.app.ui.feature.liability.LiabilitiesListScreen(
                         viewModel = viewModel,
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToDetail = { id -> navController.navigate(NavRoutes.LiabilityDetail.createRoute(id)) },
-                        onNavigateToCreate = { navController.navigate(NavRoutes.SelectLiabilityCategory.route) }
+                        onNavigateToCreate = { showCategoryPicker = true }
                     )
-                }
 
-                composable(NavRoutes.SelectLiabilityCategory.route) {
-                    com.casha.app.ui.feature.liability.SelectLiabilityCategoryScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onCategorySelected = { category ->
-                            navController.navigate(NavRoutes.CreateLiabilityWithCategory.createRoute(category.rawValue))
-                        }
-                    )
+                    if (showCategoryPicker) {
+                        com.casha.app.ui.feature.liability.SelectLiabilityCategoryScreen(
+                            onNavigateBack = { showCategoryPicker = false },
+                            onCategorySelected = { category ->
+                                selectedCategory = category
+                                showCategoryPicker = false
+                                showCreateLiability = true
+                            }
+                        )
+                    }
+
+                    if (showCreateLiability && selectedCategory != null) {
+                        com.casha.app.ui.feature.liability.CreateLiabilityScreen(
+                            selectedCategory = selectedCategory!!,
+                            viewModel = viewModel,
+                            onNavigateBack = { 
+                                showCreateLiability = false
+                                selectedCategory = null
+                            }
+                        )
+                    }
                 }
 
                 composable(

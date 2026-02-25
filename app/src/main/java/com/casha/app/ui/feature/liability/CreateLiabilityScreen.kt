@@ -113,70 +113,66 @@ fun CreateLiabilityScreen(
         LiabilityCategory.OTHER -> "e.g., Catatan pinjaman"
     }
 
-    Scaffold(
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onNavigateBack,
+        sheetState = sheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = Color(0xFFF8F9FA)
-    ) { paddingValues ->
-        Box(modifier = Modifier.fillMaxSize()) {
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.92f)
+        ) {
+            // ── Header ──────────────────────────────────────────
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = paddingValues.calculateBottomPadding())
-                    .verticalScroll(rememberScrollState()),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 12.dp)
             ) {
-                // ── Header ──────────────────────────────────────────
-                Row(
+                Text(
+                    text = screenTitle,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = "Mohon lengkapi detail informasi berikut",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+
+            // ── Error Message ───────────────────────────────────
+            errorMessage?.let { errorMsg ->
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.errorContainer
                 ) {
-                    IconButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .shadow(elevation = 2.dp, shape = CircleShape)
-                            .background(MaterialTheme.colorScheme.surfaceContainerLowest, CircleShape)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-
-                    Spacer(modifier = Modifier.width(16.dp))
-
                     Text(
-                        text = screenTitle,
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp)
                     )
                 }
+            }
 
-                // ── Error Message ───────────────────────────────────
-                errorMessage?.let { errorMsg ->
-                    Surface(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.errorContainer
-                    ) {
-                        Text(
-                            text = errorMsg,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(16.dp)
-                        )
-                    }
-                }
-
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 // ── Basic Info Section ──────────────────────────────
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Name
@@ -204,7 +200,7 @@ fun CreateLiabilityScreen(
 
                 // ── Category-Specific Fields ────────────────────────
                 Column(
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     when (selectedCategory) {
@@ -294,7 +290,7 @@ fun CreateLiabilityScreen(
                 }
 
                 // ── Notes ───────────────────────────────────────────
-                Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Column(modifier = Modifier.padding(horizontal = 20.dp)) {
                     InputCard(title = "Catatan") {
                         CashaFormTextField(
                             value = description,
@@ -305,9 +301,16 @@ fun CreateLiabilityScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
-                // ── Submit Button ───────────────────────────────────
+            // ── Submit Section ──────────────────────────────────
+            Surface(
+                color = Color(0xFFF8F9FA),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+            ) {
                 Button(
                     onClick = {
                         errorMessage = null
@@ -364,9 +367,9 @@ fun CreateLiabilityScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
                     enabled = !uiState.isLoading,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = Color(0xFF009033),
@@ -403,8 +406,6 @@ fun CreateLiabilityScreen(
                         }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(120.dp))
             }
         }
     }
