@@ -1,4 +1,4 @@
-package com.casha.app.ui.feature.liability.subviews
+package com.casha.app.ui.feature.liability.subviews.detail
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,55 +17,50 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LiabilityQuickActionsView(
+fun LiabilityLoanQuickActionsView(
     onRecordPayment: () -> Unit,
-    onAddTransaction: () -> Unit,
-    onAddInstallment: (() -> Unit)? = null
+    onSimulatePayment: () -> Unit
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
+        Text(
+            text = "Quick Actions",
+            fontSize = 18.sp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            QuickActionButton(
+            LoanQuickActionButton(
                 icon = Icons.Default.AttachMoney,
-                title = "Bayar\nTagihan",
+                title = "Bayar Cicilan",
                 color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f),
                 onClick = onRecordPayment
             )
 
-            QuickActionButton(
-                icon = Icons.Default.ShoppingCart,
-                title = "Catat\nTrans.",
-                color = Color(0xFFE53935),
+            LoanQuickActionButton(
+                icon = Icons.Default.BarChart,
+                title = "Simulasi Pelunasan",
+                color = Color(0xFF2196F3),
                 modifier = Modifier.weight(1f),
-                onClick = onAddTransaction
+                onClick = onSimulatePayment
             )
-
-            if (onAddInstallment != null) {
-                QuickActionButton(
-                    icon = Icons.Default.AddCircle,
-                    title = "Tambah\nCicilan",
-                    color = Color(0xFFE53935),
-                    modifier = Modifier.weight(1f),
-                    onClick = onAddInstallment
-                )
-            }
         }
     }
 }
 
 @Composable
-private fun QuickActionButton(
+private fun LoanQuickActionButton(
     icon: ImageVector,
     title: String,
     color: Color,
@@ -104,16 +98,14 @@ private fun QuickActionButton(
                     imageVector = icon,
                     contentDescription = title,
                     tint = color,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
             Text(
                 text = title,
-                fontSize = 12.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                textAlign = TextAlign.Center,
-                lineHeight = 16.sp
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }

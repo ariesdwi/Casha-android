@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.casha.app.domain.model.*
 import com.casha.app.domain.usecase.liability.*
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,6 +17,9 @@ import java.util.Locale
 import javax.inject.Inject
 
 data class LiabilityState(
+    val activeLiabilities: List<Liability> = emptyList(),
+    val paidOffLiabilities: List<Liability> = emptyList(),
+    // Keep old field for backward compatibility with detail screens
     val liabilities: List<Liability> = emptyList(),
     val liabilitySummary: LiabilitySummary? = null,
     val latestStatement: LiabilityStatement? = null,
@@ -25,9 +29,29 @@ data class LiabilityState(
     val liabilityInsights: LiabilityInsight? = null,
     val paymentHistory: List<LiabilityPayment> = emptyList(),
     val transactions: List<LiabilityTransaction> = emptyList(),
+    val simulationResult: SimulatePayoffResponse? = null,
     val isLoading: Boolean = false,
     val error: String? = null
-)
+) {
+    // Computed properties for the list screen
+    val totalBalance: Double
+        get() = activeLiabilities.sumOf { it.currentBalance }
+
+    val totalMonthlyInstallment: Double
+        get() = activeLiabilities.sumOf { it.monthlyInstallment ?: 0.0 }
+
+    val activeCount: Int
+        get() = activeLiabilities.size
+
+    val paidOffCount: Int
+        get() = paidOffLiabilities.size
+
+    val overdueLiabilities: List<Liability>
+        get() = activeLiabilities.filter { it.isOverdue == true }
+
+    val nonOverdueLiabilities: List<Liability>
+        get() = activeLiabilities.filter { it.isOverdue != true }
+}
 
 @HiltViewModel
 class LiabilityViewModel @Inject constructor(
@@ -43,7 +67,9 @@ class LiabilityViewModel @Inject constructor(
     private val getLiabilityPaymentHistoryUseCase: GetLiabilityPaymentHistoryUseCase,
     private val getLiabilityTransactionsUseCase: GetLiabilityTransactionsUseCase,
     private val createLiabilityTransactionUseCase: CreateLiabilityTransactionUseCase,
-    private val deleteLiabilityUseCase: DeleteLiabilityUseCase
+    private val deleteLiabilityUseCase: DeleteLiabilityUseCase,
+    private val addInstallmentUseCase: AddInstallmentUseCase,
+    private val simulatePayoffUseCase: SimulatePayoffUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LiabilityState())
@@ -59,20 +85,46 @@ class LiabilityViewModel @Inject constructor(
             return (Date().time - lastFetch.time) < cacheValidityDuration
         }
 
-    // MARK: - Fetch Liabilities
-    fun fetchLiabilities() {
+    // MARK: - Fetch All Liabilities (ACTIVE + PAID_OFF)
+    fun fetchAllLiabilities() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val liabilities = getLiabilitiesUseCase.execute()
-                _uiState.update { it.copy(liabilities = liabilities, isLoading = false) }
+                val activeDeferred = async {
+                    getLiabilitiesUseCase.execute(
+                        status = "ACTIVE",
+                        sortBy = "balance",
+                        sortOrder = "desc"
+                    )
+                }
+                val paidOffDeferred = async {
+                    getLiabilitiesUseCase.execute(status = "PAID_OFF")
+                }
+
+                val active = activeDeferred.await()
+                val paidOff = paidOffDeferred.await()
+
+                _uiState.update {
+                    it.copy(
+                        activeLiabilities = active,
+                        paidOffLiabilities = paidOff,
+                        liabilities = active + paidOff,
+                        isLoading = false
+                    )
+                }
+                lastFetchTime = Date()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
             }
         }
     }
 
-    // MARK: - Fetch Liability Summary
+    // MARK: - Legacy fetchLiabilities (for backward compat)
+    fun fetchLiabilities() {
+        fetchAllLiabilities()
+    }
+
+    // MARK: - Fetch Liability Summary (still available for other screens)
     fun fetchLiabilitySummary(force: Boolean = false) {
         if (!force && isFresh && _uiState.value.liabilitySummary != null) {
             return
@@ -95,17 +147,9 @@ class LiabilityViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val newLiability = createLiabilityUseCase.execute(request)
-                
-                _uiState.update { currentState ->
-                    val updatedList = currentState.liabilities.toMutableList()
-                    updatedList.add(newLiability)
-                    currentState.copy(liabilities = updatedList)
-                }
-
-                // Refresh summary
-                fetchLiabilitySummary(force = true)
-
+                createLiabilityUseCase.execute(request)
+                // Refresh all liabilities
+                fetchAllLiabilities()
                 _uiState.update { it.copy(isLoading = false) }
                 onSuccess()
             } catch (e: Exception) {
@@ -116,28 +160,31 @@ class LiabilityViewModel @Inject constructor(
 
     // MARK: - Record Payment
     fun recordPayment(
-        liabilityId: String,
-        amount: Double,
-        paymentType: PaymentType = PaymentType.PARTIAL,
+        liabilityId: String, 
+        amount: Double, 
+        paymentType: PaymentType, 
+        principal: Double? = null,
+        interest: Double? = null,
         notes: String? = null,
         onSuccess: () -> Unit
     ) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
-                val isoFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
                 val request = CreateLiabilityPaymentRequest(
                     amount = amount,
                     paymentDate = isoFormat.format(Date()),
                     paymentType = paymentType,
+                    principalAmount = principal,
+                    interestAmount = interest,
                     notes = notes
                 )
                 
                 recordLiabilityPaymentUseCase.execute(liabilityId, request)
                 
-                // Refresh liabilities and summary to get updated balances
-                fetchLiabilities()
-                fetchLiabilitySummary(force = true)
+                // Refresh liabilities to get updated balances
+                fetchAllLiabilities()
                 
                 _uiState.update { it.copy(isLoading = false) }
                 onSuccess()
@@ -242,7 +289,7 @@ class LiabilityViewModel @Inject constructor(
         liabilityId: String,
         name: String,
         amount: Double,
-        category: String,
+        categoryId: String,
         description: String? = null,
         onSuccess: () -> Unit
     ) {
@@ -253,7 +300,7 @@ class LiabilityViewModel @Inject constructor(
                 val request = CreateLiabilityTransactionRequest(
                     name = name,
                     amount = amount,
-                    category = category,
+                    categoryId = categoryId,
                     datetime = isoFormat.format(Date()),
                     description = description
                 )
@@ -261,16 +308,70 @@ class LiabilityViewModel @Inject constructor(
                 createLiabilityTransactionUseCase.execute(liabilityId, request)
                 
                 // Refresh liabilities first to get updated balances
-                fetchLiabilities()
+                fetchAllLiabilities()
                 // Refresh unbilled transactions for the specific liability (credit cards)
                 fetchUnbilledTransactions(liabilityId)
-                // Finally refresh summary
-                fetchLiabilitySummary(force = true)
                 
                 _uiState.update { it.copy(isLoading = false) }
                 onSuccess()
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = "Failed to add transaction", isLoading = false) }
+            }
+        }
+    }
+
+    // MARK: - Add Installment
+    fun addInstallment(
+        liabilityId: String,
+        name: String,
+        totalAmount: Double,
+        monthlyAmount: Double,
+        tenor: Int,
+        currentMonth: Int,
+        startDate: Date,
+        onSuccess: () -> Unit
+    ) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            try {
+                val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
+                val request = CreateLiabilityInstallmentRequest(
+                    name = name,
+                    totalAmount = totalAmount,
+                    monthlyAmount = monthlyAmount,
+                    tenor = tenor,
+                    currentMonth = currentMonth,
+                    startDate = isoFormat.format(startDate)
+                )
+                
+                addInstallmentUseCase.execute(liabilityId, request)
+                
+                // Refresh liability data to reflect new installment
+                fetchAllLiabilities()
+                
+                _uiState.update { it.copy(isLoading = false) }
+                onSuccess()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = "Failed to add installment", isLoading = false) }
+            }
+        }
+    }
+
+    // MARK: - Simulate Payoff
+    fun simulatePayoff(strategy: SimulationStrategy, additionalPayment: Double) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null, simulationResult = null) }
+            try {
+                val request = SimulatePayoffRequest(
+                    strategy = strategy,
+                    additionalPayment = additionalPayment.takeIf { it > 0 }
+                )
+                
+                val result = simulatePayoffUseCase.execute(request)
+                
+                _uiState.update { it.copy(simulationResult = result, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(error = "Failed to run simulation", isLoading = false) }
             }
         }
     }
@@ -282,13 +383,8 @@ class LiabilityViewModel @Inject constructor(
             try {
                 deleteLiabilityUseCase.execute(id)
                 
-                _uiState.update { currentState ->
-                    val updatedList = currentState.liabilities.filter { it.id != id }
-                    currentState.copy(liabilities = updatedList)
-                }
-
-                // Refresh summary to get updated totals
-                fetchLiabilitySummary(force = true)
+                // Refresh all liabilities
+                fetchAllLiabilities()
                 
                 _uiState.update { it.copy(isLoading = false) }
                 onSuccess()

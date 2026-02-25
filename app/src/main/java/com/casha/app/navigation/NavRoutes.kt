@@ -65,6 +65,10 @@ sealed class NavRoutes(val route: String) {
     }
 
     data object CreateLiability : NavRoutes("create_liability")
+    data object SelectLiabilityCategory : NavRoutes("select_liability_category")
+    data object CreateLiabilityWithCategory : NavRoutes("create_liability/{category}") {
+        fun createRoute(category: String) = "create_liability/$category"
+    }
 
     // ── Income ──
     data object Income : NavRoutes("income")

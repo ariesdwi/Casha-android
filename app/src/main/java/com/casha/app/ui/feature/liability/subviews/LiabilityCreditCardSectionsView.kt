@@ -22,6 +22,8 @@ import com.casha.app.domain.model.*
 import java.text.SimpleDateFormat
 import java.util.*
 
+import com.casha.app.ui.feature.liability.subviews.detail.ActiveInstallmentsListView
+
 @Composable
 fun LiabilityCreditCardSectionsView(
     liabilityState: com.casha.app.ui.feature.liability.LiabilityState,
@@ -35,10 +37,21 @@ fun LiabilityCreditCardSectionsView(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
+        // Payment section (could be moved to a bottom sheet later)
         PaymentSection(liabilityState, liability, userCurrency, onPaymentClick)
+        
+        // Active Installments
+        ActiveInstallmentsListView(
+            installments = liability.installmentPlans ?: emptyList(),
+            userCurrency = userCurrency
+        )
+
+        // All Statements
         LatestStatementSection(liabilityState, onStatementClick)
+
+        // Unbilled Transactions
         UnbilledTransactionsSection(liabilityState, userCurrency, onTransactionClick)
-        CreditLimitProgressSection(liability, userCurrency)
+
     }
 }
 
@@ -293,61 +306,7 @@ private fun TransactionRow(transaction: LiabilityTransaction, userCurrency: Stri
     }
 }
 
-@Composable
-private fun CreditLimitProgressSection(liability: Liability, userCurrency: String) {
-    val limit = liability.creditLimit ?: return
 
-    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Penggunaan Kredit", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
-                val usagePercent = (liability.currentBalance / limit).coerceIn(0.0, 1.0)
-
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Box(modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(4.dp)).background(Color(0xFFE5E5EA))) {
-                        Box(modifier = Modifier.fillMaxWidth(usagePercent.toFloat()).fillMaxHeight().background(
-                            brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
-                                colors = if (usagePercent > 0.8) listOf(Color(0xFFFF9800), Color(0xFFFF3B30)) else listOf(Color(0xFF6750A4).copy(alpha = 0.8f), Color(0xFF6750A4))
-                            )
-                        ))
-                    }
-                    Text(text = String.format(Locale.US, "%.1f%%", usagePercent * 100), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-
-                Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
-                    DetailInfoRow(Icons.Default.ArrowUpward, "Terpakai", CurrencyFormatter.format(liability.currentBalance, userCurrency))
-                    DetailInfoRow(Icons.Default.ArrowDownward, "Tersisa", CurrencyFormatter.format(limit - liability.currentBalance, userCurrency))
-                    DetailInfoRow(Icons.Default.Lock, "Limit", CurrencyFormatter.format(limit, userCurrency))
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailInfoRow(icon: ImageVector, label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Box(
-            modifier = Modifier.size(32.dp).background(Color.Gray.copy(alpha = 0.1f), CircleShape),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(14.dp))
-        }
-
-        Text(text = label, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.weight(1f))
-        Text(text = value, fontSize = 14.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
-    }
-}
 
 private fun statusColor(status: StatementStatus): Color {
     return when (status) {

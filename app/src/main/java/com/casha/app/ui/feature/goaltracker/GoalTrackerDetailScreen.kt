@@ -42,6 +42,7 @@ fun GoalTrackerDetailScreen(
     val scope = rememberCoroutineScope()
     val uiState by viewModel.uiState.collectAsState()
     val goal = uiState.selectedGoal
+    val userCurrency = CurrencyFormatter.defaultCurrency
     
     var isEditMode by remember { mutableStateOf(false) }
     var showingAddContribution by remember { mutableStateOf(false) }

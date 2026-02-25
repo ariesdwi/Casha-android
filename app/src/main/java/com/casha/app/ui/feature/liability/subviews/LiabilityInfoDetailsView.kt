@@ -5,7 +5,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.AccountBalance
+import androidx.compose.material.icons.outlined.CalendarToday
+import androidx.compose.material.icons.outlined.Event
+import androidx.compose.material.icons.outlined.ReportProblem
+import androidx.compose.material.icons.outlined.TrendingUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,12 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.casha.app.domain.model.Liability
-import com.casha.app.domain.model.LiabilityCategory
-import java.text.NumberFormat
-import java.text.SimpleDateFormat
-import java.util.*
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.domain.model.Liability
 
 @Composable
 fun LiabilityInfoDetailsView(
@@ -29,126 +29,77 @@ fun LiabilityInfoDetailsView(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Liability Details",
+            text = "Info Tagihan",
             fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.onBackground
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
-        // Primary Details Card
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                if (liability.category == LiabilityCategory.CREDIT_CARD) {
-                    DetailRow(
-                        icon = Icons.Default.CreditCard,
-                        iconColor = Color(0xFF6750A4), // Modern Purple
-                        label = "Credit Limit",
-                        value = CurrencyFormatter.format(liability.creditLimit ?: 0.0, userCurrency)
-                    )
-                    DividerRow()
-                    DetailRow(
-                        icon = Icons.Default.CalendarToday,
-                        iconColor = Color(0xFFFF9800), // Muted Orange
-                        label = "Billing Day",
-                        value = "Day ${liability.billingDay ?: 1}"
-                    )
-                    DividerRow()
-                    DetailRow(
-                        icon = Icons.Default.Schedule,
-                        iconColor = Color(0xFFE53935), // Sophisticated Red
-                        label = "Due Day",
-                        value = "Day ${liability.dueDay ?: 25}"
-                    )
-                    DividerRow()
-                    DetailRow(
-                        icon = Icons.Default.AttachMoney,
-                        iconColor = Color(0xFF43A047), // Material Green
-                        label = "Minimum Payment",
-                        value = "${liability.minPaymentPercentage ?: 10}%"
-                    )
-                } else {
-                    DetailRow(
-                        icon = Icons.Default.AccountBalanceWallet,
-                        iconColor = Color(0xFF1E88E5), // Material Blue
-                        label = "Principal",
-                        value = CurrencyFormatter.format(liability.principal ?: 0.0, userCurrency)
-                    )
-                    liability.monthlyPayment?.let { monthlyPayment ->
-                        DividerRow()
-                        DetailRow(
-                            icon = Icons.Default.EventRepeat,
-                            iconColor = Color(0xFF43A047),
-                            label = "Monthly Payment",
-                            value = CurrencyFormatter.format(monthlyPayment, userCurrency)
-                        )
-                    }
-                }
-            }
-        }
-
-        // Interest & Bank Details Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Tgl Cetak Tagihan
                 DetailRow(
-                    icon = Icons.Default.Percent,
-                    iconColor = Color(0xFF6750A4), // Modern Purple
-                    label = "Interest Rate",
-                    value = "${liability.interestRate}%"
+                    icon = Icons.Outlined.Event,
+                    iconColor = Color(0xFF1E88E5), // Blue
+                    label = "Tgl Cetak Tagihan",
+                    value = "Tanggal ${liability.billingDay ?: "-"}"
                 )
+                
                 DividerRow()
+                
+                // Jatuh Tempo
                 DetailRow(
-                    icon = Icons.Default.TrendingUp,
-                    iconColor = Color(0xFFFF9800), // Muted Orange
-                    label = "Interest Type",
-                    value = liability.interestType?.name?.lowercase()?.replaceFirstChar { it.uppercase() } ?: "N/A"
+                    icon = Icons.Outlined.CalendarToday,
+                    iconColor = Color(0xFFE53935), // Red
+                    label = "Jatuh Tempo",
+                    value = "Tanggal ${liability.dueDay ?: "-"}"
                 )
+                
+                // Bunga per Bulan
+                val interestAmount = liability.monthlyInterestAmount ?: 0.0
+                if (interestAmount >= 0) {
+                    DividerRow()
+                    DetailRow(
+                        icon = Icons.Outlined.TrendingUp,
+                        iconColor = Color(0xFFFF9800), // Orange
+                        label = "Bunga per Bulan",
+                        value = CurrencyFormatter.format(interestAmount, userCurrency)
+                    )
+                }
 
+                // Denda Keterlambatan
+                val lateFee = liability.lateFee ?: 0.0
+                if (lateFee > 0) {
+                    DividerRow()
+                    DetailRow(
+                        icon = Icons.Outlined.ReportProblem,
+                        iconColor = Color(0xFFE53935), // Red
+                        label = "Denda Keterlambatan",
+                        value = CurrencyFormatter.format(lateFee, userCurrency)
+                    )
+                }
+
+                // Bank
                 liability.bankName?.let { bank ->
                     DividerRow()
                     DetailRow(
-                        icon = Icons.Default.AccountBalance,
-                        iconColor = Color(0xFF1E88E5), // Material Blue
+                        icon = Icons.Outlined.AccountBalance,
+                        iconColor = Color(0xFF1E88E5), // Blue
                         label = "Bank",
                         value = bank
                     )
                 }
-            }
-        }
-
-        // Date Details Card
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                DetailRow(
-                    icon = Icons.Default.EventAvailable,
-                    iconColor = Color(0xFF43A047), // Material Green
-                    label = "Start Date",
-                    value = formatLiabilityDate(liability.startDate)
-                )
-                DividerRow()
-                DetailRow(
-                    icon = Icons.Default.EventBusy,
-                    iconColor = Color(0xFFE53935), // Material Red
-                    label = "End Date",
-                    value = formatLiabilityDate(liability.endDate)
-                )
             }
         }
     }
@@ -162,15 +113,14 @@ private fun DetailRow(
     value: String
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
                 .size(40.dp)
-                .background(iconColor.copy(alpha = 0.15f), CircleShape),
+                .background(iconColor.copy(alpha = 0.1f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -180,8 +130,6 @@ private fun DetailRow(
                 modifier = Modifier.size(20.dp)
             )
         }
-
-        Spacer(modifier = Modifier.width(12.dp))
 
         Text(
             text = label,
@@ -202,7 +150,7 @@ private fun DetailRow(
 @Composable
 private fun DividerRow() {
     Divider(
-        modifier = Modifier.padding(start = 52.dp, top = 4.dp, bottom = 4.dp),
-        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
+        modifier = Modifier.padding(start = 52.dp),
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
     )
 }

@@ -27,6 +27,9 @@ enum class LiabilityCategory(val rawValue: String) {
     val isCreditCard: Boolean
         get() = this == CREDIT_CARD
 
+    val isRevolving: Boolean
+        get() = this == CREDIT_CARD || this == PAY_LATER
+
     val icon: String
         get() = when (this) {
             MORTGAGE -> "house.fill"
@@ -48,7 +51,15 @@ enum class LiabilityCategory(val rawValue: String) {
 
 enum class InterestType(val rawValue: String) {
     MONTHLY("MONTHLY"),
+    YEARLY("YEARLY"),
     FLAT("FLAT");
+
+    val displaySuffix: String
+        get() = when (this) {
+            MONTHLY -> "/mo"
+            YEARLY -> "/yr"
+            FLAT -> ""
+        }
 
     companion object {
         fun fromValue(value: String): InterestType {
@@ -121,7 +132,12 @@ data class Liability(
     val daysRemaining: Int? = null,
     val isOverdue: Boolean? = null,
     val totalInterestPaid: Double? = null,
-    val totalPrincipalPaid: Double? = null
+    val totalPrincipalPaid: Double? = null,
+    val monthlyInstallment: Double? = null,
+    val tenor: Int? = null,
+    val remainingTenor: Int? = null,
+    val remainingInstallment: Double? = null,
+    val installmentPlans: List<InstallmentPlan>? = null
 )
 
 // ── Requests ──
@@ -139,22 +155,36 @@ data class CreateLiabilityRequest(
     val lateFee: Double? = null,
     val principal: Double,
     val currentBalance: Double? = null,
-    val startDate: String,
-    val endDate: String,
-    val description: String? = null
+    val startDate: String? = null,
+    val endDate: String? = null,
+    val description: String? = null,
+    val tenor: Int? = null,
+    val monthlyInstallment: Double? = null,
+    val gracePeriodMonths: Int? = null
 )
 
 data class CreateLiabilityPaymentRequest(
     val amount: Double,
     val paymentDate: String,
     val paymentType: PaymentType? = null,
+    val principalAmount: Double? = null,
+    val interestAmount: Double? = null,
     val notes: String? = null
+)
+
+data class CreateLiabilityInstallmentRequest(
+    val name: String,
+    val totalAmount: Double,
+    val monthlyAmount: Double,
+    val tenor: Int,
+    val currentMonth: Int,
+    val startDate: String
 )
 
 data class CreateLiabilityTransactionRequest(
     val name: String,
     val amount: Double,
-    val category: String,
+    val categoryId: String,
     val datetime: String,
     val description: String? = null
 )
@@ -229,6 +259,42 @@ data class LiabilityTransaction(
     }
 }
 
+enum class SimulationStrategy(val rawValue: String, val displayName: String) {
+    AVALANCHE("AVALANCHE", "Suku Bunga Tertinggi (Avalanche)"),
+    SNOWBALL("SNOWBALL", "Saldo Terkecil (Snowball)"),
+    CUSTOM("CUSTOM", "Kustom");
+
+    companion object {
+        fun fromValue(value: String): SimulationStrategy {
+            return entries.find { it.rawValue == value } ?: AVALANCHE
+        }
+    }
+}
+
+data class SimulatePayoffRequest(
+    val strategy: SimulationStrategy,
+    val additionalPayment: Double? = null
+)
+
+data class SimulatePayoffResponse(
+    val totalMonthsToPayOff: Int,
+    val estimatedPayoffDate: String,
+    val totalPaymentAmount: Double,
+    val interestSaved: Double,
+    val monthsSaved: Int,
+    val recommendation: String,
+    val liabilityBreakdown: List<LiabilityBreakdown>
+)
+
+data class LiabilityBreakdown(
+    val id: String? = null,
+    val name: String,
+    val currentBalance: Double,
+    val monthlyPayment: Double,
+    val monthsToPayOff: Int,
+    val totalInterest: Double
+)
+
 data class LiabilityStatement(
     val id: String,
     val liabilityId: String,
@@ -289,6 +355,9 @@ data class InstallmentPlan(
     val tenor: Int,
     val currentMonth: Int,
     val isActive: Boolean,
+    val progress: Int? = null,
+    val remainingAmount: Double? = null,
+    val remainingMonths: Int? = null,
     val startDate: Date,
     val createdAt: Date,
     val updatedAt: Date

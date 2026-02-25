@@ -7,7 +7,8 @@ import javax.inject.Inject
 class GetLiabilitiesUseCase @Inject constructor(
     private val repository: LiabilityRepository
 ) {
-    suspend fun execute(): List<Liability> = repository.getLiabilities()
+    suspend fun execute(status: String? = null, sortBy: String? = null, sortOrder: String? = null): List<Liability> =
+        repository.getLiabilities(status = status, sortBy = sortBy, sortOrder = sortOrder)
 }
 
 class GetLiabilitySummaryUseCase @Inject constructor(
@@ -83,5 +84,21 @@ class DeleteLiabilityUseCase @Inject constructor(
 ) {
     suspend fun execute(id: String) {
         repository.deleteLiability(id)
+    }
+}
+
+class AddInstallmentUseCase @Inject constructor(
+    private val repository: LiabilityRepository
+) {
+    suspend fun execute(liabilityId: String, request: CreateLiabilityInstallmentRequest): InstallmentPlan {
+        return repository.addInstallment(liabilityId, request)
+    }
+}
+
+class SimulatePayoffUseCase @Inject constructor(
+    private val repository: LiabilityRepository
+) {
+    suspend fun execute(request: SimulatePayoffRequest): SimulatePayoffResponse {
+        return repository.simulatePayoff(request)
     }
 }

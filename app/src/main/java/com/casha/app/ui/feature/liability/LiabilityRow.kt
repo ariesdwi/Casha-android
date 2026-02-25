@@ -14,15 +14,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.LiabilityCategory
+import com.casha.app.domain.model.InterestType
 import com.casha.app.core.util.CurrencyFormatter
-import java.text.NumberFormat
 import java.util.*
 
 @Composable
@@ -37,186 +36,179 @@ fun LiabilityRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 4.dp)
-            .shadow(elevation = 3.dp, shape = RoundedCornerShape(12.dp)),
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp)),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         onClick = onClick
     ) {
-        Row(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Icon with gradient background
-            Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(
-                        brush = androidx.compose.ui.graphics.Brush.linearGradient(
-                            colors = if (isCreditCard) {
-                                listOf(Color(0xFF6750A4).copy(alpha = 0.8f), Color(0xFF6750A4))
-                            } else {
-                                listOf(Color(0xFFFF9800).copy(alpha = 0.8f), Color(0xFFF44336).copy(alpha = 0.9f))
-                            }
-                        )
-                    ),
-                contentAlignment = Alignment.Center
+            // Top row: Icon + Name + Category Badge
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = categoryIcon,
-                    contentDescription = null,
-                    tint = Color.White,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.width(12.dp))
-
-            // Liability Info
-            Column(
-                modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                // Category icon
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(categoryColor.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
                 ) {
-                    Text(
-                        text = liability.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                    Icon(
+                        imageVector = categoryIcon,
+                        contentDescription = null,
+                        tint = categoryColor,
+                        modifier = Modifier.size(20.dp)
                     )
-
-                    // Category Badge
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                color = categoryColor.copy(alpha = 0.15f),
-                                shape = RoundedCornerShape(6.dp)
-                            )
-                            .padding(horizontal = 8.dp, vertical = 3.dp)
-                    ) {
-                        Text(
-                            text = liability.category.displayName,
-                            fontSize = 10.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = categoryColor
-                        )
-                    }
                 }
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    if (!liability.bankName.isNullOrEmpty()) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AccountBalance,
-                                contentDescription = null,
-                                modifier = Modifier.size(10.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            Text(
-                                text = liability.bankName,
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                Spacer(modifier = Modifier.width(10.dp))
 
+                Text(
+                    text = liability.name,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Category Badge
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = categoryColor.copy(alpha = 0.12f),
+                            shape = RoundedCornerShape(6.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                ) {
+                    Text(
+                        text = liability.category.displayName,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = categoryColor
+                    )
+                }
+            }
+
+            // Info row: Bank + Interest
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (!liability.bankName.isNullOrEmpty()) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Icon(
-                            imageVector = Icons.Default.Percent,
+                            imageVector = Icons.Default.AccountBalance,
                             contentDescription = null,
-                            modifier = Modifier.size(10.dp),
-                            tint = Color(0xFFFF9800)
+                            modifier = Modifier.size(12.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = String.format(Locale.getDefault(), "%.1f%%", liability.interestRate),
-                            fontSize = 10.sp,
-                            color = Color(0xFFFF9800)
+                            text = liability.bankName,
+                            fontSize = 11.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
+
+                // Interest rate with type suffix
+                val interestSuffix = liability.interestType?.displaySuffix ?: ""
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    Text(
+                        text = "•",
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = "% ${String.format(Locale.getDefault(), "%.1f", liability.interestRate)}$interestSuffix",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFFE53935)
+                    )
+                }
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Balance & Progress
-            Column(
-                horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(6.dp)
+            // Balance row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = CurrencyFormatter.format(liability.currentBalance, liability.currency ?: "IDR"),
-                    fontSize = 17.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
-                if (isCreditCard) {
-                    liability.availableCredit?.let { available ->
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = null,
-                                modifier = Modifier.size(10.dp),
-                                tint = Color(0xFF4CAF50)
-                            )
-                            Text(
-                                text = CurrencyFormatter.format(available, liability.currency ?: "IDR"),
-                                fontSize = 10.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                if (isCreditCard || liability.category == LiabilityCategory.PAY_LATER) {
+                    // No progress bar for credit-based liabilities
                 } else {
+                    // Progress bar for loans
                     val principal = if (liability.principal > 0) liability.principal else 1.0
                     val progress = (1.0 - (liability.currentBalance / principal)).toFloat().coerceIn(0f, 1f)
                     val progressColor = when {
                         progress > 0.7f -> Color(0xFF4CAF50)
                         progress > 0.3f -> Color(0xFFFF9800)
-                        else -> MaterialTheme.colorScheme.error
+                        else -> Color(0xFFE53935)
                     }
-                    
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
                         LinearProgressIndicator(
-                            progress = progress,
+                            progress = { progress },
                             modifier = Modifier
                                 .width(60.dp)
                                 .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp)), // Make it pill-shaped
+                                .clip(RoundedCornerShape(2.dp)),
                             color = progressColor,
                             trackColor = progressColor.copy(alpha = 0.2f),
                             strokeCap = StrokeCap.Round
                         )
                         Text(
                             text = "${(progress * 100).toInt()}%",
-                            fontSize = 10.sp,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = progressColor
                         )
                     }
+                }
+            }
+
+            // Overdue warning
+            if (liability.isOverdue == true && liability.daysRemaining != null) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Warning,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                        tint = Color(0xFFE53935)
+                    )
+                    Text(
+                        text = "Menunggak ${liability.daysRemaining} hari",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFFE53935)
+                    )
                 }
             }
         }

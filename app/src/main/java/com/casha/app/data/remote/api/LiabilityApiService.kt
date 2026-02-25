@@ -12,7 +12,11 @@ interface LiabilityApiService {
     ): BaseResponse<LiabilityDto>
 
     @GET(ApiEndpoints.LIABILITY_LIST)
-    suspend fun getLiabilities(): BaseResponse<LiabilityListDTO>
+    suspend fun getLiabilities(
+        @Query("status") status: String? = null,
+        @Query("sortBy") sortBy: String? = null,
+        @Query("sortOrder") sortOrder: String? = null
+    ): BaseResponse<LiabilityListDTO>
 
     @GET(ApiEndpoints.LIABILITY_SUMMARY)
     suspend fun getLiabilitySummary(): BaseResponse<LiabilitySummaryDTO>
@@ -85,4 +89,15 @@ interface LiabilityApiService {
         @Path("transactionId") transactionId: String,
         @Body request: Map<String, @JvmSuppressWildcards Any>
     ): BaseResponse<InstallmentPlanDTO>
+
+    @POST("liabilities/{id}/installments")
+    suspend fun addInstallment(
+        @Path("id") liabilityId: String,
+        @Body request: Map<String, @JvmSuppressWildcards Any>
+    ): BaseResponse<InstallmentPlanDTO>
+
+    @POST("liabilities/simulate")
+    suspend fun simulatePayoff(
+        @Body request: Map<String, @JvmSuppressWildcards Any>
+    ): BaseResponse<SimulatePayoffResponseDTO>
 }

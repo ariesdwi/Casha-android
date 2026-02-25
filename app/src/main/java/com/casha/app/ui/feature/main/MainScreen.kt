@@ -315,10 +315,34 @@ fun MainScreen(
                         viewModel = viewModel,
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToDetail = { id -> navController.navigate(NavRoutes.LiabilityDetail.createRoute(id)) },
-                        onNavigateToCreate = { navController.navigate(NavRoutes.CreateLiability.route) }
+                        onNavigateToCreate = { navController.navigate(NavRoutes.SelectLiabilityCategory.route) }
                     )
                 }
 
+                composable(NavRoutes.SelectLiabilityCategory.route) {
+                    com.casha.app.ui.feature.liability.SelectLiabilityCategoryScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onCategorySelected = { category ->
+                            navController.navigate(NavRoutes.CreateLiabilityWithCategory.createRoute(category.rawValue))
+                        }
+                    )
+                }
+
+                composable(
+                    route = NavRoutes.CreateLiabilityWithCategory.route,
+                    arguments = listOf(navArgument("category") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val categoryStr = backStackEntry.arguments?.getString("category") ?: ""
+                    val category = com.casha.app.domain.model.LiabilityCategory.fromValue(categoryStr)
+                    val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    com.casha.app.ui.feature.liability.CreateLiabilityScreen(
+                        selectedCategory = category,
+                        viewModel = viewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                // Legacy route kept for backward compatibility
                 composable(NavRoutes.CreateLiability.route) {
                     val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
                     com.casha.app.ui.feature.liability.CreateLiabilityScreen(
@@ -333,23 +357,57 @@ fun MainScreen(
                 ) { backStackEntry ->
                     val liabilityId = backStackEntry.arguments?.getString("liabilityId") ?: return@composable
                     val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
+                    val txViewModel: com.casha.app.ui.feature.transaction.TransactionViewModel = hiltViewModel()
                     val uiState by viewModel.uiState.collectAsState()
+                    val txUiState by txViewModel.uiState.collectAsState()
                     
                     // The view expects `Liability` as initialLiability parameter, it can be passed via the list or fetched individually
                     // Usually we look inside the current state if provided
                     val matchingLiability = uiState.liabilities.firstOrNull { it.id == liabilityId } 
                     
                     if (matchingLiability != null) {
+                        LaunchedEffect(liabilityId) {
+                            viewModel.fetchPaymentHistory(liabilityId)
+                            if (matchingLiability.category.isRevolving) {
+                                viewModel.fetchLatestStatement(liabilityId)
+                                viewModel.fetchAllStatements(liabilityId)
+                                viewModel.fetchUnbilledTransactions(liabilityId)
+                            }
+                        }
+
                         com.casha.app.ui.feature.liability.LiabilityDetailView(
                             initialLiability = matchingLiability,
                             liabilityState = uiState,
                             onBack = { navController.popBackStack() },
-                            onRecordPayment = { amount, paymentType ->
-                                viewModel.recordPayment(liabilityId, amount, paymentType, onSuccess = {})
+                            onRecordPayment = { amount, paymentType, principal, interest, notes ->
+                                viewModel.recordPayment(
+                                    liabilityId = liabilityId,
+                                    amount = amount,
+                                    paymentType = paymentType,
+                                    principal = principal,
+                                    interest = interest,
+                                    notes = notes,
+                                    onSuccess = {}
+                                )
                             },
-                            onAddTransaction = {
-                                // You might need a specific AddLiabilityTransactionScreen route or use the main AddTransaction mechanism
+                            onAddInstallment = { name, total, monthly, tenor, current, start ->
+                                viewModel.addInstallment(liabilityId, name, total, monthly, tenor, current, start, onSuccess = {})
                             },
+                            onSimulatePayoff = { strategy, additionalPayment ->
+                                viewModel.simulatePayoff(strategy, additionalPayment)
+                            },
+                            onAddTransaction = {},
+                            onCreateTransaction = { name, amount, categoryId, description ->
+                                viewModel.createTransaction(
+                                    liabilityId = liabilityId,
+                                    name = name,
+                                    amount = amount,
+                                    categoryId = categoryId,
+                                    description = description,
+                                    onSuccess = {}
+                                )
+                            },
+                            categories = txUiState.categories,
                             onStatementClick = { statement ->
                                 navController.navigate("statement_detail/$liabilityId/${statement.id}")
                             }

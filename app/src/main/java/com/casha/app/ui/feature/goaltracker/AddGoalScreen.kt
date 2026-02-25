@@ -166,7 +166,7 @@ fun AddGoalScreen(
             InputCard(title = "Target Amount") {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = java.util.Currency.getInstance(userCurrency).symbol,
+                        text = CurrencyFormatter.symbol(userCurrency),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(end = 8.dp)
                     )

@@ -9,7 +9,7 @@ interface LiabilityRepository {
     
     // Core operations
     suspend fun createLiability(request: CreateLiabilityRequest): Liability
-    suspend fun getLiabilities(): List<Liability>
+    suspend fun getLiabilities(status: String? = null, sortBy: String? = null, sortOrder: String? = null): List<Liability>
     suspend fun getLiabilitySummary(): LiabilitySummary
     suspend fun getLiabilityDetails(id: String): Liability
     suspend fun deleteLiability(id: String)
@@ -27,6 +27,9 @@ interface LiabilityRepository {
     suspend fun getStatementDetails(liabilityId: String, statementId: String): LiabilityStatement
     
     // Utilities
+    // Utilities
     suspend fun getLiabilityInsights(liabilityId: String): LiabilityInsight
     suspend fun convertToInstallment(liabilityId: String, transactionId: String, tenor: Int): InstallmentPlan
+    suspend fun addInstallment(liabilityId: String, request: CreateLiabilityInstallmentRequest): InstallmentPlan
+    suspend fun simulatePayoff(request: SimulatePayoffRequest): SimulatePayoffResponse
 }

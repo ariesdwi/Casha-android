@@ -20,11 +20,11 @@ class LiabilityRepositoryImpl @Inject constructor(
             "name" to request.name,
             "category" to request.category.rawValue,
             "interestRate" to request.interestRate,
-            "principal" to request.principal,
-            "startDate" to simpleDateFormatter.format(request.startDate),
-            "endDate" to simpleDateFormatter.format(request.endDate)
+            "principal" to request.principal
         )
         
+        request.startDate?.let { body["startDate"] = it }
+        request.endDate?.let { body["endDate"] = it }
         request.bankName?.let { body["bankName"] = it }
         request.creditLimit?.let { body["creditLimit"] = it }
         request.billingDay?.let { body["billingDay"] = it }
@@ -34,13 +34,16 @@ class LiabilityRepositoryImpl @Inject constructor(
         request.lateFee?.let { body["lateFee"] = it }
         request.currentBalance?.let { body["currentBalance"] = it }
         request.description?.let { body["description"] = it }
+        request.tenor?.let { body["tenor"] = it }
+        request.monthlyInstallment?.let { body["monthlyInstallment"] = it }
+        request.gracePeriodMonths?.let { body["gracePeriodMonths"] = it }
 
         val response = api.createLiability(body)
         return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
     }
 
-    override suspend fun getLiabilities(): List<Liability> {
-        val response = api.getLiabilities()
+    override suspend fun getLiabilities(status: String?, sortBy: String?, sortOrder: String?): List<Liability> {
+        val response = api.getLiabilities(status = status, sortBy = sortBy, sortOrder = sortOrder)
         return response.data?.liabilities?.map { it.toDomain() } ?: emptyList()
     }
 
@@ -76,7 +79,7 @@ class LiabilityRepositoryImpl @Inject constructor(
         val body = mutableMapOf<String, Any>(
             "name" to request.name,
             "amount" to request.amount,
-            "category" to request.category,
+            "categoryId" to request.categoryId,
             "datetime" to dateFormatter.format(request.datetime)
         )
         
@@ -125,6 +128,29 @@ class LiabilityRepositoryImpl @Inject constructor(
     override suspend fun convertToInstallment(liabilityId: String, transactionId: String, tenor: Int): InstallmentPlan {
         val body = mapOf("tenor" to tenor)
         val response = api.convertToInstallment(liabilityId, transactionId, body)
+        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+    }
+
+    override suspend fun addInstallment(liabilityId: String, request: CreateLiabilityInstallmentRequest): InstallmentPlan {
+        val body = mapOf(
+            "name" to request.name,
+            "totalAmount" to request.totalAmount,
+            "monthlyAmount" to request.monthlyAmount,
+            "tenor" to request.tenor,
+            "currentMonth" to request.currentMonth,
+            "startDate" to request.startDate
+        )
+        val response = api.addInstallment(liabilityId, body)
+        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+    }
+
+    override suspend fun simulatePayoff(request: SimulatePayoffRequest): SimulatePayoffResponse {
+        val body = mutableMapOf<String, Any>(
+            "strategy" to request.strategy.rawValue
+        )
+        request.additionalPayment?.let { body["additionalPayment"] = it }
+        
+        val response = api.simulatePayoff(body)
         return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
     }
 }
