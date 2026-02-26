@@ -56,7 +56,7 @@ data class AssetDto(
             id = id ?: "",
             name = name ?: "",
             type = type?.let { 
-                try { AssetType.valueOf(it) } catch (e: Exception) { AssetType.OTHER } 
+                try { AssetType.valueOf(it.uppercase()) } catch (e: Exception) { AssetType.OTHER } 
             } ?: AssetType.OTHER,
             amount = amount ?: 0.0,
             currency = currency ?: CurrencyFormatter.defaultCurrency,
@@ -187,3 +187,38 @@ data class PortfolioSummaryDto(
         )
     }
 }
+
+@Serializable
+data class CreateAssetRequestDto(
+    val name: String,
+    val type: String,
+    val amount: Double? = null,
+    val quantity: Double? = null,
+    val unit: String? = null,
+    val pricePerUnit: Double? = null,
+    val currency: String? = null,
+    val description: String? = null,
+    val location: String? = null,
+    val acquisitionDate: String? = null
+)
+
+@Serializable
+data class UpdateAssetRequestDto(
+    val name: String? = null,
+    val amount: Double? = null,
+    val quantity: Double? = null,
+    val unit: String? = null,
+    val pricePerUnit: Double? = null,
+    val location: String? = null,
+    val acquisitionDate: String? = null
+)
+
+@Serializable
+data class CreateAssetTransactionRequestDto(
+    val type: String,
+    val quantity: Double? = null,
+    val pricePerUnit: Double? = null,
+    val amount: Double? = null,
+    val note: String? = null,
+    val datetime: String? = null
+)

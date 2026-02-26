@@ -53,7 +53,11 @@ fun AssetsScreen(
     if (showCreateAsset) {
         CreateAssetScreen(
             viewModel = viewModel,
-            onNavigateBack = onDismissCreate
+            onNavigateBack = onDismissCreate,
+            onSuccess = { newAsset ->
+                showCreateAsset = false
+                onNavigateToAssetDetail(newAsset)
+            }
         )
     }
 

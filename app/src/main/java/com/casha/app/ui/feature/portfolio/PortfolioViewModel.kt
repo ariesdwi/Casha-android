@@ -81,7 +81,7 @@ class PortfolioViewModel @Inject constructor(
     }
 
     // MARK: - Create Asset
-    fun createAsset(request: CreateAssetRequest, onSuccess: () -> Unit = {}) {
+    fun createAsset(request: CreateAssetRequest, onSuccess: (Asset) -> Unit = {}) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
             try {
@@ -94,7 +94,7 @@ class PortfolioViewModel @Inject constructor(
                 }
                 // Refresh portfolio summary
                 fetchPortfolioSummary(force = true)
-                onSuccess()
+                onSuccess(newAsset)
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
             }

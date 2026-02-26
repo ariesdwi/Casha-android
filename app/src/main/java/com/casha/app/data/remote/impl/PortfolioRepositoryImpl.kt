@@ -3,6 +3,7 @@ package com.casha.app.data.remote.impl
 import com.casha.app.core.network.NetworkError
 import com.casha.app.core.network.safeApiCall
 import com.casha.app.data.remote.api.PortfolioApiService
+import com.casha.app.data.remote.dto.*
 import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.PortfolioRepository
 import java.text.SimpleDateFormat
@@ -17,24 +18,20 @@ class PortfolioRepositoryImpl @Inject constructor(
     private val simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     override suspend fun createAsset(request: CreateAssetRequest): Asset {
-        val body = mutableMapOf<String, Any>(
-            "name" to request.name,
-            "type" to request.type.rawValue
+        val dto = CreateAssetRequestDto(
+            name = request.name,
+            type = request.type.rawValue,
+            amount = request.amount,
+            quantity = request.quantity,
+            unit = request.unit,
+            pricePerUnit = request.pricePerUnit,
+            currency = request.currency,
+            description = request.description,
+            location = request.location,
+            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) }
         )
 
-        request.amount?.let { body["amount"] = it }
-        request.quantity?.let { body["quantity"] = it }
-        request.unit?.let { body["unit"] = it }
-        request.pricePerUnit?.let { body["pricePerUnit"] = it }
-        request.currency?.let { body["currency"] = it }
-        request.description?.let { body["description"] = it }
-        request.location?.let { body["location"] = it }
-        
-        request.acquisitionDate?.let { 
-            body["acquisitionDate"] = simpleDateFormatter.format(it)
-        }
-
-        val result = safeApiCall { api.createAsset(body) }
+        val result = safeApiCall { api.createAsset(dto) }
         return result.fold(
             onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
             onFailure = { throw it }
@@ -58,49 +55,42 @@ class PortfolioRepositoryImpl @Inject constructor(
     }
 
     override suspend fun updateAsset(id: String, request: UpdateAssetRequest): Asset {
-        val body = mutableMapOf<String, Any>()
-        
-        request.name?.let { body["name"] = it }
-        request.amount?.let { body["amount"] = it }
-        request.quantity?.let { body["quantity"] = it }
-        request.unit?.let { body["unit"] = it }
-        request.pricePerUnit?.let { body["pricePerUnit"] = it }
-        request.location?.let { body["location"] = it }
-        
-        request.acquisitionDate?.let {
-            body["acquisitionDate"] = simpleDateFormatter.format(it)
-        }
+        val dto = UpdateAssetRequestDto(
+            name = request.name,
+            amount = request.amount,
+            quantity = request.quantity,
+            unit = request.unit,
+            pricePerUnit = request.pricePerUnit,
+            location = request.location,
+            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) }
+        )
 
-        val result = safeApiCall { api.updateAsset(id, body) }
+        val result = safeApiCall { api.updateAsset(id, dto) }
         return result.fold(
             onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
             onFailure = { throw it }
         )
     }
 
-    override suspend fun deleteAsset(id: String): Asset {
+    override suspend fun deleteAsset(id: String) {
         val result = safeApiCall { api.deleteAsset(id) }
-        return result.fold(
-            onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
+        result.fold(
+            onSuccess = { /* Handle success */ },
             onFailure = { throw it }
         )
     }
 
     override suspend fun addAssetTransaction(assetId: String, request: CreateAssetTransactionRequest): AssetTransaction {
-        val body = mutableMapOf<String, Any>(
-            "type" to request.type.rawValue
+        val dto = CreateAssetTransactionRequestDto(
+            type = request.type.rawValue,
+            quantity = request.quantity,
+            pricePerUnit = request.pricePerUnit,
+            amount = request.amount,
+            note = request.note,
+            datetime = request.datetime?.let { isoFormatter.format(it) }
         )
 
-        request.quantity?.let { body["quantity"] = it }
-        request.pricePerUnit?.let { body["pricePerUnit"] = it }
-        request.amount?.let { body["amount"] = it }
-        request.note?.let { body["note"] = it }
-        
-        request.datetime?.let {
-            body["datetime"] = isoFormatter.format(it)
-        }
-
-        val result = safeApiCall { api.addAssetTransaction(assetId, body) }
+        val result = safeApiCall { api.addAssetTransaction(assetId, dto) }
         return result.fold(
             onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
             onFailure = { throw it }

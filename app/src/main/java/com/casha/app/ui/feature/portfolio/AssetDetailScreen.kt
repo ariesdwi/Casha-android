@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Asset
+import com.casha.app.domain.model.AssetTransactionType
 import com.casha.app.domain.model.UpdateAssetRequest
 import com.casha.app.ui.feature.portfolio.subviews.detail.*
 import com.casha.app.ui.theme.CashaPrimaryLight
@@ -40,6 +41,8 @@ fun AssetDetailScreen(
     // Screen states
     var showEditModal by remember { mutableStateOf(false) }
     var showingDeleteConfirmation by remember { mutableStateOf(false) }
+    var showingAddTransaction by remember { mutableStateOf(false) }
+    var selectedTransactionType by remember { mutableStateOf(AssetTransactionType.SAVING) }
     
     val userCurrency = CurrencyFormatter.defaultCurrency
 
@@ -53,6 +56,15 @@ fun AssetDetailScreen(
             asset = asset,
             viewModel = viewModel,
             onNavigateBack = { showEditModal = false }
+        )
+    }
+
+    if (showingAddTransaction) {
+        AddAssetTransactionScreen(
+            asset = asset,
+            transactionType = selectedTransactionType,
+            viewModel = viewModel,
+            onNavigateBack = { showingAddTransaction = false }
         )
     }
 
@@ -76,6 +88,7 @@ fun AssetDetailScreen(
                         Icon(Icons.Default.Edit, contentDescription = "Edit")
                     }
                 },
+                windowInsets = WindowInsets(0.dp),
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
@@ -95,8 +108,14 @@ fun AssetDetailScreen(
 
             AssetQuickActionsView(
                 asset = asset,
-                onBuyTapped = { /* TODO: Show AddAssetTransactionView (Saving) */ },
-                onSellTapped = { /* TODO: Show AddAssetTransactionView (Withdraw) */ }
+                onBuyTapped = {
+                    selectedTransactionType = AssetTransactionType.SAVING
+                    showingAddTransaction = true
+                },
+                onSellTapped = {
+                    selectedTransactionType = AssetTransactionType.WITHDRAW
+                    showingAddTransaction = true
+                }
             )
             
             AssetInfoDetailsView(asset = asset)

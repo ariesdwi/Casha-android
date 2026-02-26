@@ -374,6 +374,32 @@ fun MainScreen(
                     )
                 }
 
+                composable(
+                    route = NavRoutes.AssetDetail.route,
+                    arguments = listOf(navArgument("assetId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val assetId = backStackEntry.arguments?.getString("assetId") ?: return@composable
+                    val viewModel: com.casha.app.ui.feature.portfolio.PortfolioViewModel = hiltViewModel()
+                    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                    
+                    val matchingAsset = uiState.assets.firstOrNull { it.id == assetId }
+                    
+                    if (matchingAsset != null) {
+                        com.casha.app.ui.feature.portfolio.AssetDetailScreen(
+                            assetId = assetId,
+                            initialAsset = matchingAsset,
+                            viewModel = viewModel,
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    } else {
+                        // Fallback or loading if needed, though AssetsScreen should have loaded it
+                        LaunchedEffect(assetId) {
+                            viewModel.fetchAssets()
+                        }
+                    }
+                }
+
+
                 composable(NavRoutes.Liabilities.route) {
                     val viewModel: com.casha.app.ui.feature.liability.LiabilityViewModel = hiltViewModel()
                     var showCategoryPicker by remember { mutableStateOf(false) }

@@ -8,7 +8,7 @@ interface PortfolioApiService {
 
     @POST(ApiEndpoints.ASSET_CREATE)
     suspend fun createAsset(
-        @Body request: Map<String, @JvmSuppressWildcards Any>
+        @Body request: CreateAssetRequestDto
     ): BaseResponse<AssetDto>
 
     @GET(ApiEndpoints.ASSET_LIST)
@@ -20,18 +20,18 @@ interface PortfolioApiService {
     @PATCH("assets/{id}")
     suspend fun updateAsset(
         @Path("id") id: String,
-        @Body request: Map<String, @JvmSuppressWildcards Any>
+        @Body request: UpdateAssetRequestDto
     ): BaseResponse<AssetDto>
 
     @DELETE("assets/{id}")
     suspend fun deleteAsset(
         @Path("id") id: String
-    ): BaseResponse<AssetDto>
+    ): BaseResponse<Unit?>
 
     @POST("assets/{assetId}/transactions")
     suspend fun addAssetTransaction(
         @Path("assetId") assetId: String,
-        @Body request: Map<String, @JvmSuppressWildcards Any>
+        @Body request: CreateAssetTransactionRequestDto
     ): BaseResponse<AssetTransactionDto>
 
     @GET("assets/{assetId}/transactions")

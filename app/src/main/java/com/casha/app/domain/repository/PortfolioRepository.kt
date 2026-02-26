@@ -31,7 +31,7 @@ interface PortfolioRepository {
     /**
      * Delete an asset
      */
-    suspend fun deleteAsset(id: String): Asset
+    suspend fun deleteAsset(id: String)
 
     /**
      * Add asset transaction (buy/sell)

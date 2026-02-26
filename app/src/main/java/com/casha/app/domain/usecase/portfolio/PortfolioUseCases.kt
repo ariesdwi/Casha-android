@@ -53,8 +53,8 @@ class CreateAssetUseCase @Inject constructor(
 class DeleteAssetUseCase @Inject constructor(
     private val repository: PortfolioRepository
 ) {
-    suspend fun execute(id: String): Asset {
-        return repository.deleteAsset(id)
+    suspend fun execute(id: String) {
+        repository.deleteAsset(id)
     }
 }
 

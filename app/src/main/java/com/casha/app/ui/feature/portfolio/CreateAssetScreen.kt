@@ -39,7 +39,8 @@ import java.util.*
 @Composable
 fun CreateAssetScreen(
     viewModel: PortfolioViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onSuccess: (Asset) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -73,32 +74,6 @@ fun CreateAssetScreen(
     LaunchedEffect(selectedType) {
         if (unit.isEmpty()) {
             unit = selectedType.recommendedUnit ?: ""
-        }
-    }
-
-    if (showingTypePicker) {
-        ModalBottomSheet(
-            onDismissRequest = { showingTypePicker = false },
-            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-            dragHandle = { BottomSheetDefaults.DragHandle() },
-            containerColor = Color(0xFFF8F9FA)
-        ) {
-            Column(modifier = Modifier.fillMaxHeight(0.8f)) {
-                Text(
-                    text = "Pilih Tipe Aset",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-                )
-                AssetTypePicker(
-                    selectedType = selectedType,
-                    onTypeSelected = {
-                        selectedType = it
-                        unit = it.recommendedUnit ?: ""
-                        showingTypePicker = false
-                    }
-                )
-            }
         }
     }
 
@@ -382,6 +357,7 @@ fun CreateAssetScreen(
                             CreateAssetRequest(
                                 name = name,
                                 type = selectedType,
+                                amount = qtyVal * priceVal,
                                 quantity = qtyVal,
                                 unit = unit.ifBlank { selectedType.recommendedUnit },
                                 pricePerUnit = priceVal,
@@ -399,14 +375,16 @@ fun CreateAssetScreen(
                                 name = name,
                                 type = selectedType,
                                 amount = amtVal,
+                                quantity = 1.0,
+                                pricePerUnit = amtVal,
                                 description = description.takeIf { it.isNotBlank() },
                                 acquisitionDate = if (showAcquisitionDate) acquisitionDate else null,
                                 location = location.takeIf { it.isNotBlank() }
                             )
                         }
                         
-                        viewModel.createAsset(request) {
-                            onNavigateBack()
+                        viewModel.createAsset(request) { newAsset ->
+                            onSuccess(newAsset)
                         }
                     },
                     modifier = Modifier
@@ -440,6 +418,32 @@ fun CreateAssetScreen(
                         }
                     }
                 }
+            }
+        }
+    }
+
+    if (showingTypePicker) {
+        ModalBottomSheet(
+            onDismissRequest = { showingTypePicker = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            dragHandle = { BottomSheetDefaults.DragHandle() },
+            containerColor = Color(0xFFF8F9FA)
+        ) {
+            Column(modifier = Modifier.fillMaxHeight(0.8f)) {
+                Text(
+                    text = "Pilih Tipe Aset",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
+                )
+                AssetTypePicker(
+                    selectedType = selectedType,
+                    onTypeSelected = {
+                        selectedType = it
+                        unit = it.recommendedUnit ?: ""
+                        showingTypePicker = false
+                    }
+                )
             }
         }
     }
