@@ -23,28 +23,29 @@ fun PortfolioSummaryHeader(
     summary: PortfolioSummary?,
     modifier: Modifier = Modifier
 ) {
-    val dateFormatter = remember { SimpleDateFormat("dd/MM/yy HH:mm", Locale.getDefault()) }
+    val dateFormatter = remember { SimpleDateFormat("dd/MM/yy, HH.mm", Locale.getDefault()) }
     
     Box(
         modifier = modifier
             .fillMaxWidth()
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFF2196F3), Color(0xFF00BCD4))
+                    colors = listOf(Color(0xFF0095FF), Color(0xFF00D1FF))
                 ),
-                shape = RoundedCornerShape(20.dp)
+                shape = RoundedCornerShape(24.dp)
             )
-            .padding(vertical = 24.dp, horizontal = 16.dp),
+            .padding(vertical = 28.dp, horizontal = 16.dp),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = "Total Aset",
-                style = MaterialTheme.typography.labelMedium,
-                color = Color.White.copy(alpha = 0.8f)
+                style = MaterialTheme.typography.labelLarge,
+                color = Color.White.copy(alpha = 0.9f),
+                fontSize = 14.sp
             )
             
             Text(
@@ -52,14 +53,16 @@ fun PortfolioSummaryHeader(
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = Color.White,
-                fontSize = 32.sp
+                fontSize = 40.sp,
+                letterSpacing = (-0.5).sp
             )
             
             summary?.lastUpdated?.let { date ->
                 Text(
-                    text = "Terakhir diperbarui ${dateFormatter.format(date)}",
+                    text = "Diperbarui: ${dateFormatter.format(date)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.7f)
+                    color = Color.White.copy(alpha = 0.8f),
+                    fontSize = 12.sp
                 )
             }
         }

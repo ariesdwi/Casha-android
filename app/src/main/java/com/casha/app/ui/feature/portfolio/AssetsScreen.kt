@@ -1,11 +1,15 @@
 package com.casha.app.ui.feature.portfolio
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
@@ -83,7 +87,7 @@ fun AssetsScreen(
     }
 
     Scaffold(
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
         Column(
             modifier = Modifier
@@ -106,7 +110,7 @@ fun AssetsScreen(
                         .background(MaterialTheme.colorScheme.surface, CircleShape)
                 ) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // using AutoMirrored for RTL support
                         contentDescription = "Back",
                         tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.size(20.dp)
@@ -114,7 +118,7 @@ fun AssetsScreen(
                 }
 
                 Text(
-                    text = "Portfolio",
+                    text = "Portofolio",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -130,30 +134,41 @@ fun AssetsScreen(
                     Icon(
                         imageVector = Icons.Default.AddCircle,
                         contentDescription = "Add Asset",
-                        tint = Color(0xFF009033), // Matching LiabilitiesListScreen accent green
-                        modifier = Modifier.size(45.dp) // Large icon as in Liabilites
+                        tint = Color(0xFF009033),
+                        modifier = Modifier.size(45.dp)
                     )
                 }
             }
 
-            PullToRefreshBox(
-                isRefreshing = isRefreshing,
-                onRefresh = { isRefreshing = true },
-                state = pullToRefreshState,
-                modifier = Modifier.weight(1f)
-            ) {
-                if (uiState.isLoading && uiState.assets.isEmpty()) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            Box(modifier = Modifier.weight(1f)) {
+                PullToRefreshBox(
+                    isRefreshing = isRefreshing,
+                    onRefresh = { isRefreshing = true },
+                    state = pullToRefreshState,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    if (uiState.isLoading && uiState.assets.isEmpty()) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState()),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                        }
+                    } else if (uiState.assets.isEmpty()) {
+                        EmptyStateView(
+                            onAddAssetClick = { showCreateAsset = true },
+                            modifier = Modifier.verticalScroll(rememberScrollState())
+                        )
+                    } else {
+                        AssetsList(
+                            assets = uiState.assets,
+                            summary = uiState.portfolioSummary,
+                            onAssetClick = onNavigateToAssetDetail,
+                            state = scrollState
+                        )
                     }
-                } else if (uiState.assets.isEmpty()) {
-                    EmptyStateView(onAddAssetClick = { showCreateAsset = true })
-                } else {
-                    AssetsList(
-                        assets = uiState.assets,
-                        summary = uiState.portfolioSummary,
-                        onAssetClick = onNavigateToAssetDetail
-                    )
                 }
             }
         }
@@ -164,18 +179,20 @@ fun AssetsScreen(
 private fun AssetsList(
     assets: List<Asset>,
     summary: com.casha.app.domain.model.PortfolioSummary?,
-    onAssetClick: (Asset) -> Unit
+    onAssetClick: (Asset) -> Unit,
+    state: androidx.compose.foundation.lazy.LazyListState = androidx.compose.foundation.lazy.rememberLazyListState()
 ) {
     LazyColumn(
+        state = state,
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(bottom = 32.dp, start = 20.dp, end = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Summary Header
         item {
             PortfolioSummaryHeader(
                 summary = summary,
-                modifier = Modifier.padding(top = 16.dp)
+                modifier = Modifier.padding(vertical = 8.dp)
             )
         }
         
@@ -185,39 +202,19 @@ private fun AssetsList(
             if (assetsInCategory.isNotEmpty()) {
                 // Category Header
                 item {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    ) {
-                        Icon(
-                            imageVector = mapSFSymbolToImageVector(category.icon),
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = category.rawValue,
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                    SectionHeader(
+                        icon = mapSFSymbolToImageVector(category.icon),
+                        title = category.rawValue,
+                        iconTint = Color(0xFF009033) // Match secondary style tint if needed, or default
+                    )
                 }
                 
-                // Asset Rows
-                items(assetsInCategory) { asset ->
-                    Surface(
-                        onClick = { onAssetClick(asset) },
-                        shape = MaterialTheme.shapes.medium,
-                        color = Color.White,
-                        tonalElevation = 1.dp
-                    ) {
-                        AssetRow(
-                            asset = asset,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                    }
+                // Asset Items
+                items(assetsInCategory, key = { "asset-${it.id}" }) { asset ->
+                    AssetRow(
+                        asset = asset,
+                        onClick = { onAssetClick(asset) }
+                    )
                 }
             }
         }
@@ -225,9 +222,12 @@ private fun AssetsList(
 }
 
 @Composable
-private fun EmptyStateView(onAddAssetClick: () -> Unit) {
+private fun EmptyStateView(
+    onAddAssetClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(32.dp),
         verticalArrangement = Arrangement.Center,
@@ -269,6 +269,32 @@ private fun EmptyStateView(onAddAssetClick: () -> Unit) {
             Spacer(modifier = Modifier.width(8.dp))
             Text("Tambah Aset")
         }
+    }
+}
+
+@Composable
+private fun SectionHeader(
+    icon: ImageVector,
+    title: String,
+    iconTint: Color
+) {
+    Row(
+        modifier = Modifier.padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp),
+            tint = iconTint
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
     }
 }
 

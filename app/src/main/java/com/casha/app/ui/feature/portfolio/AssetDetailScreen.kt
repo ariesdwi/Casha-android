@@ -69,6 +69,7 @@ fun AssetDetailScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { 
@@ -99,8 +100,7 @@ fun AssetDetailScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-                .padding(bottom = 24.dp),
+                .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             // Asset Balance Card
@@ -145,6 +145,8 @@ fun AssetDetailScreen(
                     Text("Hapus Aset", fontWeight = FontWeight.Bold)
                 }
             }
+
+            Spacer(modifier = Modifier.height(84.dp))
         }
     }
 
