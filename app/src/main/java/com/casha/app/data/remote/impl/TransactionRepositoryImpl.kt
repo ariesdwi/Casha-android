@@ -9,6 +9,7 @@ import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.TransactionRepository
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -33,7 +34,7 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun fetchTransactions() {
-        try {
+        safeApiCall {
             val response = apiService.getTransactions()
             val entities = response.transactions.map { it.toEntity() }
             transactionDao.insertTransactions(entities)
@@ -46,8 +47,6 @@ class TransactionRepositoryImpl @Inject constructor(
                 // If the remote list is actually empty, delete all synced transactions
                 transactionDao.clearAllSynced()
             }
-        } catch (e: Exception) {
-            // Log or handle fetch error
         }
     }
 
@@ -218,60 +217,66 @@ class TransactionRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveTransaction(transaction: TransactionCasha) {
-        try {
-            // Attempt to sync to remote immediately
-            val response = cashflowApiService.createTransaction(
+        val result = safeApiCall {
+            cashflowApiService.createTransaction(
                 request = transaction.toEntity().toUploadDto()
             )
-            // If successful, save locally as synced with remote ID
-            val remoteId = response.data?.id
-            transactionDao.insertTransaction(transaction.copy(isSynced = true, remoteId = remoteId).toEntity())
-        } catch (e: Exception) {
-            // If offline or network fails, save locally as unsynced
-            transactionDao.insertTransaction(transaction.copy(isSynced = false).toEntity())
         }
+        
+        result.fold(
+            onSuccess = { response ->
+                val remoteId = response.data?.id
+                transactionDao.insertTransaction(transaction.copy(isSynced = true, remoteId = remoteId).toEntity())
+            },
+            onFailure = {
+                transactionDao.insertTransaction(transaction.copy(isSynced = false).toEntity())
+            }
+        )
     }
 
     override suspend fun deleteTransaction(id: String) {
         val local = transactionDao.getTransactionById(id)
         val remoteId = local?.remoteId ?: id
         
-        // 1. Remote-First Failsafe: Try deleting from API
-        // If this fails (e.g. offline), it will throw an Exception, completely skipping local deletion.
-        cashflowApiService.deleteCashflow("EXPENSE", remoteId)
-        
-        // 2. Only if the remote call succeeds, delete locally
-        if (local != null) {
-            transactionDao.deleteTransaction(local)
+        val result = safeApiCall {
+            cashflowApiService.deleteCashflow("EXPENSE", remoteId)
         }
+        
+        result.onSuccess {
+            if (local != null) {
+                transactionDao.deleteTransaction(local)
+            }
+        }
+        // If failure, we don't delete locally (consistent with existing logic, but now safe)
     }
     
     override suspend fun updateTransaction(id: String, request: UpdateTransactionDto) {
         val local = transactionDao.getTransactionById(id)
         val remoteId = local?.remoteId ?: id
         
-        // 1. Remote-First Failsafe: Try updating API
-        cashflowApiService.updateCashflow("EXPENSE", remoteId, request)
+        val result = safeApiCall {
+            cashflowApiService.updateCashflow("EXPENSE", remoteId, request)
+        }
         
-        // 2. Only if the remote call succeeds, update local entity
-        if (local != null) {
-            val updatedEntity = local.copy(
-                name = request.name,
-                amount = request.amount,
-                category = request.category ?: local.category,
-                datetime = dateFormat.parse(request.datetime) ?: local.datetime,
-                isSynced = true
-            )
-            transactionDao.insertTransaction(updatedEntity)
+        result.onSuccess {
+            if (local != null) {
+                val updatedEntity = local.copy(
+                    name = request.name,
+                    amount = request.amount,
+                    category = request.category ?: local.category,
+                    datetime = dateFormat.parse(request.datetime) ?: local.datetime,
+                    isSynced = true
+                )
+                transactionDao.insertTransaction(updatedEntity)
+            }
         }
     }
 
     override suspend fun syncTransactions() {
         val unsynced = transactionDao.getUnsyncedTransactions()
         unsynced.forEach { entity ->
-            try {
-                if (entity.remoteId != null && entity.remoteId.isNotEmpty()) {
-                    // Update existing cashflow
+            if (entity.remoteId != null && entity.remoteId.isNotEmpty()) {
+                safeApiCall {
                     cashflowApiService.updateCashflow(
                         type = "EXPENSE",
                         id = entity.remoteId,
@@ -282,16 +287,17 @@ class TransactionRepositoryImpl @Inject constructor(
                             datetime = dateFormat.format(entity.datetime)
                         )
                     )
+                }.onSuccess {
                     transactionDao.insertTransaction(entity.copy(isSynced = true))
-                } else {
-                    // Create new cashflow
-                    val response = cashflowApiService.createTransaction(
+                }
+            } else {
+                safeApiCall {
+                    cashflowApiService.createTransaction(
                         request = entity.toUploadDto()
                     )
+                }.onSuccess { response ->
                     transactionDao.insertTransaction(entity.copy(isSynced = true, remoteId = response.data?.id))
                 }
-            } catch (e: Exception) {
-                // Keep unsynced
             }
         }
     }

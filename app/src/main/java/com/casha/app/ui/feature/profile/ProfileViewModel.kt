@@ -22,7 +22,9 @@ data class ProfileUiState(
     val isLoggedOut: Boolean = false,
     val lastUpdated: Date? = null,
     val errorMessage: String? = null,
-    val isOnline: Boolean = false
+    val isOnline: Boolean = false,
+    val isPremium: Boolean = false,
+    val isUpdateSuccess: Boolean = false
 )
 
 @HiltViewModel
@@ -32,7 +34,8 @@ class ProfileViewModel @Inject constructor(
     private val deleteAccountUseCase: DeleteAccountUseCase,
     private val deleteAllLocalDataUseCase: DeleteAllLocalDataUseCase,
     private val authManager: AuthManager,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -56,6 +59,13 @@ class ProfileViewModel @Inject constructor(
             loadCachedProfile()
             refreshProfile()
         }
+
+        // Monitor premium status
+        subscriptionManager.isPremium
+            .onEach { isPremium ->
+                _uiState.update { it.copy(isPremium = isPremium) }
+            }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun loadCachedProfile() {
@@ -138,7 +148,8 @@ class ProfileViewModel @Inject constructor(
                     it.copy(
                         profile = updatedProfile, 
                         isLoading = false,
-                        lastUpdated = Date()
+                        lastUpdated = Date(),
+                        isUpdateSuccess = true
                     ) 
                 }
                 
@@ -191,5 +202,16 @@ class ProfileViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun togglePremiumDebug() {
+        viewModelScope.launch {
+            val currentStatus = _uiState.value.isPremium
+            subscriptionManager.setPremiumStatus(!currentStatus)
+        }
+    }
+
+    fun resetUpdateSuccess() {
+        _uiState.update { it.copy(isUpdateSuccess = false) }
     }
 }

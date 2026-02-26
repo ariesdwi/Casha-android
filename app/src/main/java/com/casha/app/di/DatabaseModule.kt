@@ -38,4 +38,7 @@ object DatabaseModule {
 
     @Provides
     fun provideIncomeDao(db: CashaDatabase) = db.incomeDao()
+
+    @Provides
+    fun provideNotificationDao(db: CashaDatabase) = db.notificationDao()
 }

@@ -20,9 +20,15 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Work
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.casha.app.domain.model.Asset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,8 +51,12 @@ import com.casha.app.ui.feature.transaction.subview.TransactionDetailScreen
 import com.casha.app.ui.feature.report.ReportScreen
 import com.casha.app.ui.feature.report.subview.TransactionListByCategoryView
 import com.casha.app.ui.feature.transaction.coordinator.AddMessageScreen
+import com.casha.app.ui.feature.portfolio.AssetsScreen
+import com.casha.app.ui.feature.portfolio.CreateAssetScreen
+import com.casha.app.ui.feature.portfolio.EditAssetScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     parentNavController: NavHostController,
@@ -131,6 +141,12 @@ fun MainScreen(
     var showCoordinator by remember { mutableStateOf(false) }
     var showAddTransactionSheet by remember { mutableStateOf(false) }
     var editTransactionId by remember { mutableStateOf<String?>(null) }
+    var showProfileEditSheet by remember { mutableStateOf(false) }
+    var showNotificationsSheet by remember { mutableStateOf(false) }
+    var showPaywallSheet by remember { mutableStateOf(false) }
+
+    val subViewModel: com.casha.app.ui.feature.subscription.SubscriptionManager = hiltViewModel()
+    val isPremium by subViewModel.hasPremiumAccess.collectAsState()
 
     val currentRoute = navBackStackEntry?.destination?.route
 
@@ -184,6 +200,20 @@ fun MainScreen(
             AddTransactionScreen(
                 transactionId = editTransactionId,
                 onNavigateBack = { showAddTransactionSheet = false }
+            )
+        }
+
+        if (showProfileEditSheet) {
+            val viewModel: com.casha.app.ui.feature.profile.ProfileViewModel = hiltViewModel()
+            com.casha.app.ui.feature.profile.ProfileEditScreen(
+                viewModel = viewModel,
+                onNavigateBack = { showProfileEditSheet = false }
+            )
+        }
+
+        if (showNotificationsSheet) {
+            com.casha.app.ui.feature.profile.NotificationHistoryScreen(
+                onBackClick = { showNotificationsSheet = false }
             )
         }
 
@@ -294,11 +324,20 @@ fun MainScreen(
                 composable(NavRoutes.Profile.route) {
                     com.casha.app.ui.feature.profile.ProfileScreen(
                         onBackClick = { navController.popBackStack() },
-                        onNavigateToEditProfile = { navController.navigate(NavRoutes.ProfileEdit.route) },
-                        onNavigateToNotifications = { /* TODO */ },
-                        onNavigateToPortfolio = { navController.navigate(NavRoutes.Portfolio.route) },
-                        onNavigateToLiabilities = { navController.navigate(NavRoutes.Liabilities.route) },
-                        onNavigateToGoalTracker = { navController.navigate(NavRoutes.GoalTracker.route) },
+                        onNavigateToEditProfile = { showProfileEditSheet = true },
+                        onNavigateToNotifications = { showNotificationsSheet = true },
+                        onNavigateToPortfolio = { 
+                            if (isPremium) navController.navigate(NavRoutes.Portfolio.route)
+                            else showPaywallSheet = true
+                        },
+                        onNavigateToLiabilities = { 
+                            if (isPremium) navController.navigate(NavRoutes.Liabilities.route)
+                            else showPaywallSheet = true
+                        },
+                        onNavigateToGoalTracker = { 
+                            if (isPremium) navController.navigate(NavRoutes.GoalTracker.route)
+                            else showPaywallSheet = true
+                        },
                         onNavigateToCategories = { navController.navigate(NavRoutes.Categories.route) },
                         onNavigateToSubscription = { navController.navigate(NavRoutes.Subscription.route) },
                         onLogout = {
@@ -306,6 +345,32 @@ fun MainScreen(
                                 popUpTo(NavRoutes.Dashboard.route) { inclusive = true }
                             }
                         }
+                    )
+                }
+
+                // Routes below are kept for navigation stability but logic is moved to modals above
+                composable(NavRoutes.ProfileEdit.route) {
+                    val viewModel: com.casha.app.ui.feature.profile.ProfileViewModel = hiltViewModel()
+                    com.casha.app.ui.feature.profile.ProfileEditScreen(
+                        viewModel = viewModel,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(NavRoutes.Notifications.route) {
+                    com.casha.app.ui.feature.profile.NotificationHistoryScreen(
+                        onBackClick = { navController.popBackStack() }
+                    )
+                }
+
+                composable(NavRoutes.Portfolio.route) {
+                    val portfolioViewModel: com.casha.app.ui.feature.portfolio.PortfolioViewModel = hiltViewModel()
+                    AssetsScreen(
+                        viewModel = portfolioViewModel,
+                        onNavigateToAssetDetail = { asset ->
+                            navController.navigate(NavRoutes.AssetDetail.createRoute(asset.id))
+                        },
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 
@@ -497,8 +562,22 @@ fun MainScreen(
                 }
             }
         }
+
+        if (showPaywallSheet) {
+            ModalBottomSheet(
+                onDismissRequest = { showPaywallSheet = false },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                dragHandle = null,
+                containerColor = Color.Transparent,
+                contentWindowInsets = { WindowInsets(0.dp) }
+            ) {
+                com.casha.app.ui.feature.subscription.PaywallScreen(
+                    onDismiss = { showPaywallSheet = false }
+                )
+            }
+        }
+        }
     }
-}
 }
 
 @Composable

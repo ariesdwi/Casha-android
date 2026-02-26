@@ -9,9 +9,10 @@ import com.casha.app.data.local.entity.*
         TransactionEntity::class,
         BudgetEntity::class,
         CategoryEntity::class,
-        IncomeEntity::class
+        IncomeEntity::class,
+        NotificationEntity::class
     ],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -20,4 +21,5 @@ abstract class CashaDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun categoryDao(): CategoryDao
     abstract fun incomeDao(): IncomeDao
+    abstract fun notificationDao(): NotificationDao
 }

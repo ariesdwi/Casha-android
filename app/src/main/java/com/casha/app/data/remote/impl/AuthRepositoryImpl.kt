@@ -12,6 +12,7 @@ import com.casha.app.domain.model.LoginResult
 import com.casha.app.domain.model.UpdateProfileRequest
 import com.casha.app.domain.model.UserCasha
 import com.casha.app.domain.repository.AuthRepository
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,15 +25,23 @@ class AuthRepositoryImpl @Inject constructor(
 ) : AuthRepository {
 
     override suspend fun login(email: String, password: String): LoginResult {
-        val response = apiService.login(LoginRequestDTO(email, password))
-        return response.data?.toLoginResult()
-            ?: throw Exception(response.message)
+        val result = safeApiCall { apiService.login(LoginRequestDTO(email, password)) }
+        return result.fold(
+            onSuccess = { response -> 
+                response.data?.toLoginResult() ?: throw Exception(response.message)
+            },
+            onFailure = { error -> throw error }
+        )
     }
 
     override suspend fun googleLogin(idToken: String): LoginResult {
-        val response = apiService.googleLogin(GoogleLoginRequestDTO(idToken))
-        return response.data?.toLoginResult()
-            ?: throw Exception(response.message)
+        val result = safeApiCall { apiService.googleLogin(GoogleLoginRequestDTO(idToken)) }
+        return result.fold(
+            onSuccess = { response -> 
+                response.data?.toLoginResult() ?: throw Exception(response.message)
+            },
+            onFailure = { error -> throw error }
+        )
     }
 
     override suspend fun register(
@@ -41,43 +50,65 @@ class AuthRepositoryImpl @Inject constructor(
         phone: String,
         password: String
     ): String {
-        val response = apiService.register(
-            RegisterRequestDTO(name, email, phone, password)
+        val result = safeApiCall {
+            apiService.register(
+                RegisterRequestDTO(name, email, phone, password)
+            )
+        }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.accessToken ?: throw Exception(response.message)
+            },
+            onFailure = { error -> throw error }
         )
-        return response.data?.accessToken
-            ?: throw Exception(response.message)
     }
 
     override suspend fun resetPassword(email: String) {
-        val response = apiService.resetPassword(ResetPasswordRequestDTO(email))
-        if (response.code != 200 && response.code != 201) {
-            throw Exception(response.message)
-        }
+        val result = safeApiCall { apiService.resetPassword(ResetPasswordRequestDTO(email)) }
+        result.onSuccess { response ->
+            if (response.code != 200 && response.code != 201) {
+                throw Exception(response.message)
+            }
+        }.onFailure { throw it }
     }
 
     override suspend fun getProfile(): UserCasha {
-        val response = apiService.getProfile()
-        return response.data?.toDomain()
-            ?: throw Exception(response.message)
+        val result = safeApiCall { apiService.getProfile() }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw Exception(response.message)
+            },
+            onFailure = { error -> throw error }
+        )
     }
 
     override suspend fun updateProfile(request: UpdateProfileRequest): UserCasha {
-        val response = apiService.updateProfile(request.toDTO())
-        return response.data?.toDomain()
-            ?: throw Exception(response.message)
+        val result = safeApiCall { apiService.updateProfile(request.toDTO()) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw Exception(response.message)
+            },
+            onFailure = { error -> throw error }
+        )
     }
 
     override suspend fun deleteAccount() {
-        val response = apiService.deleteAccount()
-        if (response.code != 200 && response.code != 201) {
-            throw Exception(response.message)
-        }
+        val result = safeApiCall { apiService.deleteAccount() }
+        result.onSuccess { response ->
+            if (response.code != 200 && response.code != 201) {
+                throw Exception(response.message)
+            }
+        }.onFailure { throw it }
     }
 
     override suspend fun registerPushToken(token: String) {
-        val response = apiService.registerPushToken(com.casha.app.data.remote.dto.RegisterTokenRequestDTO(token))
-        if (response.code != 200 && response.code != 201) {
-            throw Exception(response.message)
+        val result = safeApiCall { 
+            apiService.registerPushToken(com.casha.app.data.remote.dto.RegisterTokenRequestDTO(token)) 
         }
+        result.onSuccess { response ->
+            if (response.code != 200 && response.code != 201) {
+                throw Exception(response.message)
+            }
+        }.onFailure { throw it }
     }
 }

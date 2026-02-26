@@ -9,12 +9,15 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SubscriptionManager @Inject constructor(
-    @ApplicationContext private val context: Context
+    @ApplicationContext private val context: Context,
+    private val coreSubscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel(), PurchasesUpdatedListener {
 
     // -- State
@@ -41,7 +44,15 @@ class SubscriptionManager @Inject constructor(
             .enablePendingPurchases()
             .build()
         
+        
         setupBillingClient()
+        
+        // Monitor core status changes (from DataStore) to keep VM state in sync
+        coreSubscriptionManager.isPremium
+            .onEach { isPremium ->
+                _hasPremiumAccess.value = isPremium
+            }
+            .launchIn(viewModelScope)
     }
 
     // MARK: - Setup
@@ -157,10 +168,14 @@ class SubscriptionManager @Inject constructor(
                     billingClient.acknowledgePurchase(ackParams) { result ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                             _hasPremiumAccess.value = true
+                            viewModelScope.launch {
+                                coreSubscriptionManager.setPremiumStatus(true)
+                            }
                         }
                     }
                 } else {
                     _hasPremiumAccess.value = true
+                    coreSubscriptionManager.setPremiumStatus(true)
                 }
             }
         }
@@ -185,8 +200,12 @@ class SubscriptionManager @Inject constructor(
                 val inappPurchases = if (resultInapp.responseCode == BillingClient.BillingResponseCode.OK) purchasesInapp else emptyList()
                 
                 val allPurchases = subPurchases + inappPurchases
-                _hasPremiumAccess.value = allPurchases.any {
+                val isPremium = allPurchases.any {
                     it.purchaseState == Purchase.PurchaseState.PURCHASED
+                }
+                _hasPremiumAccess.value = isPremium
+                viewModelScope.launch {
+                    coreSubscriptionManager.setPremiumStatus(isPremium)
                 }
             }
         }

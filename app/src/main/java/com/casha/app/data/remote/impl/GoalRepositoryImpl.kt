@@ -6,6 +6,7 @@ import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.GoalRepository
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -19,13 +20,19 @@ class GoalRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getGoals(): List<Goal> {
-        val response = apiService.getGoals()
-        return response.data?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { apiService.getGoals() }
+        return result.fold(
+            onSuccess = { response -> response.data?.map { it.toDomain() } ?: emptyList() },
+            onFailure = { emptyList() }
+        )
     }
 
     override suspend fun getSummary(): GoalSummary {
-        val response = apiService.getSummary()
-        return response.data?.toDomain() ?: GoalSummary(0, 0, 0, 0.0, 0.0, 0.0)
+        val result = safeApiCall { apiService.getSummary() }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: GoalSummary(0, 0, 0, 0.0, 0.0, 0.0) },
+            onFailure = { GoalSummary(0, 0, 0, 0.0, 0.0, 0.0) }
+        )
     }
 
     override suspend fun createGoal(request: CreateGoalRequest) {
@@ -39,26 +46,34 @@ class GoalRepositoryImpl @Inject constructor(
             color = request.color,
             note = request.note
         )
-        apiService.createGoal(mappedRequest)
+        safeApiCall { apiService.createGoal(mappedRequest) }
     }
 
     override suspend fun fetchGoalCategories(): List<GoalCategory> {
-        val response = apiService.getGoalsCategories()
-        return response.data?.map { dto ->
-            GoalCategory(
-                id = dto.id,
-                name = dto.name.replace("_", " ").lowercase().replaceFirstChar { char -> char.uppercase() },
-                icon = dto.icon,
-                color = dto.color,
-                isActive = dto.isActive,
-                userId = dto.userId
-            )
-        } ?: emptyList()
+        val result = safeApiCall { apiService.getGoalsCategories() }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.map { dto ->
+                    GoalCategory(
+                        id = dto.id,
+                        name = dto.name.replace("_", " ").lowercase().replaceFirstChar { char -> char.uppercase() },
+                        icon = dto.icon,
+                        color = dto.color,
+                        isActive = dto.isActive,
+                        userId = dto.userId
+                    )
+                } ?: emptyList()
+            },
+            onFailure = { emptyList() }
+        )
     }
 
     override suspend fun getGoal(id: String): Goal? {
-        val response = apiService.getGoal(id)
-        return response.data?.toDomain()
+        val result = safeApiCall { apiService.getGoal(id) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() },
+            onFailure = { null }
+        )
     }
 
     override suspend fun updateGoal(id: String, request: CreateGoalRequest) {
@@ -72,16 +87,16 @@ class GoalRepositoryImpl @Inject constructor(
             color = request.color,
             note = request.note
         )
-        apiService.updateGoal(id, mappedRequest)
+        safeApiCall { apiService.updateGoal(id, mappedRequest) }
     }
 
     override suspend fun deleteGoal(id: String) {
-        apiService.deleteGoal(id)
+        safeApiCall { apiService.deleteGoal(id) }
     }
 
     override suspend fun addContribution(goalId: String, amount: Double, note: String?) {
         val request = AddContributionApiRequest(amount, note)
-        apiService.addContribution(goalId, request)
+        safeApiCall { apiService.addContribution(goalId, request) }
     }
 
     private fun GoalDto.toDomain() = Goal(

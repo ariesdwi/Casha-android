@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -31,13 +32,22 @@ class IncomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getIncomes(): List<IncomeCasha> {
-        val response = apiService.getIncomes()
-        return response.data?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { apiService.getIncomes() }
+        return result.fold(
+            onSuccess = { response -> response.data?.map { it.toDomain() } ?: emptyList() },
+            onFailure = { 
+                // Fallback to local
+                incomeDao.getAllIncomesOnce().map { it.toDomain() }
+            }
+        )
     }
 
     override suspend fun getSummary(period: String?): IncomeSummary {
-        val response = apiService.getSummary(period)
-        return response.data?.toDomain() ?: IncomeSummary(0.0, 0, emptyList())
+        val result = safeApiCall { apiService.getSummary(period) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: IncomeSummary(0.0, 0, emptyList()) },
+            onFailure = { IncomeSummary(0.0, 0, emptyList()) }
+        )
     }
 
     override suspend fun saveIncome(request: CreateIncomeRequest) {
@@ -56,27 +66,22 @@ class IncomeRepositoryImpl @Inject constructor(
             updatedAt = Date()
         )
 
-        // Try syncing to remote first
-        try {
-            val dto = CreateIncomeRequestDto(
-                name = request.name,
-                type = request.type.name,
-                amount = request.amount,
-                datetime = dateFormat.format(request.datetime),
-                source = request.source,
-                isRecurring = request.isRecurring,
-                frequency = request.frequency?.name,
-                note = request.note,
-                assetId = request.assetId
-            )
-            // Backend call
-            apiService.createIncome(dto)
-            // If success, store locally
-            incomeDao.insertIncome(entity)
-        } catch (e: Exception) {
-            // Keep it locally as an offline fallback
-            incomeDao.insertIncome(entity)
-        }
+        val dto = CreateIncomeRequestDto(
+            name = request.name,
+            type = request.type.name,
+            amount = request.amount,
+            datetime = dateFormat.format(request.datetime),
+            source = request.source,
+            isRecurring = request.isRecurring,
+            frequency = request.frequency?.name,
+            note = request.note,
+            assetId = request.assetId
+        )
+
+        safeApiCall { apiService.createIncome(dto) }.fold(
+            onSuccess = { incomeDao.insertIncome(entity) },
+            onFailure = { incomeDao.insertIncome(entity) } // Still fallback
+        )
     }
 
     override suspend fun updateIncome(id: String, request: CreateIncomeRequest) {
@@ -87,7 +92,9 @@ class IncomeRepositoryImpl @Inject constructor(
             amount = request.amount,
             datetime = dateFormat.format(request.datetime)
         )
-        cashflowApiService.updateCashflow("INCOME", id, dto) 
+        val result = safeApiCall { cashflowApiService.updateCashflow("INCOME", id, dto) }
+        // We NEED the API to succeed here for the local update to be valid
+        result.onFailure { throw it }
         
         // 2. Only if remote succeeds, save locally
         val entity = IncomeEntity(
@@ -108,7 +115,8 @@ class IncomeRepositoryImpl @Inject constructor(
 
     override suspend fun deleteIncome(id: String) {
         // 1. Remote-First Failsafe: Try deleting from API
-        cashflowApiService.deleteCashflow("INCOME", id)
+        val result = safeApiCall { cashflowApiService.deleteCashflow("INCOME", id) }
+        result.onFailure { throw it }
         
         // 2. Only if remote succeeds, delete locally
         incomeDao.deleteById(id)

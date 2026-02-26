@@ -2,6 +2,9 @@ package com.casha.app.data.local.database
 
 import androidx.room.TypeConverter
 import com.casha.app.domain.model.*
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Date
 
 class Converters {
@@ -33,5 +36,35 @@ class Converters {
     @TypeConverter
     fun incomeFrequencyToString(enum: IncomeFrequency?): String? {
         return enum?.name
+    }
+
+    @TypeConverter
+    fun fromNotificationType(value: String?): NotificationType? {
+        return value?.let { enumValueOf<NotificationType>(it) }
+    }
+
+    @TypeConverter
+    fun notificationTypeToString(enum: NotificationType?): String? {
+        return enum?.name
+    }
+
+    @TypeConverter
+    fun fromStringMap(value: String?): Map<String, String>? {
+        if (value == null) return null
+        return try {
+            Json.decodeFromString<Map<String, String>>(value)
+        } catch (e: Exception) {
+            emptyMap()
+        }
+    }
+
+    @TypeConverter
+    fun toStringMap(value: Map<String, String>?): String? {
+        if (value == null) return null
+        return try {
+            Json.encodeToString(value)
+        } catch (e: Exception) {
+            "{}"
+        }
     }
 }

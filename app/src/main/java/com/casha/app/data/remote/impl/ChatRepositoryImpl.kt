@@ -11,6 +11,7 @@ import com.casha.app.data.remote.dto.ChatTransactionDto
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
 import com.casha.app.domain.repository.ChatRepository
+import com.casha.app.core.network.safeApiCall
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -37,8 +38,11 @@ class ChatRepositoryImpl @Inject constructor(
     }
 
     override suspend fun parseChat(input: String): ChatParseResult {
-        val response = apiService.parseChat(ChatRequestDto(input = input))
-        return processChatResponse(response)
+        val result = safeApiCall { apiService.parseChat(ChatRequestDto(input = input)) }
+        return result.fold(
+            onSuccess = { response -> processChatResponse(response) },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun parseImage(file: File): ChatParseResult {
@@ -46,8 +50,12 @@ class ChatRepositoryImpl @Inject constructor(
         val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
         val inputBody = okhttp3.RequestBody.Companion.create("text/plain".toMediaTypeOrNull(), "")
-        val response = apiService.parseImage(body, inputBody)
-        return processChatResponse(response)
+        
+        val result = safeApiCall { apiService.parseImage(body, inputBody) }
+        return result.fold(
+            onSuccess = { response -> processChatResponse(response) },
+            onFailure = { throw it }
+        )
     }
 
     private suspend fun processChatResponse(response: com.casha.app.data.remote.dto.ChatResponseDto): ChatParseResult {

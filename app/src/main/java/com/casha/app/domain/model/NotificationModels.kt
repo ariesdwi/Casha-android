@@ -27,5 +27,6 @@ data class NotificationCasha(
     val type: NotificationType,
     val imageUrl: String? = null,
     val data: Map<String, String> = emptyMap(),
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
+    val isRead: Boolean = false
 )

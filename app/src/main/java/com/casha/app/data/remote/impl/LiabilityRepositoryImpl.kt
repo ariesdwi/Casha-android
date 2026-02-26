@@ -6,6 +6,7 @@ import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.LiabilityRepository
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 
 class LiabilityRepositoryImpl @Inject constructor(
@@ -38,27 +39,47 @@ class LiabilityRepositoryImpl @Inject constructor(
         request.monthlyInstallment?.let { body["monthlyInstallment"] = it }
         request.gracePeriodMonths?.let { body["gracePeriodMonths"] = it }
 
-        val response = api.createLiability(body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.createLiability(body) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getLiabilities(status: String?, sortBy: String?, sortOrder: String?): List<Liability> {
-        val response = api.getLiabilities(status = status, sortBy = sortBy, sortOrder = sortOrder)
-        return response.data?.liabilities?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { api.getLiabilities(status = status, sortBy = sortBy, sortOrder = sortOrder) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.liabilities?.map { it.toDomain() } ?: emptyList()
+            },
+            onFailure = { emptyList() } // Return empty list on failure for safety
+        )
     }
 
     override suspend fun getLiabilitySummary(): LiabilitySummary {
-        val response = api.getLiabilitySummary()
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.getLiabilitySummary() }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getLiabilityDetails(id: String): Liability {
-        val response = api.getLiabilityDetails(id)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.getLiabilityDetails(id) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun deleteLiability(id: String) {
-        api.deleteLiability(id)
+        safeApiCall { api.deleteLiability(id) }
     }
 
     override suspend fun recordPayment(liabilityId: String, request: CreateLiabilityPaymentRequest): LiabilityPayment {
@@ -71,8 +92,13 @@ class LiabilityRepositoryImpl @Inject constructor(
         request.paymentType?.let { body["paymentType"] = it.rawValue }
         request.notes?.let { body["notes"] = it }
         
-        val response = api.recordPayment(liabilityId, body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.recordPayment(liabilityId, body) }
+        return result.fold(
+            onSuccess = { response -> 
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun createTransaction(liabilityId: String, request: CreateLiabilityTransactionRequest): LiabilityTransaction {
@@ -85,50 +111,87 @@ class LiabilityRepositoryImpl @Inject constructor(
         
         request.description?.let { body["description"] = it }
         
-        val response = api.createTransaction(liabilityId, body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.createTransaction(liabilityId, body) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getTransactions(liabilityId: String, page: Int, pageSize: Int): List<LiabilityTransaction> {
-        val response = api.getTransactions(liabilityId, page, pageSize)
-        return response.data?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { api.getTransactions(liabilityId, page, pageSize) }
+        return result.fold(
+            onSuccess = { response -> 
+                response.data?.map { it.toDomain() } ?: emptyList() 
+            },
+            onFailure = { emptyList() }
+        )
     }
 
     override suspend fun getPaymentHistory(liabilityId: String, page: Int, pageSize: Int): LiabilityPaymentHistory {
-        val response = api.getPaymentHistory(liabilityId, page, pageSize)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.getPaymentHistory(liabilityId, page, pageSize) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getUnbilledTransactions(liabilityId: String): UnbilledTransactions {
-        val response = api.getUnbilledTransactions(liabilityId)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.getUnbilledTransactions(liabilityId) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getLatestStatement(liabilityId: String): LiabilityStatement? {
-        val response = api.getLatestStatement(liabilityId)
-        return response.data?.toDomain()
+        val result = safeApiCall { api.getLatestStatement(liabilityId) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() },
+            onFailure = { null }
+        )
     }
 
     override suspend fun getAllStatements(liabilityId: String): List<LiabilityStatement> {
-        val response = api.getAllStatements(liabilityId)
-        return response.data?.statements?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { api.getAllStatements(liabilityId) }
+        return result.fold(
+            onSuccess = { response -> response.data?.statements?.map { it.toDomain() } ?: emptyList() },
+            onFailure = { emptyList() }
+        )
     }
 
     override suspend fun getStatementDetails(liabilityId: String, statementId: String): LiabilityStatement {
-        val response = api.getStatementDetails(liabilityId, statementId)
-        val data = response.data ?: throw NetworkError.RequestFailed("Invalid response")
-        return com.casha.app.data.remote.dto.LiabilityStatementDTO.fromDetailData(data, liabilityId)
+        val result = safeApiCall { api.getStatementDetails(liabilityId, statementId) }
+        return result.fold(
+            onSuccess = { response -> 
+                val data = response.data ?: throw NetworkError.RequestFailed("Invalid response")
+                com.casha.app.data.remote.dto.LiabilityStatementDTO.fromDetailData(data, liabilityId)
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun getLiabilityInsights(liabilityId: String): LiabilityInsight {
-        val response = api.getLiabilityInsights(liabilityId)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.getLiabilityInsights(liabilityId) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun convertToInstallment(liabilityId: String, transactionId: String, tenor: Int): InstallmentPlan {
         val body = mapOf("tenor" to tenor)
-        val response = api.convertToInstallment(liabilityId, transactionId, body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.convertToInstallment(liabilityId, transactionId, body) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun addInstallment(liabilityId: String, request: CreateLiabilityInstallmentRequest): InstallmentPlan {
@@ -140,8 +203,11 @@ class LiabilityRepositoryImpl @Inject constructor(
             "currentMonth" to request.currentMonth,
             "startDate" to request.startDate
         )
-        val response = api.addInstallment(liabilityId, body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.addInstallment(liabilityId, body) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun simulatePayoff(request: SimulatePayoffRequest): SimulatePayoffResponse {
@@ -150,7 +216,10 @@ class LiabilityRepositoryImpl @Inject constructor(
         )
         request.additionalPayment?.let { body["additionalPayment"] = it }
         
-        val response = api.simulatePayoff(body)
-        return response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response")
+        val result = safeApiCall { api.simulatePayoff(body) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
+            onFailure = { throw it }
+        )
     }
 }

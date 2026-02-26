@@ -7,6 +7,7 @@ import com.casha.app.domain.repository.CashflowRepository
 import com.casha.app.domain.usecase.dashboard.CashflowHistoryResponse
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -20,14 +21,22 @@ class CashflowRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getHistory(month: String?, year: String?, page: Int, pageSize: Int): CashflowHistoryResponse {
-        val response = apiService.getHistory(month, year, page, pageSize)
-        val entries = response.data?.items?.map { it.toDomain() } ?: emptyList()
-        return CashflowHistoryResponse(entries)
+        val result = safeApiCall { apiService.getHistory(month, year, page, pageSize) }
+        return result.fold(
+            onSuccess = { response -> 
+                val entries = response.data?.items?.map { it.toDomain() } ?: emptyList()
+                CashflowHistoryResponse(entries)
+            },
+            onFailure = { CashflowHistoryResponse(emptyList()) }
+        )
     }
 
     override suspend fun getSummary(month: String?, year: String?): CashflowSummary {
-        val response = apiService.getSummary(month, year)
-        return response.data?.toDomain() ?: CashflowSummary(0.0, 0.0, 0.0, "Current")
+        val result = safeApiCall { apiService.getSummary(month, year) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: CashflowSummary(0.0, 0.0, 0.0, "Current") },
+            onFailure = { CashflowSummary(0.0, 0.0, 0.0, "Current") }
+        )
     }
 
     private fun CashflowDto.toDomain() = CashflowEntry(

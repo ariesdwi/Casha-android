@@ -33,6 +33,14 @@ class AuthInterceptor @Inject constructor(
             }
         }.build()
 
-        return chain.proceed(newRequest)
+        return try {
+            chain.proceed(newRequest)
+        } catch (e: java.io.IOException) {
+            // Rethrow standard IOException so the caller (Retrofit/SafeApiCall) can catch it
+            throw e
+        } catch (e: Exception) {
+            // Wrap other unexpected exceptions to avoid crashing OkHttp
+            throw java.io.IOException("AuthInterceptor error: ${e.message}", e)
+        }
     }
 }

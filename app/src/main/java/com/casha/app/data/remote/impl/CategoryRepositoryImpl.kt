@@ -10,6 +10,7 @@ import com.casha.app.domain.model.CategoryCasha
 import com.casha.app.domain.repository.CategoryRepository
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -24,36 +25,51 @@ class CategoryRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getAllCategories(): List<CategoryCasha> {
-        val response = apiService.getAllCategories()
-        val entities = response.data?.map { it.toEntity() } ?: emptyList()
-        if (entities.isNotEmpty()) {
-            categoryDao.insertCategories(entities)
-        }
-        return entities.map { it.toDomain() }
+        val result = safeApiCall { apiService.getAllCategories() }
+        return result.fold(
+            onSuccess = { response -> 
+                val entities = response.data?.map { it.toEntity() } ?: emptyList()
+                if (entities.isNotEmpty()) {
+                    categoryDao.insertCategories(entities)
+                }
+                entities.map { it.toDomain() }
+            },
+            onFailure = { 
+                // Fallback to local data on error
+                categoryDao.getAllCategoriesOnce().map { it.toDomain() }
+            }
+        )
     }
 
     override suspend fun createCategory(name: String, isActive: Boolean): CategoryCasha {
-        // Remote-first: API must succeed before saving locally
-        val response = apiService.createCategory(CreateCategoryRequest(name, isActive))
-        val entity = response.data?.toEntity()
-            ?: throw IllegalStateException("Failed to create category")
-        categoryDao.insertCategory(entity)
-        return entity.toDomain()
+        val result = safeApiCall { apiService.createCategory(CreateCategoryRequest(name, isActive)) }
+        return result.fold(
+            onSuccess = { response ->
+                val entity = response.data?.toEntity() ?: throw IllegalStateException("Failed to create category")
+                categoryDao.insertCategory(entity)
+                entity.toDomain()
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun updateCategory(id: String, name: String, isActive: Boolean): CategoryCasha {
-        // Remote-first: API must succeed before updating locally
-        val response = apiService.updateCategory(id, UpdateCategoryRequest(name, isActive))
-        val entity = response.data?.toEntity()
-            ?: throw IllegalStateException("Failed to update category")
-        categoryDao.insertCategory(entity) // upsert
-        return entity.toDomain()
+        val result = safeApiCall { apiService.updateCategory(id, UpdateCategoryRequest(name, isActive)) }
+        return result.fold(
+            onSuccess = { response ->
+                val entity = response.data?.toEntity() ?: throw IllegalStateException("Failed to update category")
+                categoryDao.insertCategory(entity)
+                entity.toDomain()
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun deleteCategory(id: String) {
-        // Remote-first: API must succeed before removing locally
-        apiService.deleteCategory(id)
-        categoryDao.deleteById(id)
+        val result = safeApiCall { apiService.deleteCategory(id) }
+        result.onSuccess {
+            categoryDao.deleteById(id)
+        }.onFailure { throw it }
     }
 
     // ── Mapper ──

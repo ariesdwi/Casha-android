@@ -10,6 +10,7 @@ import com.casha.app.core.util.DateHelper
 import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.util.*
+import com.casha.app.core.network.safeApiCall
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -30,40 +31,69 @@ class BudgetRepositoryImpl @Inject constructor(
     // ── Remote Operations ──
 
     override suspend fun fetchRemoteBudgets(month: String?): List<BudgetCasha> {
-        val response = apiService.getBudgets(month)
-        return response.data?.map { it.toDomain(month) } ?: emptyList()
+        val result = safeApiCall { apiService.getBudgets(month) }
+        return result.fold(
+            onSuccess = { response -> response.data?.map { it.toDomain(month) } ?: emptyList() },
+            onFailure = { emptyList() }
+        )
     }
 
     override suspend fun fetchRemoteSummary(month: String?): BudgetSummary {
-        val response = apiService.getSummary(month)
-        return response.data?.toDomain() ?: BudgetSummary(0.0, 0.0, 0.0, "USD")
+        val result = safeApiCall { apiService.getSummary(month) }
+        return result.fold(
+            onSuccess = { response -> response.data?.toDomain() ?: BudgetSummary(0.0, 0.0, 0.0, "USD") },
+            onFailure = { BudgetSummary(0.0, 0.0, 0.0, "USD") }
+        )
     }
 
     override suspend fun createRemoteBudget(request: NewBudgetRequest): BudgetCasha {
-        val response = apiService.addBudget(request.toDto())
-        return response.data?.toDomain(request.month) ?: throw Exception("Failed to create budget")
+        val result = safeApiCall { apiService.addBudget(request.toDto()) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain(request.month) ?: throw Exception("Failed to create budget")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun updateRemoteBudget(id: String, request: NewBudgetRequest): BudgetCasha {
-        val response = apiService.updateBudget(id, request.toUpdateDto())
-        return response.data?.toDomain(request.month) ?: throw Exception("Failed to update budget")
+        val result = safeApiCall { apiService.updateBudget(id, request.toUpdateDto()) }
+        return result.fold(
+            onSuccess = { response ->
+                response.data?.toDomain(request.month) ?: throw Exception("Failed to update budget")
+            },
+            onFailure = { throw it }
+        )
     }
 
     override suspend fun deleteRemoteBudget(id: String) {
-        apiService.deleteBudget(id)
+        safeApiCall { apiService.deleteBudget(id) }.onFailure { throw it }
     }
 
     override suspend fun fetchAIRecommendations(monthlyIncome: Double?): FinancialRecommendationResponse {
-        val response = apiService.getAIRecommendations(monthlyIncome)
-        return response.data?.toDomain() ?: FinancialRecommendationResponse(
-            summary = RecommendationSummary("debt-free", 50, 30, 20),
-            financialSummary = FinancialSummary(0.0, 0.0)
+        val result = safeApiCall { apiService.getAIRecommendations(monthlyIncome) }
+        return result.fold(
+            onSuccess = { response -> 
+                response.data?.toDomain() ?: FinancialRecommendationResponse(
+                    summary = RecommendationSummary("debt-free", 50, 30, 20),
+                    financialSummary = FinancialSummary(0.0, 0.0)
+                )
+            },
+            onFailure = { 
+                FinancialRecommendationResponse(
+                    summary = RecommendationSummary("debt-free", 50, 30, 20),
+                    financialSummary = FinancialSummary(0.0, 0.0)
+                )
+            }
         )
     }
 
     override suspend fun applyRemoteRecommendations(request: ApplyRecommendationsRequest): List<BudgetCasha> {
-        val response = apiService.applyRecommendations(request)
-        return response.data?.budgets?.map { it.toDomain() } ?: emptyList()
+        val result = safeApiCall { apiService.applyRecommendations(request) }
+        return result.fold(
+            onSuccess = { response -> response.data?.budgets?.map { it.toDomain() } ?: emptyList() },
+            onFailure = { emptyList() }
+        )
     }
 
     // ── Local Operations ──

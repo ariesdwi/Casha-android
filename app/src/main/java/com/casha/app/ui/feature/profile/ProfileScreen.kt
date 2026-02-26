@@ -119,7 +119,7 @@ fun ProfileScreen(
                 item {
                     val profile = uiState.profile
                     if (profile != null) {
-                        ProfileHeader(profile = profile)
+                        ProfileHeader(profile = profile, isPremium = uiState.isPremium)
                     } else {
                         PlaceholderProfileHeader()
                     }
@@ -151,7 +151,7 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         icon = Icons.Default.Work,
                         title = "Portfolio",
-                        isLocked = true, // Simulation
+                        isLocked = !uiState.isPremium,
                         onClick = onNavigateToPortfolio
                     )
                 }
@@ -159,7 +159,7 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         icon = Icons.Default.CreditCard,
                         title = "Liabilities",
-                        isLocked = true, // Simulation
+                        isLocked = !uiState.isPremium,
                         onClick = onNavigateToLiabilities
                     )
                 }
@@ -167,6 +167,7 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         icon = Icons.Default.Flag,
                         title = "Goal Tracker",
+                        isLocked = !uiState.isPremium,
                         onClick = onNavigateToGoalTracker
                     )
                 }
@@ -185,8 +186,8 @@ fun ProfileScreen(
                     ProfileMenuItem(
                         icon = Icons.Default.Star,
                         title = "Subscription Status",
-                        badge = if (true) "Active" else "Inactive", // Simulation
-                        badgeColor = if (true) Color(0xFF4CAF50) else CashaDanger,
+                        badge = if (uiState.isPremium) "Active" else "Inactive",
+                        badgeColor = if (uiState.isPremium) Color(0xFF4CAF50) else CashaDanger,
                         onClick = onNavigateToSubscription
                     )
                 }
@@ -209,6 +210,22 @@ fun ProfileScreen(
                         accentColor = CashaDanger,
                         onClick = { viewModel.logout() }
                     )
+                }
+
+                // Developer Tools
+                if (com.casha.app.BuildConfig.DEBUG) {
+                    item {
+                        ProfileSectionHeader("Developer Tools")
+                    }
+                    item {
+                        ProfileMenuItem(
+                            icon = Icons.Default.BugReport,
+                            title = "Toggle Premium (Debug)",
+                            badge = if (uiState.isPremium) "ON" else "OFF",
+                            badgeColor = if (uiState.isPremium) Color(0xFF4CAF50) else Color.Gray,
+                            onClick = { viewModel.togglePremiumDebug() }
+                        )
+                    }
                 }
             }
         }
@@ -240,7 +257,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(profile: UserCasha) {
+fun ProfileHeader(profile: UserCasha, isPremium: Boolean) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -293,13 +310,13 @@ fun ProfileHeader(profile: UserCasha) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.Verified,
+                    imageVector = if (isPremium) Icons.Default.Verified else Icons.Default.Person,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
                     tint = CashaBlue
                 )
                 Text(
-                    text = "Premium User",
+                    text = if (isPremium) "Premium User" else "Free User",
                     style = MaterialTheme.typography.labelSmall,
                     color = CashaBlue,
                     fontWeight = FontWeight.Bold

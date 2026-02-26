@@ -41,6 +41,9 @@ interface CategoryDao {
     @Query("SELECT * FROM categories ORDER BY name ASC")
     fun getAllCategories(): Flow<List<CategoryEntity>>
 
+    @Query("SELECT * FROM categories ORDER BY name ASC")
+    suspend fun getAllCategoriesOnce(): List<CategoryEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertCategory(category: CategoryEntity)
 
@@ -58,6 +61,9 @@ interface CategoryDao {
 interface IncomeDao {
     @Query("SELECT * FROM incomes ORDER BY datetime DESC")
     fun getAllIncomes(): Flow<List<IncomeEntity>>
+
+    @Query("SELECT * FROM incomes ORDER BY datetime DESC")
+    suspend fun getAllIncomesOnce(): List<IncomeEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertIncome(income: IncomeEntity)

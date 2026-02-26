@@ -39,13 +39,11 @@ class ErrorInterceptor @Inject constructor() : Interceptor {
         val response: Response
         try {
             response = chain.proceed(request)
-        } catch (e: java.net.SocketTimeoutException) {
-            throw NetworkError.Timeout()
-        } catch (e: java.net.UnknownHostException) {
-            throw NetworkError.NoConnection()
-        } catch (e: java.net.ConnectException) {
-            throw NetworkError.NoConnection()
+        } catch (e: java.io.IOException) {
+            // Rethrow standard IOExceptions so OkHttp and Retrofit handle them normally
+            throw e
         } catch (e: Exception) {
+            // Wrap other unexpected exceptions
             throw NetworkError.Unknown(e)
         }
 
@@ -78,29 +76,23 @@ class ErrorInterceptor @Inject constructor() : Interceptor {
 
         // ── Handle other errors (4xx, 5xx) ──
         if (statusCode !in 200..299) {
-            val errorBody = response.peekBody(Long.MAX_VALUE).string()
-            val errorMessage = parseErrorMessage(errorBody) ?: "Request failed ($statusCode)"
-
-            AppConfig.log("🔴 ERROR: $errorMessage (HTTP $statusCode)", AppConfig.LogLevel.ERROR)
-
-            // Return the response so Retrofit can still parse it
-            // (BaseResponse has code/status/message for graceful handling)
+            val errorBody = try {
+                response.peekBody(Long.MAX_VALUE).string()
+            } catch (e: Exception) {
+                "{\"message\": \"Could not read error body: ${e.message}\"}"
+            }
+            
+            val errorMessage = try {
+                val jsonParser = kotlinx.serialization.json.Json { ignoreUnknownKeys = true }
+                val jsonObj = jsonParser.parseToJsonElement(errorBody).jsonObject
+                jsonObj["message"]?.jsonPrimitive?.content ?: "API Error: $statusCode"
+            } catch (e: Exception) {
+                "API Error: $statusCode"
+            }
+            
+            throw NetworkError.ApiError(statusCode, errorMessage)
         }
 
         return response
-    }
-
-    /**
-     * Tries to extract error message from JSON response body.
-     * Supports: `{ "message": "..." }` or `{ "error": "..." }`
-     */
-    private fun parseErrorMessage(body: String): String? {
-        return try {
-            val json = Json.parseToJsonElement(body).jsonObject
-            json["message"]?.jsonPrimitive?.content
-                ?: json["error"]?.jsonPrimitive?.content
-        } catch (e: Exception) {
-            null
-        }
     }
 }
