@@ -34,10 +34,9 @@ import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import com.casha.app.ui.feature.budget.BudgetViewModel
 import com.casha.app.ui.theme.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
-// ── Professional Background Color ──
-private val ProfessionalBackground = Color(0xFFF7F8FA)
-private val InputBackground = Color(0xFFF0F2F5)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,7 +63,7 @@ fun BudgetAIAdvisorSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = ProfessionalBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Scaffold(
             modifier = Modifier.fillMaxHeight(0.9f),
@@ -72,7 +71,7 @@ fun BudgetAIAdvisorSheet(
                 TopAppBar(
                     title = {
                         Text(
-                            "AI Budget Advisor",
+                            stringResource(R.string.budget_advisor_title),
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.titleMedium
                         )
@@ -84,16 +83,16 @@ fun BudgetAIAdvisorSheet(
                     },
                     actions = {
                         TextButton(onClick = onDismiss) {
-                            Text("Done", color = CashaSuccess)
+                            Text(stringResource(R.string.budget_advisor_done), color = CashaSuccess)
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = ProfessionalBackground
+                        containerColor = MaterialTheme.colorScheme.background
                     ),
                     windowInsets = WindowInsets(0.dp)
                 )
             },
-        containerColor = ProfessionalBackground
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Column(
             modifier = Modifier
@@ -142,7 +141,7 @@ fun BudgetAIAdvisorSheet(
                 Box(modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp), contentAlignment = Alignment.Center) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         CircularProgressIndicator(color = CashaSuccess)
-                        Text("Analyzing financial data...", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text(stringResource(R.string.budget_advisor_analyzing), color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
             }
@@ -179,14 +178,14 @@ fun BudgetAIAdvisorSheet(
         if (showingApplySuccess) {
             AlertDialog(
                 onDismissRequest = { showingApplySuccess = false },
-                title = { Text("Success") },
-                text = { Text("All recommended budgets have been applied successfully.") },
+                title = { Text(stringResource(R.string.budget_advisor_success_title)) },
+                text = { Text(stringResource(R.string.budget_advisor_success_message)) },
                 confirmButton = {
                     TextButton(onClick = {
                         showingApplySuccess = false
                         onDismiss()
                     }) {
-                        Text("Great!")
+                        Text(stringResource(R.string.budget_advisor_success_button))
                     }
                 }
             )
@@ -209,28 +208,28 @@ private fun HeaderSection() {
         Box(
             modifier = Modifier
                 .size(72.dp)
-                .shadow(elevation = 8.dp, shape = CircleShape, ambientColor = Color.Magenta, spotColor = Color.Magenta)
-                .background(Color.White, CircleShape),
+                .shadow(elevation = 8.dp, shape = CircleShape, ambientColor = MaterialTheme.colorScheme.primary, spotColor = MaterialTheme.colorScheme.primary)
+                .background(MaterialTheme.colorScheme.surface, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.AutoAwesome,
                 contentDescription = null,
-                tint = Color.Magenta,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(36.dp)
             )
         }
 
         Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
             Text(
-                "Financial Freedom Advisor",
+                stringResource(R.string.budget_advisor_header_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
             Text(
-                "AI analysis of your debts and assets to optimize your budget for a Debt-Free Strategy.",
+                stringResource(R.string.budget_advisor_header_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -250,13 +249,13 @@ private fun IncomeInputSection(
 ) {
     var isFocused by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Monthly Income Allocation", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_income_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -265,7 +264,7 @@ private fun IncomeInputSection(
             OutlinedTextField(
                 value = if (isFocused) incomeText else if (incomeText.isNotEmpty()) CurrencyFormatter.formatInput(incomeText) else "",
                 onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onIncomeChange(it) },
-                placeholder = { Text("Amount to allocate") },
+                placeholder = { Text(stringResource(R.string.budget_advisor_income_placeholder)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.weight(1f).onFocusChanged { isFocused = it.isFocused },
                 singleLine = true,
@@ -283,7 +282,7 @@ private fun IncomeInputSection(
                 colors = ButtonDefaults.buttonColors(containerColor = CashaSuccess),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Analyze")
+                Text(stringResource(R.string.budget_advisor_income_analyze))
             }
         }
     }
@@ -305,13 +304,13 @@ private fun FixedExpensesSection(
 ) {
     var isAmountFocused by remember { mutableStateOf(false) }
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Fixed Spending (Optional)", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_fixed_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-                .background(Color.White, RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
         ) {
             // Input Row
             Row(
@@ -322,7 +321,7 @@ private fun FixedExpensesSection(
                 Box(
                     modifier = Modifier
                         .weight(1f)
-                        .background(InputBackground, RoundedCornerShape(10.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(10.dp))
                         .clickable { onCategoryMenuToggle(true) }
                         .padding(12.dp)
                 ) {
@@ -332,7 +331,7 @@ private fun FixedExpensesSection(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = fixedCategory.ifEmpty { "Category" },
+                            text = fixedCategory.ifEmpty { stringResource(R.string.budget_advisor_fixed_category) },
                             fontSize = 12.sp,
                             color = if (fixedCategory.isEmpty()) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
                         )
@@ -358,13 +357,13 @@ private fun FixedExpensesSection(
                 OutlinedTextField(
                     value = if (isAmountFocused) fixedAmountText else if (fixedAmountText.isNotEmpty()) CurrencyFormatter.formatInput(fixedAmountText) else "",
                     onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onAmountChange(it) },
-                    placeholder = { Text("Amount", fontSize = 12.sp) },
+                    placeholder = { Text(stringResource(R.string.budget_advisor_fixed_amount), fontSize = 12.sp) },
                     modifier = Modifier.weight(1f).onFocusChanged { isAmountFocused = it.isFocused },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = InputBackground,
-                        unfocusedContainerColor = InputBackground,
+                        focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         focusedBorderColor = Color.Transparent,
                         unfocusedBorderColor = Color.Transparent
                     ),
@@ -381,7 +380,7 @@ private fun FixedExpensesSection(
 
             // List of Expenses
             if (fixedExpenses.isNotEmpty()) {
-                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                 Column(modifier = Modifier.padding(vertical = 4.dp)) {
                     fixedExpenses.entries.sortedBy { it.key }.forEachIndexed { index, entry ->
                         Row(
@@ -406,7 +405,7 @@ private fun FixedExpensesSection(
                             }
                         }
                         if (index < fixedExpenses.size - 1) {
-                            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = Color.LightGray.copy(alpha = 0.5f))
+                            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                         }
                     }
                 }
@@ -414,7 +413,7 @@ private fun FixedExpensesSection(
         }
 
         Text(
-            "These amounts will be locked in the AI recommendation.",
+            stringResource(R.string.budget_advisor_fixed_locked),
             fontStyle = FontStyle.Italic,
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -429,14 +428,14 @@ private fun StrategySummarySection(summary: RecommendationSummary) {
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
-                .background(Color.White, RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
                 .border(1.dp, CashaSuccess.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                "AI Strategy: ${summary.strategy.replaceFirstChar { it.uppercase() }}",
+                stringResource(R.string.budget_advisor_strategy_title, summary.strategy.replaceFirstChar { it.uppercase() }),
                 fontWeight = FontWeight.Bold,
                 color = CashaSuccess,
                 fontSize = 16.sp
@@ -448,9 +447,9 @@ private fun StrategySummarySection(summary: RecommendationSummary) {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            AllocationCircle(title = "Needs", percentage = summary.needsPercentage, color = Color.Blue, modifier = Modifier.weight(1f))
-            AllocationCircle(title = "Wants", percentage = summary.wantsPercentage, color = Color(0xFFFFA500), modifier = Modifier.weight(1f))
-            AllocationCircle(title = "Savings", percentage = summary.savingsPercentage, color = CashaSuccess, modifier = Modifier.weight(1f))
+            AllocationCircle(title = stringResource(R.string.budget_advisor_strategy_needs), percentage = summary.needsPercentage, color = CashaBlue, modifier = Modifier.weight(1f))
+            AllocationCircle(title = stringResource(R.string.budget_advisor_strategy_wants), percentage = summary.wantsPercentage, color = CashaWarning, modifier = Modifier.weight(1f))
+            AllocationCircle(title = stringResource(R.string.budget_advisor_strategy_savings), percentage = summary.savingsPercentage, color = CashaSuccess, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -460,7 +459,7 @@ private fun AllocationCircle(title: String, percentage: Int, color: Color, modif
     Column(
         modifier = modifier
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .padding(vertical = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -485,13 +484,13 @@ private fun AllocationCircle(title: String, percentage: Int, color: Color, modif
 @Composable
 private fun BudgetMilestonesSection(milestones: List<BudgetMilestone>) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Budget Milestones", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_milestones_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         milestones.forEach { milestone ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
-                    .background(Color.White, RoundedCornerShape(12.dp))
+                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 verticalAlignment = Alignment.CenterVertically
@@ -509,7 +508,7 @@ private fun BudgetMilestonesSection(milestones: List<BudgetMilestone>) {
                     Text(milestone.title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            "Target: ${milestone.target}",
+                            stringResource(R.string.budget_advisor_milestones_target, milestone.target),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Medium,
                             color = CashaSuccess,
@@ -533,13 +532,13 @@ private fun BudgetMilestonesSection(milestones: List<BudgetMilestone>) {
 @Composable
 private fun FinancialSummarySection(summary: FinancialSummary) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("Current Financial Picture", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_summary_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            SummaryCard("Total Debts", summary.debts, Color.Red, Modifier.weight(1f))
-            SummaryCard("Total Assets", summary.assets, CashaSuccess, Modifier.weight(1f))
+            SummaryCard(stringResource(R.string.budget_advisor_summary_debts), summary.debts, CashaDanger, Modifier.weight(1f))
+            SummaryCard(stringResource(R.string.budget_advisor_summary_assets), summary.assets, CashaSuccess, Modifier.weight(1f))
         }
     }
 }
@@ -549,7 +548,7 @@ private fun SummaryCard(title: String, value: Double, color: Color, modifier: Mo
     Column(
         modifier = modifier
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
-            .background(Color.White, RoundedCornerShape(12.dp))
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .border(1.dp, color.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
@@ -567,13 +566,13 @@ private fun SummaryCard(title: String, value: Double, color: Color, modifier: Mo
 @Composable
 private fun InsightsSection(insights: List<String>) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        Text("AI Insights", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_insights_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .shadow(elevation = 2.dp, shape = RoundedCornerShape(12.dp))
-                .background(Color.White, RoundedCornerShape(12.dp))
-                .border(1.dp, Color(0xFFFFC107).copy(alpha = 0.3f), RoundedCornerShape(12.dp))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
+                .border(1.dp, CashaWarning.copy(alpha = 0.3f), RoundedCornerShape(12.dp))
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
@@ -582,7 +581,7 @@ private fun InsightsSection(insights: List<String>) {
                     Icon(
                         Icons.Default.Lightbulb, 
                         contentDescription = null, 
-                        tint = Color(0xFFD4A000), 
+                        tint = CashaWarning, 
                         modifier = Modifier.size(18.dp).padding(top = 2.dp)
                     )
                     Text(insight, fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurfaceVariant, lineHeight = 18.sp)
@@ -595,13 +594,13 @@ private fun InsightsSection(insights: List<String>) {
 @Composable
 private fun RecommendationsList(recommendations: List<BudgetAIRecommendation>) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        Text("AI Recommendations", fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
+        Text(stringResource(R.string.budget_advisor_recommendations_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         recommendations.filter { it.suggestedAmount > 0 }.forEach { rec ->
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp))
-                    .background(Color.White, RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(16.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -624,7 +623,7 @@ private fun RecommendationsList(recommendations: List<BudgetAIRecommendation>) {
                     Text(CurrencyFormatter.format(rec.suggestedAmount), fontWeight = FontWeight.Bold, color = CashaSuccess, fontSize = 16.sp)
                 }
                 
-                HorizontalDivider(color = Color.LightGray.copy(alpha = 0.3f))
+                HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f))
                 
                 Text(
                     rec.reasoning, 
@@ -654,7 +653,7 @@ private fun ApplyAllButton(isLoading: Boolean, onApply: () -> Unit) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp), color = Color.White, strokeWidth = 2.dp)
         } else {
             Icon(Icons.Default.AddCircle, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-            Text("Apply All Recommendations", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            Text(stringResource(R.string.budget_advisor_recommendations_apply_all), fontWeight = FontWeight.Bold, fontSize = 16.sp)
         }
     }
 }

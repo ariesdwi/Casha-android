@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.domain.model.GoalCategory
 import com.casha.app.core.util.CurrencyFormatter
 
@@ -128,11 +130,11 @@ fun OptionalFieldsSection(
     selectedColor: Color
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        InputCard(title = "Notes") {
+        InputCard(title = stringResource(R.string.goal_input_notes)) {
             OutlinedTextField(
                 value = note,
                 onValueChange = onNoteChange,
-                placeholder = { Text("Add any details...") },
+                placeholder = { Text(stringResource(R.string.goal_placeholder_notes)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = false,
                 maxLines = 3,
@@ -155,7 +157,7 @@ fun OptionalFieldsSection(
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
-                text = "Appearance",
+                text = stringResource(R.string.goal_input_appearance),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -275,7 +277,7 @@ fun CategorySelectionCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = "Category",
+                    text = stringResource(R.string.goal_input_category),
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -306,7 +308,7 @@ fun GoalCategoryPickerBottomSheet(
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Column(modifier = Modifier.padding(bottom = 24.dp)) {
             Text(
-                "Select Category",
+                stringResource(R.string.goal_details_select_category),
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(16.dp)
             )
@@ -376,7 +378,7 @@ fun GoalPreviewCard(
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = name.ifBlank { "Unset Goal Name" },
+                    text = name.ifBlank { stringResource(R.string.goal_placeholder_name_default) },
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -390,7 +392,7 @@ fun GoalPreviewCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "Target: ${CurrencyFormatter.format(targetAmount.toDoubleOrNull() ?: 0.0, userCurrency)}",
+                    text = "${stringResource(R.string.goal_label_target)}: ${CurrencyFormatter.format(targetAmount.toDoubleOrNull() ?: 0.0, userCurrency)}",
                     style = MaterialTheme.typography.bodyLarge,
                     color = color,
                     fontWeight = FontWeight.Bold

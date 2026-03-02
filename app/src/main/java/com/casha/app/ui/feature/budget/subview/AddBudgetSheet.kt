@@ -26,6 +26,8 @@ import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.NewBudgetRequest
 import com.casha.app.core.util.CurrencyFormatter
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,24 +69,24 @@ fun AddBudgetSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF2F2F7)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Scaffold(
             modifier = Modifier.fillMaxHeight(0.9f),
-            containerColor = Color(0xFFF2F2F7), // iOS grouped background color
+            containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = if (isEditMode) "Edit Budget" else "Add Budget",
+                        text = stringResource(if (isEditMode) R.string.budget_edit_title else R.string.budget_add_title),
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 17.sp,
-                        color = Color.Black
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 navigationIcon = {
                     TextButton(onClick = onDismiss) {
-                        Text("Cancel", color = Color.Black, fontSize = 17.sp)
+                        Text(stringResource(R.string.budget_action_cancel), color = MaterialTheme.colorScheme.onBackground, fontSize = 17.sp)
                     }
                 },
                 actions = {
@@ -109,17 +111,17 @@ fun AddBudgetSheet(
                         enabled = isValid
                     ) {
                         Text(
-                            text = "Save",
+                            text = stringResource(R.string.budget_action_save),
                             fontWeight = FontWeight.SemiBold,
                             fontSize = 17.sp,
-                            color = if (isValid) Color.Black else Color.Gray
+                            color = if (isValid) MaterialTheme.colorScheme.onBackground else Color.Gray
                         )
                     }
                 },
                 windowInsets = WindowInsets(0.dp),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color(0xFFF2F2F7),
-                    scrolledContainerColor = Color(0xFFF2F2F7)
+                    containerColor = MaterialTheme.colorScheme.background,
+                    scrolledContainerColor = MaterialTheme.colorScheme.background
                 )
             )
         }
@@ -136,7 +138,7 @@ fun AddBudgetSheet(
             // Group 1: Budget Details
             Column {
                 Text(
-                    text = "Budget Details",
+                    text = stringResource(R.string.budget_details_header),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                     modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
@@ -144,7 +146,7 @@ fun AddBudgetSheet(
                 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.surface
                 ) {
                     Column {
                         // Amount Input Row
@@ -158,7 +160,7 @@ fun AddBudgetSheet(
                                 onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) amountText = it },
                                 textStyle = TextStyle(
                                     fontSize = 17.sp,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 ),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                                 modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
@@ -168,7 +170,7 @@ fun AddBudgetSheet(
                                             text = "0",
                                             style = TextStyle(
                                                 fontSize = 17.sp,
-                                                color = Color.LightGray
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                             )
                                         )
                                     }
@@ -179,7 +181,7 @@ fun AddBudgetSheet(
                         
                         HorizontalDivider(
                             modifier = Modifier.padding(start = 16.dp),
-                            color = Color(0xFFE5E5EA),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f),
                             thickness = 0.5.dp
                         )
                         
@@ -196,14 +198,14 @@ fun AddBudgetSheet(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "Category",
+                                    text = stringResource(R.string.budget_details_category),
                                     fontSize = 17.sp,
-                                    color = Color.Black
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                                 
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     Text(
-                                        text = selectedCategoryName.ifEmpty { "Select Category" },
+                                        text = selectedCategoryName.ifEmpty { stringResource(R.string.budget_details_select_category) },
                                         fontSize = 17.sp,
                                         color = Color.Gray
                                     )
@@ -222,7 +224,7 @@ fun AddBudgetSheet(
                                 onDismissRequest = { showCategoryDropdown = false },
                                 modifier = Modifier
                                     .fillMaxWidth(0.9f)
-                                    .background(Color.White)
+                                    .background(MaterialTheme.colorScheme.surface)
                             ) {
                                 uiState.categories.forEach { category ->
                                     DropdownMenuItem(
@@ -242,7 +244,7 @@ fun AddBudgetSheet(
             // Group 2: Month & Year
             Column {
                 Text(
-                    text = "Month & Year",
+                    text = stringResource(R.string.budget_month_header),
                     style = MaterialTheme.typography.labelLarge,
                     color = Color.Gray,
                     modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
@@ -250,7 +252,7 @@ fun AddBudgetSheet(
                 
                 Surface(
                     shape = RoundedCornerShape(12.dp),
-                    color = Color.White
+                    color = MaterialTheme.colorScheme.surface
                 ) {
                     Box(
                         modifier = Modifier
@@ -264,9 +266,9 @@ fun AddBudgetSheet(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Month",
+                                text = stringResource(R.string.budget_month_label),
                                 fontSize = 17.sp,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             
                             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -291,7 +293,7 @@ fun AddBudgetSheet(
                             onDismissRequest = { showMonthDropdown = false },
                             modifier = Modifier
                                 .fillMaxWidth(0.9f)
-                                .background(Color.White)
+                                .background(MaterialTheme.colorScheme.surface)
                         ) {
                             monthOptions.forEach { option ->
                                 DropdownMenuItem(

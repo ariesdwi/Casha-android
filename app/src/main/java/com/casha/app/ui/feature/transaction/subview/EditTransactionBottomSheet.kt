@@ -18,6 +18,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.domain.model.CashflowType
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.TransactionRequest
@@ -72,7 +74,7 @@ fun EditTransactionBottomSheet(
                         .padding(horizontal = 16.dp, vertical = 8.dp)
                 ) {
                     Text(
-                        "Cancel", 
+                        stringResource(R.string.transactions_detail_cancel), 
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
@@ -97,7 +99,7 @@ fun EditTransactionBottomSheet(
             // Transaction Details Group
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = if (cashflowType == CashflowType.INCOME) "Income Details" else "Transaction Details",
+                    text = if (cashflowType == CashflowType.INCOME) "Income Details" else stringResource(R.string.transactions_edit_title),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
@@ -120,7 +122,7 @@ fun EditTransactionBottomSheet(
                                 focusedIndicatorColor = Color.Transparent,
                                 unfocusedIndicatorColor = Color.Transparent
                             ),
-                            placeholder = { Text("Name") },
+                            placeholder = { Text(stringResource(R.string.transactions_edit_name_placeholder)) },
                             textStyle = MaterialTheme.typography.bodyLarge
                         )
                         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
@@ -152,7 +154,7 @@ fun EditTransactionBottomSheet(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("Category", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.transactions_detail_category), style = MaterialTheme.typography.bodyLarge)
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = category.ifEmpty { "Shopping" },
@@ -174,7 +176,7 @@ fun EditTransactionBottomSheet(
             // Date Group
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Date",
+                    text = stringResource(R.string.transactions_detail_date),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontWeight = FontWeight.Bold,
@@ -187,7 +189,7 @@ fun EditTransactionBottomSheet(
                 ) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text(
-                            text = "Date",
+                            text = stringResource(R.string.transactions_detail_date),
                             style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
@@ -233,7 +235,7 @@ fun EditTransactionBottomSheet(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Confirmed", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.transactions_edit_confirmed), style = MaterialTheme.typography.bodyLarge)
                     Switch(
                         checked = isConfirmed,
                         onCheckedChange = { isConfirmed = it },
@@ -270,7 +272,7 @@ fun EditTransactionBottomSheet(
                 ),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Save Changes", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.transactions_edit_save), fontWeight = FontWeight.Bold)
             }
             
             Spacer(modifier = Modifier.height(32.dp))

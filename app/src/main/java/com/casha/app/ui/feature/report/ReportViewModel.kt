@@ -20,7 +20,9 @@ data class ReportUiState(
     val categorySpendings: List<ChartCategorySpending> = emptyList(),
     val transactionsByCategory: List<TransactionCasha> = emptyList(),
     val isLoading: Boolean = false,
-    val selectedPeriod: ReportFilterPeriod = ReportFilterPeriod.MONTH
+    val selectedPeriod: ReportFilterPeriod = ReportFilterPeriod.MONTH,
+    val customStartDate: Date? = null,
+    val customEndDate: Date? = null
 )
 
 @HiltViewModel
@@ -63,7 +65,28 @@ class ReportViewModel @Inject constructor(
     }
 
     fun setFilter(period: ReportFilterPeriod) {
-        _uiState.update { it.copy(selectedPeriod = period) }
+        _uiState.update { it.copy(
+            selectedPeriod = period,
+            customStartDate = null,
+            customEndDate = null
+        ) }
+        refreshAllData()
+    }
+
+    fun setCustomDateRange(startMillis: Long, endMillis: Long) {
+        val startDate = Date(startMillis)
+        val endDate = Calendar.getInstance().apply {
+            timeInMillis = endMillis
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }.time
+        _uiState.update { it.copy(
+            selectedPeriod = ReportFilterPeriod.CUSTOM,
+            customStartDate = startDate,
+            customEndDate = endDate
+        ) }
         refreshAllData()
     }
 
@@ -74,8 +97,16 @@ class ReportViewModel @Inject constructor(
     private fun makeDateRange(): Pair<Date, Date> {
         val now = Date()
         val calendar = Calendar.getInstance()
+
+        // Handle custom date range
+        val state = _uiState.value
+        if (state.selectedPeriod == ReportFilterPeriod.CUSTOM) {
+            val start = state.customStartDate ?: now
+            val end = state.customEndDate ?: now
+            return Pair(start, end)
+        }
         
-        val startDate: Date = when (_uiState.value.selectedPeriod) {
+        val startDate: Date = when (state.selectedPeriod) {
             ReportFilterPeriod.WEEK -> {
                 calendar.apply {
                     time = now
@@ -106,6 +137,7 @@ class ReportViewModel @Inject constructor(
                     set(Calendar.MILLISECOND, 0)
                 }.time
             }
+            ReportFilterPeriod.CUSTOM -> now // fallback, handled above
         }
         
         return Pair(startDate, now)

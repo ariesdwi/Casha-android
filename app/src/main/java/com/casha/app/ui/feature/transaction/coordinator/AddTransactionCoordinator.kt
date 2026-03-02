@@ -17,12 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.foundation.background
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.navigation.NavRoutes
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import android.net.Uri
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.io.File
+import androidx.core.content.FileProvider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,6 +37,8 @@ fun AddTransactionCoordinator(
     viewModel: AddTransactionCoordinatorViewModel = hiltViewModel()
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
+
+    // ── Photo Library Launcher ──
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri ->
@@ -50,6 +56,44 @@ fun AddTransactionCoordinator(
             viewModel.uploadImage(it)
         }
     }
+
+    // ── Camera Launcher ──
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraImageUri?.let { viewModel.uploadImage(it) }
+        } else {
+            // User cancelled camera — just close the coordinator
+            viewModel.close()
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Create temp file and launch camera
+            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                tempFile
+            )
+            cameraImageUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            android.widget.Toast.makeText(context, "Camera permission is required to take photos", android.widget.Toast.LENGTH_SHORT).show()
+            viewModel.close()
+        }
+    }
+
+    fun launchCamera() {
+        cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+    }
+
     val uiState by viewModel.uiState.collectAsState()
     val sheetState = rememberModalBottomSheetState()
 
@@ -74,9 +118,8 @@ fun AddTransactionCoordinator(
                 viewModel.close()
             }
             PresentationState.CAMERA -> {
-                onNavigate(NavRoutes.ReceiptCamera.route)
-                onDismiss()
-                viewModel.close()
+                launchCamera()
+                // Don't close/dismiss yet, wait for camera result
             }
             PresentationState.PHOTO_LIBRARY -> {
                 imagePickerLauncher.launch("image/*")
@@ -122,7 +165,7 @@ fun AddTransactionCoordinator(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "Add Transaction",
+                        text = stringResource(R.string.add_transaction_coordinator_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
@@ -131,7 +174,7 @@ fun AddTransactionCoordinator(
                     Spacer(modifier = Modifier.height(8.dp))
                     
                     Text(
-                        text = "Choose how you'd like to\nadd a transaction",
+                        text = stringResource(R.string.add_transaction_coordinator_message_premium),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
@@ -140,28 +183,28 @@ fun AddTransactionCoordinator(
                     Spacer(modifier = Modifier.height(24.dp))
                     
                     CoordinatorOption(
-                        title = "Manual Entry",
+                        title = stringResource(R.string.add_transaction_coordinator_button_manual),
                         onClick = { viewModel.onFeatureSelected(PresentationState.MANUAL_ENTRY) }
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     CoordinatorOption(
-                        title = "Chat with AI",
+                        title = stringResource(R.string.add_transaction_coordinator_button_chat),
                         onClick = { viewModel.onFeatureSelected(PresentationState.CHAT) }
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     CoordinatorOption(
-                        title = "Take Photo",
+                        title = stringResource(R.string.add_transaction_coordinator_button_camera),
                         onClick = { viewModel.onFeatureSelected(PresentationState.CAMERA) }
                     )
                     
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     CoordinatorOption(
-                        title = "Photo Library",
+                        title = stringResource(R.string.add_transaction_coordinator_button_photo_library),
                         onClick = { viewModel.onFeatureSelected(PresentationState.PHOTO_LIBRARY) }
                     )
                 }
@@ -193,3 +236,4 @@ fun CoordinatorOption(
         }
     }
 }
+

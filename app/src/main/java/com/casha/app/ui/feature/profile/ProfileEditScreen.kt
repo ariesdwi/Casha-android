@@ -7,6 +7,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -64,7 +66,7 @@ fun ProfileEditScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        "Ubah Profil",
+                        stringResource(R.string.profile_edit_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -89,7 +91,7 @@ fun ProfileEditScreen(
                             enabled = isFormValid
                         ) {
                             Text(
-                                "Simpan",
+                                stringResource(R.string.profile_action_save),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 15.sp,
                                 color = if (isFormValid) Color(0xFF009033) else Color.Gray
@@ -122,10 +124,10 @@ fun ProfileEditScreen(
                     }
                 }
 
-                InputCard(title = "Informasi Pribadi") {
+                InputCard(title = stringResource(R.string.profile_edit_personal_info)) {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            "Nama",
+                            stringResource(R.string.profile_edit_name),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -138,7 +140,7 @@ fun ProfileEditScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
-                            "Email",
+                            stringResource(R.string.profile_edit_email),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -152,7 +154,7 @@ fun ProfileEditScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         
                         Text(
-                            "Nomor Telepon",
+                            stringResource(R.string.profile_edit_phone),
                             style = MaterialTheme.typography.labelMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

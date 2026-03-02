@@ -5,8 +5,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.casha.app.R
 import com.casha.app.domain.model.CategoryCasha
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -35,7 +37,7 @@ fun AddEditCategoryBottomSheet(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = if (category == null) "Add Category" else "Edit Category",
+                text = if (category == null) stringResource(R.string.profile_categories_edit_new_title) else stringResource(R.string.profile_categories_edit_edit_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold
             )
@@ -43,7 +45,7 @@ fun AddEditCategoryBottomSheet(
             OutlinedTextField(
                 value = name,
                 onValueChange = { name = it },
-                label = { Text("Category Name") },
+                label = { Text(stringResource(R.string.profile_categories_edit_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
@@ -54,7 +56,7 @@ fun AddEditCategoryBottomSheet(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
-                    Text("Is Active", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.profile_categories_edit_active), style = MaterialTheme.typography.bodyLarge)
                     Text(
                         "Determine if this category is visible in forms",
                         style = MaterialTheme.typography.labelSmall,
@@ -73,7 +75,7 @@ fun AddEditCategoryBottomSheet(
                 enabled = name.isNotBlank(),
                 shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp)
             ) {
-                Text(if (category == null) "Create Category" else "Save Changes")
+                Text(if (category == null) stringResource(R.string.profile_category_new_title) else stringResource(R.string.profile_action_save))
             }
             
             Spacer(modifier = Modifier.height(16.dp))

@@ -8,7 +8,8 @@ import java.util.Date
 enum class ReportFilterPeriod(val displayName: String) {
     WEEK("This Week"),
     MONTH("This Month"),
-    YEAR("This Year")
+    YEAR("This Year"),
+    CUSTOM("Custom Range")
 }
 
 /**

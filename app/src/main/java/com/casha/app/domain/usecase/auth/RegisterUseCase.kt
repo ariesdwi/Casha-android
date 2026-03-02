@@ -1,5 +1,6 @@
 package com.casha.app.domain.usecase.auth
 
+import com.casha.app.domain.model.RegisterResult
 import com.casha.app.domain.repository.AuthRepository
 import javax.inject.Inject
 
@@ -7,11 +8,12 @@ class RegisterUseCase @Inject constructor(
     private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(
-        name: String,
+        name: String?,
         email: String,
-        phone: String,
-        password: String
-    ): String {
-        return authRepository.register(name, email, phone, password)
+        phone: String?,
+        password: String,
+        avatar: String? = null
+    ): RegisterResult {
+        return authRepository.register(name, email, phone, password, avatar)
     }
 }

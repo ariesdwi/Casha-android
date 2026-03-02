@@ -3,6 +3,8 @@ package com.casha.app.ui.feature.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -93,35 +95,41 @@ fun MainScreen(
 
     var selectedTab by remember { mutableIntStateOf(1) } // Default to Home
 
-    val tabs = remember {
+    val navReport = stringResource(R.string.nav_report)
+    val navHome = stringResource(R.string.nav_dashboard)
+    val navAdd = stringResource(R.string.nav_add)
+    val navTransactions = stringResource(R.string.nav_transactions)
+    val navBudget = stringResource(R.string.nav_budget)
+
+    val tabs = remember(navReport, navHome, navAdd, navTransactions, navBudget) {
         listOf(
             TabItem(
-                title = "Report",
+                title = navReport,
                 icon = Icons.Outlined.PieChart,
                 selectedIcon = Icons.Filled.PieChart,
                 tag = 0
             ),
             TabItem(
-                title = "Home",
+                title = navHome,
                 icon = Icons.Outlined.Home,
                 selectedIcon = Icons.Filled.Home,
                 tag = 1
             ),
             TabItem(
-                title = "Add",
+                title = navAdd,
                 icon = Icons.Filled.Add,
                 selectedIcon = Icons.Filled.Add,
                 tag = 5,
                 isCenterButton = true
             ),
             TabItem(
-                title = "Transactions",
+                title = navTransactions,
                 icon = Icons.AutoMirrored.Outlined.FormatListBulleted,
                 selectedIcon = Icons.AutoMirrored.Filled.FormatListBulleted,
                 tag = 2
             ),
             TabItem(
-                title = "Budget",
+                title = navBudget,
                 icon = Icons.Outlined.CreditCard,
                 selectedIcon = Icons.Filled.CreditCard,
                 tag = 3
@@ -151,8 +159,7 @@ fun MainScreen(
     val currentRoute = navBackStackEntry?.destination?.route
 
     val hideBottomBar = remember(currentRoute) {
-        currentRoute == NavRoutes.Chat.route ||
-        currentRoute == NavRoutes.ReceiptCamera.route
+        currentRoute == NavRoutes.Chat.route
     }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
@@ -169,6 +176,20 @@ fun MainScreen(
                                 popUpTo(navController.graph.startDestinationId) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
+                            }
+                        },
+                        onTabDoubleTapped = { tag ->
+                            if (tag == selectedTab) {
+                                // Double tapped the currently active tab -> reset to its root
+                                navController.popBackStack(tagToRoute(tag), inclusive = false)
+                            } else {
+                                // Double tapped a different tab -> treat like single tap
+                                selectedTab = tag
+                                navController.navigate(tagToRoute(tag)) {
+                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         },
                         tabs = tabs.map { tabItem ->
@@ -316,9 +337,14 @@ fun MainScreen(
                     arguments = listOf(navArgument("category") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val category = backStackEntry.arguments?.getString("category") ?: ""
+                    val parentEntry = remember(backStackEntry) {
+                        navController.getBackStackEntry(NavRoutes.Report.route)
+                    }
+                    val viewModel: com.casha.app.ui.feature.report.ReportViewModel = hiltViewModel(parentEntry)
                     TransactionListByCategoryView(
                         category = category,
-                        onBackClick = { navController.popBackStack() }
+                        onBackClick = { navController.popBackStack() },
+                        viewModel = viewModel
                     )
                 }
                 composable(NavRoutes.Profile.route) {
@@ -579,9 +605,7 @@ fun MainScreen(
                     )
                 }
 
-                composable(NavRoutes.ReceiptCamera.route) {
-                    PlaceholderTab(title = "Scan Receipt (Premium ✨)")
-                }
+
 
                 composable(NavRoutes.Subscription.route) {
                     PlaceholderTab(title = "Upgrade to Premium ✨")

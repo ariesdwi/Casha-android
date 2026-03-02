@@ -18,10 +18,11 @@ data class LoginRequestDTO(
 
 @Serializable
 data class RegisterRequestDTO(
-    val name: String,
     val email: String,
-    val phone: String,
-    val password: String
+    val password: String,
+    val name: String? = null,
+    val avatar: String? = null,
+    val phone: String? = null
 )
 
 @Serializable
@@ -56,8 +57,9 @@ data class LoginResponseDTO(
 
 @Serializable
 data class RegisterResponseDTO(
-    @SerialName("access_token")
-    val accessToken: String = ""
+    val message: String = "",
+    val userExists: Boolean? = null,
+    val isVerified: Boolean? = null
 )
 
 @Serializable

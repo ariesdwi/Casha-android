@@ -27,6 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import kotlinx.coroutines.launch
@@ -80,20 +82,20 @@ fun GoalTrackerDetailScreen(
     }
 
     Scaffold(
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         if (goal != null) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xFFF8F9FA))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(bottom = paddingValues.calculateBottomPadding())
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
                     // Custom Header
                     DetailHeader(
-                        title = if (isEditMode) "Edit Goal" else goal.name,
+                        title = if (isEditMode) stringResource(R.string.goal_details_edit_title) else goal.name,
                         onBack = onNavigateBack,
                         onAction = {
                             if (isEditMode) {
@@ -116,7 +118,7 @@ fun GoalTrackerDetailScreen(
                                 isEditMode = true
                             }
                         },
-                        actionText = if (isEditMode) "Save" else "Edit",
+                        actionText = if (isEditMode) stringResource(R.string.goal_action_save) else stringResource(R.string.goal_action_edit),
                         isActionEnabled = !isEditMode || (editName.isNotBlank() && editTargetAmount.isNotBlank())
                     )
 
@@ -172,7 +174,7 @@ fun GoalTrackerDetailScreen(
                             ) {
                                 Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Delete Goal", fontWeight = FontWeight.Bold)
+                                Text(stringResource(R.string.goal_action_delete_goal), fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -181,11 +183,12 @@ fun GoalTrackerDetailScreen(
                 }
             } else if (uiState.isLoading) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(stringResource(R.string.goal_status_loading), color = MaterialTheme.colorScheme.primary)
                     CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 }
             } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("Goal not found", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.goal_status_not_found), color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -207,8 +210,8 @@ fun GoalTrackerDetailScreen(
     if (showingDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showingDeleteConfirmation = false },
-            title = { Text("Delete Goal") },
-            text = { Text("Are you sure you want to delete \"${goal?.name}\"? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.goal_action_delete_goal)) },
+            text = { Text(stringResource(R.string.goal_delete_confirmation, goal?.name ?: "")) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -221,12 +224,12 @@ fun GoalTrackerDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.goal_action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showingDeleteConfirmation = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.goal_action_cancel))
                 }
             }
         )
@@ -270,7 +273,7 @@ fun DetailHeader(
             Icon(
                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                 contentDescription = "Back",
-                tint = Color.Black,
+                tint = MaterialTheme.colorScheme.primary, // Nav actions: cashaPrimary
                 modifier = Modifier.size(20.dp)
             )
         }
@@ -281,7 +284,7 @@ fun DetailHeader(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = MaterialTheme.colorScheme.onBackground,
             maxLines = 1,
             modifier = Modifier.weight(1.0f)
         )
@@ -325,7 +328,7 @@ fun GoalBalanceCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "Saved Amount",
+                        text = stringResource(R.string.goal_label_saved_amount),
                         color = Color.White.copy(alpha = 0.8f),
                         fontSize = 14.sp
                     )
@@ -336,7 +339,7 @@ fun GoalBalanceCard(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Target: ${CurrencyFormatter.format(goal.targetAmount, goal.currency)}",
+                        text = "${stringResource(R.string.goal_label_target)}: ${CurrencyFormatter.format(goal.targetAmount, goal.currency)}",
                         color = Color.White.copy(alpha = 0.7f),
                         fontSize = 13.sp,
                         modifier = Modifier.padding(top = 4.dp)
@@ -361,7 +364,7 @@ fun GoalBalanceCard(
 fun QuickActionsSection(onTopUpClick: () -> Unit, goalColor: Color) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "Quick Actions",
+            text = stringResource(R.string.goal_label_quick_actions),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -375,7 +378,7 @@ fun QuickActionsSection(onTopUpClick: () -> Unit, goalColor: Color) {
         ) {
             Icon(Icons.Default.AddCircle, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Top Up Savings", fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.goal_details_top_up), fontWeight = FontWeight.Bold)
         }
     }
 }
@@ -387,7 +390,7 @@ fun GoalProgressSection(goal: Goal) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface, // cashaCard
         shadowElevation = 2.dp
     ) {
         Column(
@@ -401,7 +404,7 @@ fun GoalProgressSection(goal: Goal) {
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.Star, contentDescription = null, tint = goalColor, modifier = Modifier.size(20.dp))
-                    Text("Progress", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.goal_label_progress), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
                 
                 Surface(
@@ -409,7 +412,7 @@ fun GoalProgressSection(goal: Goal) {
                     shape = RoundedCornerShape(10.dp)
                 ) {
                     Text(
-                        text = "${goal.progress.percentage.toInt()}% Complete",
+                        text = stringResource(R.string.goal_label_complete, goal.progress.percentage.toInt()),
                         color = goalColor,
                         fontWeight = FontWeight.Bold,
                         fontSize = 12.sp,
@@ -444,16 +447,16 @@ fun GoalProgressSection(goal: Goal) {
                 val remaining = maxOf(goal.targetAmount - goal.currentAmount, 0.0)
                 InfoChip(
                     icon = Icons.Default.Info, // Placeholder icon
-                    label = "Still Needed",
+                    label = stringResource(R.string.goal_label_still_needed),
                     value = CurrencyFormatter.format(remaining, goal.currency),
-                    color = Color(0xFFF44336), // Accent/Warning red
+                    color = MaterialTheme.colorScheme.error, // cashaDanger (substituting for Accent/Warning red)
                     modifier = Modifier.weight(1f)
                 )
 
                 if (goal.progress.monthlySavingsNeeded != null) {
                     InfoChip(
                         icon = Icons.Default.DateRange,
-                        label = "Per Month",
+                        label = stringResource(R.string.goal_label_per_month),
                         value = CurrencyFormatter.format(goal.progress.monthlySavingsNeeded, goal.currency),
                         color = goalColor,
                         modifier = Modifier.weight(1f)
@@ -493,8 +496,8 @@ fun InfoChip(
             }
 
             Column {
-                Text(text = label, fontSize = 10.sp, color = Color.Gray)
-                Text(text = value, fontSize = 12.sp, fontWeight = FontWeight.Bold, maxLines = 1)
+                Text(text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = value, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
             }
         }
     }
@@ -504,7 +507,7 @@ fun InfoChip(
 fun GoalDetailsSection(goal: Goal) {
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(
-            text = "Details",
+            text = stringResource(R.string.goal_details_header),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -512,30 +515,30 @@ fun GoalDetailsSection(goal: Goal) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(16.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface, // cashaCard
             shadowElevation = 2.dp
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 DetailRow(label = "Category", value = goal.category.name)
                 
                 goal.deadline?.let {
-                    DetailRow(label = "Deadline", value = java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(it))
+                    DetailRow(label = stringResource(R.string.goal_label_deadline), value = java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(it))
                     goal.progress.daysRemaining?.let { days ->
-                        DetailRow(label = "Time Left", value = "$days Days")
+                        DetailRow(label = stringResource(R.string.goal_label_time_left), value = "$days Days")
                     }
                 }
                 
-                DetailRow(label = "Status", value = goal.status.name.lowercase().replaceFirstChar { it.uppercase() })
+                DetailRow(label = stringResource(R.string.goal_label_status), value = goal.status.name.lowercase().replaceFirstChar { it.uppercase() })
                 
                 goal.assetName?.let {
-                    DetailRow(label = "Linked Asset", value = it)
+                    DetailRow(label = stringResource(R.string.goal_label_linked_asset), value = it)
                 }
                 
                 if (!goal.note.isNullOrBlank()) {
-                    DetailRow(label = "Note", value = goal.note)
+                    DetailRow(label = stringResource(R.string.goal_label_note), value = goal.note)
                 }
                 
-                DetailRow(label = "Last Updated", value = java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(goal.updatedAt), isLast = true)
+                DetailRow(label = stringResource(R.string.goal_details_last_updated), value = java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(goal.updatedAt), isLast = true)
             }
         }
     }
@@ -551,11 +554,11 @@ fun DetailRow(label: String, value: String, isLast: Boolean = false) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = label, color = Color.Gray, fontSize = 14.sp)
-            Text(text = value, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
+            Text(text = label, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 14.sp)
+            Text(text = value, color = MaterialTheme.colorScheme.onSurface, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
         }
         if (!isLast) {
-            HorizontalDivider(color = Color.Black.copy(alpha = 0.05f))
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f))
         }
     }
 }
@@ -573,21 +576,21 @@ fun ContributionHistorySection(contributions: List<GoalContribution>) {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface, // cashaCard
                 shadowElevation = 2.dp
             ) {
                 Text(
-                    "No contributions yet",
+                    stringResource(R.string.goal_history_empty),
                     modifier = Modifier.padding(24.dp).fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         } else {
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                color = Color.White,
+                color = MaterialTheme.colorScheme.surface, // cashaCard
                 shadowElevation = 2.dp
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -636,7 +639,7 @@ fun ContributionRow(contribution: GoalContribution, isLast: Boolean) {
                 .weight(1f)
                 .padding(bottom = if (isLast) 0.dp else 10.dp),
             shape = RoundedCornerShape(14.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface, // cashaCard
             shadowElevation = 1.dp
         ) {
             Row(
@@ -646,14 +649,15 @@ fun ContributionRow(contribution: GoalContribution, isLast: Boolean) {
             ) {
                 Column {
                     Text(
-                        text = contribution.note?.ifBlank { "Contribution" } ?: "Contribution",
+                        text = contribution.note?.ifBlank { stringResource(R.string.goal_history_contribution) } ?: stringResource(R.string.goal_history_contribution),
                         fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp
                     )
                     Text(
                         text = java.text.SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(contribution.datetime),
                         fontSize = 10.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
                 
@@ -692,11 +696,11 @@ fun EditGoalSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         // Name
-        InputCard(title = "Goal Name") {
+        InputCard(title = stringResource(R.string.goal_input_name)) {
             OutlinedTextField(
                 value = name,
                 onValueChange = onNameChange,
-                placeholder = { Text("e.g. Vacation Fund") },
+                placeholder = { Text(stringResource(R.string.goal_placeholder_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 colors = OutlinedTextFieldDefaults.colors(
@@ -707,7 +711,7 @@ fun EditGoalSection(
         }
 
         // Target Amount
-        InputCard(title = "Target Amount") {
+        InputCard(title = stringResource(R.string.goal_input_target_amount)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
@@ -734,7 +738,7 @@ fun EditGoalSection(
         Surface(
             onClick = onCategoryClick,
             shape = RoundedCornerShape(16.dp),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shadowElevation = 2.dp
         ) {
             Row(
@@ -749,10 +753,10 @@ fun EditGoalSection(
                     Text(text = category.icon, fontSize = 20.sp)
                 }
                 Column(modifier = Modifier.weight(1f)) {
-                    Text("Category", fontSize = 12.sp, color = Color.Gray)
-                    Text(category.name, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Text(stringResource(R.string.goal_input_category), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(category.name, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
                 }
-                Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = Color.Gray)
+                Icon(Icons.Default.KeyboardArrowRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
@@ -766,11 +770,11 @@ fun EditGoalSection(
         )
 
         // Note
-        InputCard(title = "Note") {
+        InputCard(title = stringResource(R.string.goal_input_notes)) {
             OutlinedTextField(
                 value = note,
                 onValueChange = onNoteChange,
-                placeholder = { Text("Optional notes...") },
+                placeholder = { Text(stringResource(R.string.goal_placeholder_notes)) },
                 modifier = Modifier.fillMaxWidth(),
                 colors = OutlinedTextFieldDefaults.colors(
                     unfocusedBorderColor = Color.Transparent,
@@ -809,7 +813,7 @@ fun AddContributionSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
-        containerColor = Color(0xFFF8F9FA),
+        containerColor = MaterialTheme.colorScheme.background, // cashaBackground
         dragHandle = { BottomSheetDefaults.DragHandle() }
     ) {
         Column(
@@ -829,20 +833,20 @@ fun AddContributionSheet(
                     Text(goal.icon ?: "🎯", fontSize = 30.sp)
                 }
                 Text(goal.name, fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                Text("Add contribution to your goal", color = Color.Gray, fontSize = 14.sp)
+                Text(stringResource(R.string.goal_add_contribution_title), color = Color.Gray, fontSize = 14.sp)
             }
 
             // Amount Input
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.Info, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                    Text("Amount", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Gray)
+                    Text(stringResource(R.string.goal_input_amount), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Gray)
                 }
                 
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
-                    color = Color.White,
+                    color = MaterialTheme.colorScheme.surface, // cashaCard
                     border = androidx.compose.foundation.BorderStroke(1.5.dp, if (amount.isEmpty()) Color.Transparent else goalColor.copy(alpha = 0.4f))
                 ) {
                     Row(
@@ -862,7 +866,7 @@ fun AddContributionSheet(
                             textStyle = androidx.compose.ui.text.TextStyle(
                                 fontSize = 36.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color.Black
+                                color = MaterialTheme.colorScheme.onSurface
                             ),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             modifier = Modifier.fillMaxWidth()
@@ -875,18 +879,18 @@ fun AddContributionSheet(
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.Edit, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                    Text("Note", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Gray)
+                    Text(stringResource(R.string.goal_label_note), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = Color.Gray)
                 }
                 
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    placeholder = { Text("What's this for?") },
+                    placeholder = { Text(stringResource(R.string.goal_placeholder_contribution_notes)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(18.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.White,
-                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
                         unfocusedBorderColor = Color.Transparent,
                         focusedBorderColor = Color.Transparent
                     )
@@ -907,7 +911,7 @@ fun AddContributionSheet(
             ) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Confirm", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.goal_add_contribution_confirm), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

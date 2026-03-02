@@ -34,9 +34,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.core.content.FileProvider
 import com.casha.app.domain.model.ChatParseIntent
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,6 +59,7 @@ fun AddMessageScreen(
     var showSourceSelection by remember { mutableStateOf(false) }
     val context = androidx.compose.ui.platform.LocalContext.current
 
+    // ── Photo Library Launcher ──
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -70,6 +75,38 @@ fun AddMessageScreen(
             }
             viewModel.sendImage(it) 
         }
+    }
+
+    // ── Camera Launcher ──
+    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            cameraImageUri?.let { viewModel.sendImage(it) }
+        }
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            val tempFile = File(context.cacheDir, "chat_camera_${System.currentTimeMillis()}.jpg")
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                tempFile
+            )
+            cameraImageUri = uri
+            cameraLauncher.launch(uri)
+        } else {
+            android.widget.Toast.makeText(context, "Camera permission is required to take photos", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun launchCamera() {
+        cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA)
     }
 
     // Clear any previous state when opening the screen
@@ -131,13 +168,13 @@ fun AddMessageScreen(
                     
                     Column {
                         Text(
-                            text = "New Transaction",
+                            text = stringResource(R.string.add_transaction_chat_header),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = Color(0xFF1A1A2E)
                         )
                         Text(
-                            text = "Keep it short and simple",
+                            text = stringResource(R.string.add_transaction_chat_subheadline),
                             style = MaterialTheme.typography.bodySmall,
                             color = Color(0xFF888AAA)
                         )
@@ -170,7 +207,7 @@ fun AddMessageScreen(
                 color = Color.White,
                 shadowElevation = 0.dp
             ) {
-                Column {
+                Column(modifier = Modifier.imePadding()) {
                     // Transparent-to-white gradient to match the screenshot's floating effect
                     Box(
                         modifier = Modifier
@@ -220,7 +257,7 @@ fun AddMessageScreen(
                                 ) {
                                     if (messageInput.isEmpty()) {
                                         Text(
-                                            text = "Describe your transaction...",
+                                            text = stringResource(R.string.add_transaction_chat_input_placeholder),
                                             style = MaterialTheme.typography.bodyMedium,
                                             color = Color(0xFF888AAA).copy(alpha = 0.6f)
                                         )
@@ -281,8 +318,7 @@ fun AddMessageScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
-                .imePadding(),
+                .padding(innerPadding),
             state = listState,
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -316,11 +352,19 @@ fun AddMessageScreen(
         if (showSourceSelection) {
             AlertDialog(
                 onDismissRequest = { showSourceSelection = false },
-                title = { Text("Select Source") },
+                title = { Text(stringResource(R.string.add_transaction_chat_source_selection)) },
                 text = {
                     Column {
                         ListItem(
-                            headlineContent = { Text("Photo Library") },
+                            headlineContent = { Text(stringResource(R.string.add_transaction_coordinator_button_camera)) },
+                            leadingContent = { Icon(Icons.Default.CameraAlt, null) },
+                            modifier = Modifier.clickable {
+                                showSourceSelection = false
+                                launchCamera()
+                            }
+                        )
+                        ListItem(
+                            headlineContent = { Text(stringResource(R.string.add_transaction_chat_photo_library)) },
                             leadingContent = { Icon(Icons.Default.PhotoLibrary, null) },
                             modifier = Modifier.clickable {
                                 showSourceSelection = false
@@ -328,7 +372,7 @@ fun AddMessageScreen(
                             }
                         )
                         ListItem(
-                            headlineContent = { Text("Cancel") },
+                            headlineContent = { Text(stringResource(R.string.add_transaction_cancel)) },
                             leadingContent = { Icon(Icons.Default.Cancel, null) },
                             modifier = Modifier.clickable { showSourceSelection = false }
                         )
@@ -367,7 +411,7 @@ fun WelcomeMessageView(
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
-                    text = "Hi there! 👋",
+                    text = stringResource(R.string.add_transaction_chat_welcome_greeting),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color(0xFF1A1A2E),
@@ -375,7 +419,7 @@ fun WelcomeMessageView(
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "How to use",
+                        text = stringResource(R.string.add_transaction_chat_welcome_show),
                         style = MaterialTheme.typography.labelMedium,
                         color = Color(0xFF00C896),
                         fontWeight = FontWeight.Medium
@@ -393,7 +437,7 @@ fun WelcomeMessageView(
             Spacer(modifier = Modifier.height(10.dp))
             
             Text(
-                text = "Track your finances naturally! Tell me about your expenses, income, or payments.",
+                text = stringResource(R.string.add_transaction_chat_welcome_description),
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color(0xFF888AAA),
                 lineHeight = 22.sp
@@ -406,23 +450,23 @@ fun WelcomeMessageView(
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     Text(
-                        "TRY THESE EXAMPLES", 
+                        stringResource(R.string.add_transaction_chat_welcome_try_these).uppercase(), 
                         style = MaterialTheme.typography.labelSmall, 
                         fontWeight = FontWeight.Bold, 
                         color = Color(0xFF888AAA)
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     
-                    ExampleRow(Icons.Default.ShoppingCart, "50k coffee this morning", "Expense", Color(0xFFFF6B6B)) {
+                    ExampleRow(Icons.Default.ShoppingCart, "50k coffee this morning", stringResource(R.string.add_transaction_chat_welcome_expense_title), Color(0xFFFF6B6B)) {
                         onExampleClick("50k coffee this morning")
                     }
-                    ExampleRow(Icons.Default.ArrowDownward, "Received 5m salary today", "Income", Color(0xFF00C896)) {
+                    ExampleRow(Icons.Default.ArrowDownward, "Received 5m salary today", stringResource(R.string.add_transaction_chat_welcome_income_title), Color(0xFF00C896)) {
                         onExampleClick("Received 5m salary today")
                     }
-                    ExampleRow(Icons.Default.CreditCard, "Paid 2m credit card", "Payment", Color(0xFF6C63FF)) {
+                    ExampleRow(Icons.Default.CreditCard, "Paid 2m credit card", stringResource(R.string.add_transaction_chat_welcome_payment_title), Color(0xFF6C63FF)) {
                         onExampleClick("Paid 2m credit card")
                     }
-                    ExampleRow(Icons.Default.PhotoCamera, "Upload a receipt photo", null, null) {
+                    ExampleRow(Icons.Default.PhotoCamera, stringResource(R.string.add_transaction_chat_welcome_upload_receipt), null, null) {
                         onCameraClick()
                     }
                 }
@@ -490,7 +534,7 @@ fun UserMessageView(message: String) {
                 )
             }
             Spacer(modifier = Modifier.height(4.dp))
-            Text("You • Sent", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text("You • " + stringResource(R.string.add_transaction_chat_status_sent), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 }
@@ -513,12 +557,12 @@ fun ProcessingMessageView() {
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column {
-                Text("Processing", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.add_transaction_chat_processing).removeSuffix("..."), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(4.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     CircularProgressIndicator(modifier = Modifier.size(14.dp), strokeWidth = 2.dp)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Creating your transaction...", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.add_transaction_chat_creating) + "...", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -559,7 +603,7 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isSuccess) "Transaction Logged" else "Something went wrong",
+                        text = if (isSuccess) "Transaction Logged" else stringResource(R.string.add_transaction_chat_error_oops),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFF1A1A2E)

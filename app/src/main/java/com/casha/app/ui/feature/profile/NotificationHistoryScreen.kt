@@ -15,11 +15,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.casha.app.R
 import com.casha.app.domain.model.NotificationCasha
 import com.casha.app.domain.model.NotificationType
 import com.casha.app.ui.theme.CashaBlue
@@ -56,7 +58,7 @@ fun NotificationHistoryScreen(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = "Notifikasi",
+                        text = stringResource(R.string.profile_action_notifications),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
@@ -102,7 +104,7 @@ fun NotificationHistoryScreen(
                                 fontWeight = FontWeight.Bold
                             )
                             TextButton(onClick = { viewModel.markAllAsRead() }) {
-                                Text("Tandai semua dibaca", fontSize = 12.sp)
+                                Text(stringResource(R.string.profile_action_mark_all_read), fontSize = 12.sp)
                             }
                         }
                     }
@@ -122,7 +124,7 @@ fun NotificationHistoryScreen(
                             )
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Belum ada notifikasi",
+                                text = stringResource(R.string.profile_notifications_empty_title),
                                 color = Color.Gray,
                                 style = MaterialTheme.typography.bodyMedium
                             )

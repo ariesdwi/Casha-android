@@ -23,6 +23,8 @@ import androidx.compose.ui.unit.sp
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.BudgetSummary
 import com.casha.app.ui.theme.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 /**
  * Premium budget overview card with a custom donut chart and detailed stats.
@@ -47,7 +49,7 @@ fun BudgetOverviewCard(
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -57,7 +59,7 @@ fun BudgetOverviewCard(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Budget Overview",
+                text = stringResource(R.string.budget_summary_overview),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.align(Alignment.Start)
@@ -66,6 +68,7 @@ fun BudgetOverviewCard(
             Spacer(modifier = Modifier.height(16.dp))
 
             // Donut Chart
+            val trackColor = MaterialTheme.colorScheme.surfaceVariant
             Box(
                 modifier = Modifier.size(140.dp),
                 contentAlignment = Alignment.Center
@@ -73,7 +76,7 @@ fun BudgetOverviewCard(
                 Canvas(modifier = Modifier.size(120.dp)) {
                     // Background Circle
                     drawArc(
-                        color = Color(0xFFF0F0F0),
+                        color = trackColor,
                         startAngle = 0f,
                         sweepAngle = 360f,
                         useCenter = false,
@@ -96,7 +99,7 @@ fun BudgetOverviewCard(
                         color = progressColor
                     )
                     Text(
-                        text = "Spent",
+                        text = stringResource(R.string.budget_label_spent),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -114,21 +117,21 @@ fun BudgetOverviewCard(
                     icon = Icons.Default.KeyboardArrowDown,
                     iconColor = CashaBlue,
                     amount = totalBudget,
-                    label = "BUDGET",
+                    label = stringResource(R.string.budget_label_budget).uppercase(),
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
                     icon = Icons.Default.KeyboardArrowUp,
                     iconColor = progressColor,
                     amount = totalSpent,
-                    label = "SPENT",
+                    label = stringResource(R.string.budget_label_spent).uppercase(),
                     modifier = Modifier.weight(1f)
                 )
                 StatCard(
                     icon = Icons.Default.CheckCircle,
-                    iconColor = CashaTeal,
+                    iconColor = if (totalRemaining >= 0) CashaSuccess else CashaDanger,
                     amount = totalRemaining,
-                    label = "REMAINING",
+                    label = stringResource(R.string.budget_label_remaining).uppercase(),
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -141,7 +144,7 @@ fun BudgetOverviewCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
-                    .background(Color(0xFFF0F0F0), CircleShape),
+                    .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape),
                 color = progressColor,
                 strokeCap = StrokeCap.Round
             )
@@ -153,14 +156,14 @@ fun BudgetOverviewCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Spent: ${CurrencyFormatter.format(totalSpent)}",
+                    text = "${stringResource(R.string.budget_label_spent)}: ${CurrencyFormatter.format(totalSpent)}",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Remaining: ${CurrencyFormatter.format(totalRemaining)}",
+                    text = "${stringResource(R.string.budget_label_remaining)}: ${CurrencyFormatter.format(totalRemaining)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (totalRemaining >= 0) CashaSuccess else CashaDanger
                 )
             }
         }
@@ -177,7 +180,7 @@ private fun StatCard(
 ) {
     Surface(
         modifier = modifier,
-        color = Color(0xFFF8F9FA),
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(

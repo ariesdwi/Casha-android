@@ -13,10 +13,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.DateHelper
 import com.casha.app.ui.feature.transaction.subview.TransactionList
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,7 +74,7 @@ fun TransactionScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Transactions",
+                        text = stringResource(R.string.transactions_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -108,7 +114,7 @@ fun TransactionScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
-                    placeholder = { Text("Search transactions...") },
+                    placeholder = { Text(stringResource(R.string.transactions_search_placeholder)) },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
@@ -134,7 +140,7 @@ fun TransactionScreen(
                     // "This month" option
                     val isThisMonthSelected = uiState.selectedMonth == "This month" || uiState.selectedMonth == thisMonthRaw
                     FilterPill(
-                        title = "This month",
+                        title = stringResource(R.string.transactions_filter_this_month),
                         isSelected = isThisMonthSelected,
                         onClick = { viewModel.filterTransactionsByMonth("This month") } // Or pass thisMonthRaw
                     )
@@ -142,10 +148,11 @@ fun TransactionScreen(
                     // "Other month" dropdown
                     var expanded by remember { mutableStateOf(false) }
                     val isOtherMonthSelected = !isThisMonthSelected && uiState.selectedMonth != "This year"
+                    val otherMonthTitleStr = stringResource(R.string.transactions_filter_other_month)
                     val otherMonthTitle = if (isOtherMonthSelected) {
                         if (uiState.selectedMonth in monthOptions) DateHelper.formatMonthYearDisplay(uiState.selectedMonth)
                         else uiState.selectedMonth
-                    } else "Other month"
+                    } else otherMonthTitleStr
 
                     Box {
                         FilterPill(
@@ -183,10 +190,90 @@ fun TransactionScreen(
 
                     // "This year" option
                     FilterPill(
-                        title = "This year",
+                        title = stringResource(R.string.transactions_filter_this_year),
                         isSelected = uiState.selectedMonth == "This year",
                         onClick = { viewModel.filterTransactionsByMonth("This year") }
                     )
+
+                    // "Custom Range" date picker option
+                    val isCustomSelected = uiState.selectedMonth == "Custom"
+                    val customRangeLabel = if (isCustomSelected && uiState.customStartDate != null && uiState.customEndDate != null) {
+                        val fmt = remember { SimpleDateFormat("d MMM", Locale.getDefault()) }
+                        "${fmt.format(uiState.customStartDate)} - ${fmt.format(uiState.customEndDate)}"
+                    } else {
+                        stringResource(R.string.transactions_filter_custom_range)
+                    }
+
+                    var showDateRangePicker by remember { mutableStateOf(false) }
+
+                    FilterPill(
+                        title = customRangeLabel,
+                        isSelected = isCustomSelected,
+                        showChevron = false,
+                        onClick = { showDateRangePicker = true }
+                    )
+
+                    // DateRangePicker BottomSheet
+                    if (showDateRangePicker) {
+                        val dateRangePickerState = rememberDateRangePickerState(
+                            initialSelectedStartDateMillis = uiState.customStartDate?.time,
+                            initialSelectedEndDateMillis = uiState.customEndDate?.time
+                        )
+
+                        ModalBottomSheet(
+                            onDismissRequest = { showDateRangePicker = false },
+                            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                            containerColor = MaterialTheme.colorScheme.surface
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(bottom = 16.dp)
+                            ) {
+                                // Header with title and confirm button
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    TextButton(onClick = { showDateRangePicker = false }) {
+                                        Text(stringResource(R.string.add_transaction_cancel))
+                                    }
+                                    Text(
+                                        text = stringResource(R.string.transactions_filter_select_date_range),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                    TextButton(
+                                        onClick = {
+                                            val start = dateRangePickerState.selectedStartDateMillis
+                                            val end = dateRangePickerState.selectedEndDateMillis
+                                            if (start != null && end != null) {
+                                                viewModel.setCustomDateRange(start, end)
+                                            }
+                                            showDateRangePicker = false
+                                        },
+                                        enabled = dateRangePickerState.selectedStartDateMillis != null &&
+                                                  dateRangePickerState.selectedEndDateMillis != null
+                                    ) {
+                                        Text(stringResource(R.string.profile_action_done))
+                                    }
+                                }
+
+                                DateRangePicker(
+                                    state = dateRangePickerState,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(500.dp),
+                                    title = null,
+                                    headline = null,
+                                    showModeToggle = false
+                                )
+                            }
+                        }
+                    }
                 }
 
                 // Search Context Indicator
@@ -236,8 +323,6 @@ fun TransactionScreen(
                             TransactionList(
                                 sections = emptyList(),
                                 isLoading = false,
-                                onDelete = {},
-                                onEdit = {},
                                 onClick = { _, _ -> }
                             )
                         }
@@ -245,8 +330,6 @@ fun TransactionScreen(
                         TransactionList(
                             sections = sectionsToDisplay,
                             isLoading = uiState.isLoading,
-                            onDelete = { viewModel.deleteTransaction(it) },
-                            onEdit = { onNavigateToEditTransaction(it) },
                             onClick = { id, type -> onNavigateToTransactionDetail(id, type) }
                         )
                     }
@@ -308,13 +391,13 @@ fun EmptySearchStateView(searchQuery: String) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No search results",
+            text = stringResource(R.string.transactions_empty_state_no_search_results),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
-            text = "No matches found for \"$searchQuery\". Try adjusting your filters.",
+            text = stringResource(R.string.transactions_empty_state_no_matching_query, searchQuery),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )

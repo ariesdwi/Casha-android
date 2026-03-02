@@ -8,6 +8,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -38,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -60,6 +63,7 @@ data class TabItem(
 fun CustomTabBar(
     selectedTab: Int,
     onTabSelected: (Int) -> Unit,
+    onTabDoubleTapped: ((Int) -> Unit)? = null,
     tabs: List<TabItem>,
     modifier: Modifier = Modifier
 ) {
@@ -100,6 +104,7 @@ fun CustomTabBar(
                         isSelected = selectedTab == tab.tag,
                         primaryColor = primaryColor,
                         onTabSelected = onTabSelected,
+                        onTabDoubleTapped = onTabDoubleTapped,
                         haptic = haptic,
                         modifier = Modifier.weight(1f)
                     )
@@ -198,6 +203,7 @@ private fun RegularTabButton(
     isSelected: Boolean,
     primaryColor: Color,
     onTabSelected: (Int) -> Unit,
+    onTabDoubleTapped: ((Int) -> Unit)? = null,
     haptic: androidx.compose.ui.hapticfeedback.HapticFeedback,
     modifier: Modifier = Modifier
 ) {
@@ -246,12 +252,27 @@ private fun RegularTabButton(
             .graphicsLayer {
                 this.alpha = alpha
             }
-            .clickable(
-                interactionSource = interactionSource,
-                indication = null
-            ) {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                onTabSelected(tab.tag)
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onPress = { offset ->
+                        val press = PressInteraction.Press(offset)
+                        interactionSource.emit(press)
+                        tryAwaitRelease()
+                        interactionSource.emit(PressInteraction.Release(press))
+                    },
+                    onTap = {
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onTabSelected(tab.tag)
+                    },
+                    onDoubleTap = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        if (onTabDoubleTapped != null) {
+                            onTabDoubleTapped(tab.tag)
+                        } else {
+                            onTabSelected(tab.tag)
+                        }
+                    }
+                )
             },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

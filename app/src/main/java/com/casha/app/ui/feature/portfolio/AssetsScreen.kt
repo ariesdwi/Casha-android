@@ -30,10 +30,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.casha.app.R
 import com.casha.app.domain.model.Asset
 import com.casha.app.domain.model.AssetCategory
 import com.casha.app.ui.feature.portfolio.subviews.AssetRow
 import com.casha.app.ui.feature.portfolio.subviews.PortfolioSummaryHeader
+import com.casha.app.ui.util.mapSFSymbolToImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,20 +48,37 @@ fun AssetsScreen(
     val scrollState = rememberLazyListState()
     val pullToRefreshState = rememberPullToRefreshState()
     
+    var showCategoryPicker by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf<AssetCategory?>(null) }
     var showCreateAsset by remember { mutableStateOf(false) }
     var assetToEdit by remember { mutableStateOf<Asset?>(null) }
     var isRefreshing by remember { mutableStateOf(false) }
 
     // Handlers for modals
-    val onDismissCreate = { showCreateAsset = false }
+    val onDismissCreate = { 
+        showCreateAsset = false 
+        selectedCategory = null
+    }
     val onDismissEdit = { assetToEdit = null }
 
-    if (showCreateAsset) {
+    if (showCategoryPicker) {
+        SelectAssetCategoryScreen(
+            onNavigateBack = { showCategoryPicker = false },
+            onCategorySelected = { category ->
+                selectedCategory = category
+                showCategoryPicker = false
+                showCreateAsset = true
+            }
+        )
+    }
+
+    if (showCreateAsset && selectedCategory != null) {
         CreateAssetScreen(
+            selectedCategory = selectedCategory!!,
             viewModel = viewModel,
             onNavigateBack = onDismissCreate,
             onSuccess = { newAsset ->
-                showCreateAsset = false
+                onDismissCreate()
                 onNavigateToAssetDetail(newAsset)
             }
         )
@@ -118,14 +137,14 @@ fun AssetsScreen(
                 }
 
                 Text(
-                    text = "Portofolio",
+                    text = stringResource(R.string.portfolio_dashboard_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
 
                 IconButton(
-                    onClick = { showCreateAsset = true },
+                    onClick = { showCategoryPicker = true },
                     modifier = Modifier
                         .size(40.dp)
                         .shadow(elevation = 2.dp, shape = CircleShape)
@@ -134,7 +153,7 @@ fun AssetsScreen(
                     Icon(
                         imageVector = Icons.Default.AddCircle,
                         contentDescription = "Add Asset",
-                        tint = Color(0xFF009033),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(45.dp)
                     )
                 }
@@ -158,7 +177,7 @@ fun AssetsScreen(
                         }
                     } else if (uiState.assets.isEmpty()) {
                         EmptyStateView(
-                            onAddAssetClick = { showCreateAsset = true },
+                            onAddAssetClick = { showCategoryPicker = true },
                             modifier = Modifier.verticalScroll(rememberScrollState())
                         )
                     } else {
@@ -243,7 +262,7 @@ private fun EmptyStateView(
         Spacer(modifier = Modifier.height(24.dp))
         
         Text(
-            text = "Belum Ada Aset",
+            text = stringResource(R.string.portfolio_empty_title),
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -252,7 +271,7 @@ private fun EmptyStateView(
         Spacer(modifier = Modifier.height(8.dp))
         
         Text(
-            text = "Mulai pantau kekayaan bersih Anda dengan menambahkan aset pertama Anda.",
+            text = stringResource(R.string.portfolio_empty_subtitle),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -267,7 +286,7 @@ private fun EmptyStateView(
         ) {
             Icon(Icons.Default.Add, contentDescription = null)
             Spacer(modifier = Modifier.width(8.dp))
-            Text("Tambah Aset")
+            Text(stringResource(R.string.portfolio_action_add_asset))
         }
     }
 }
@@ -293,14 +312,9 @@ private fun SectionHeader(
             text = title,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }
 
-/**
- * Maps SwiftUI SF Symbol names used in AssetCategory.icon to Android Material Icons.
- */
-private fun mapSFSymbolToImageVector(sfSymbol: String): ImageVector {
-    return Icons.AutoMirrored.Filled.ArrowBack
-}
+

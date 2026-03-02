@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.BudgetCasha
 import com.casha.app.domain.model.NewBudgetRequest
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +51,7 @@ fun EditBudgetSheet(
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
             Text(
-                text = "Edit ${budget.category} Budget",
+                text = "${stringResource(R.string.budget_edit_title)} - ${budget.category}",
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
@@ -59,7 +61,7 @@ fun EditBudgetSheet(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Budget Amount",
+                    text = stringResource(R.string.budget_advisor_fixed_amount),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -124,7 +126,7 @@ fun EditBudgetSheet(
                 enabled = isFormValid,
                 shape = RoundedCornerShape(16.dp)
             ) {
-                Text("Save Changes", fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.budget_action_save), fontWeight = FontWeight.Bold)
             }
         }
     }

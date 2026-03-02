@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.DateHelper
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @Composable
 fun BudgetFilterBar(
@@ -44,7 +46,7 @@ fun BudgetFilterBar(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = if (selectedMonth.isEmpty()) "Select Month" else DateHelper.formatMonthYearDisplay(selectedMonth),
+                    text = if (selectedMonth.isEmpty()) stringResource(R.string.budget_month_select) else DateHelper.formatMonthYearDisplay(selectedMonth),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -52,7 +54,7 @@ fun BudgetFilterBar(
                 
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = "Select Month",
+                    contentDescription = stringResource(R.string.budget_month_select),
                     modifier = Modifier.size(18.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )

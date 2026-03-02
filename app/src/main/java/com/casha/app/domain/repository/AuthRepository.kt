@@ -1,6 +1,7 @@
 package com.casha.app.domain.repository
 
 import com.casha.app.domain.model.LoginResult
+import com.casha.app.domain.model.RegisterResult
 import com.casha.app.domain.model.UpdateProfileRequest
 import com.casha.app.domain.model.UserCasha
 
@@ -15,11 +16,11 @@ interface AuthRepository {
     /** Google SSO login with ID token. */
     suspend fun googleLogin(idToken: String): LoginResult
 
-    /** Register a new account. Returns access token. */
-    suspend fun register(name: String, email: String, phone: String, password: String): String
+    /** Register a new account. Returns result with verification message. */
+    suspend fun register(name: String?, email: String, phone: String?, password: String, avatar: String? = null): RegisterResult
 
-    /** Send password reset email. */
-    suspend fun resetPassword(email: String)
+    /** Send password reset email. Returns API message. */
+    suspend fun resetPassword(email: String): String
 
     /** Fetch the current user's profile. */
     suspend fun getProfile(): UserCasha

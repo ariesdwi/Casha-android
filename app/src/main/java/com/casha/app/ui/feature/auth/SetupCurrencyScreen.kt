@@ -22,6 +22,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -60,7 +62,7 @@ fun SetupCurrencyScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Set Your Currency",
+                text = stringResource(R.string.auth_currency_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -69,7 +71,7 @@ fun SetupCurrencyScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = "Choose the currency you'll use for tracking your money. This will be your primary currency.",
+                text = stringResource(R.string.auth_currency_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -84,7 +86,7 @@ fun SetupCurrencyScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text(
-                    text = "Selected Currency",
+                    text = stringResource(R.string.auth_currency_selected),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -126,7 +128,7 @@ fun SetupCurrencyScreen(
                             }
                         } ?: run {
                             Text(
-                                text = "Select a currency",
+                                text = stringResource(R.string.auth_currency_select_placeholder),
                                 style = MaterialTheme.typography.bodyLarge,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.weight(1f)
@@ -135,7 +137,7 @@ fun SetupCurrencyScreen(
 
                         if (!uiState.hasSelectedCurrency) {
                             Text(
-                                text = "Change",
+                                text = stringResource(R.string.auth_currency_change),
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.Bold
@@ -167,7 +169,9 @@ fun SetupCurrencyScreen(
                     )
                 } else {
                     Text(
-                        text = if (uiState.hasSelectedCurrency) "Already Set" else "Confirm Currency",
+                        text = if (uiState.hasSelectedCurrency)
+                            stringResource(R.string.auth_currency_already_selected)
+                        else stringResource(R.string.auth_currency_confirm),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
@@ -176,7 +180,7 @@ fun SetupCurrencyScreen(
 
             if (uiState.hasSelectedCurrency) {
                 Text(
-                    text = "Currency cannot be changed once established.",
+                    text = stringResource(R.string.auth_currency_already_selected),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                     modifier = Modifier.padding(top = 12.dp, bottom = 24.dp)
@@ -235,7 +239,7 @@ fun CurrencySearchSheet(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Select Currency",
+                    text = stringResource(R.string.auth_currency_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -250,7 +254,7 @@ fun CurrencySearchSheet(
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },
-                placeholder = { Text("Search by code or name...") },
+                placeholder = { Text(stringResource(R.string.auth_currency_search_placeholder)) },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = null) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),

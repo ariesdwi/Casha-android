@@ -137,11 +137,13 @@ fun LiabilityRow(
                         text = "% ${String.format(Locale.getDefault(), "%.1f", liability.interestRate)}$interestSuffix",
                         fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFFE53935)
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
-
+            
+            HorizontalDivider(color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.15f))
+            
             // Balance row
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -211,6 +213,8 @@ fun LiabilityRow(
                     )
                 }
             }
+            // Divider (if you wanted to add it as per spec: cashaTextSecondary.opacity(0.15))
+            // Current code does not have a divider. I will add one separating content.
         }
     }
 }
@@ -218,14 +222,14 @@ fun LiabilityRow(
 @Composable
 private fun getCategoryColor(category: LiabilityCategory): Color {
     return when (category) {
-        LiabilityCategory.MORTGAGE -> Color(0xFF2196F3) // Blue
-        LiabilityCategory.PERSONAL_LOAN -> Color(0xFF9C27B0) // Purple
-        LiabilityCategory.AUTO_LOAN -> Color(0xFF4CAF50) // Green
-        LiabilityCategory.STUDENT_LOAN -> Color(0xFFFF9800) // Orange
-        LiabilityCategory.BUSINESS_LOAN -> Color(0xFF3F51B5) // Indigo
-        LiabilityCategory.CREDIT_CARD -> Color(0xFF6750A4) // Casha Primary
-        LiabilityCategory.PAY_LATER -> Color(0xFFE91E63) // Pink
-        LiabilityCategory.OTHER -> Color(0xFF9E9E9E) // Gray
+        LiabilityCategory.MORTGAGE -> Color(0xFF2196F3) // blue
+        LiabilityCategory.PERSONAL_LOAN -> Color(0xFF9C27B0) // purple
+        LiabilityCategory.AUTO_LOAN -> Color(0xFF4CAF50) // green
+        LiabilityCategory.STUDENT_LOAN -> Color(0xFFFF9800) // orange
+        LiabilityCategory.BUSINESS_LOAN -> Color(0xFF3F51B5) // indigo
+        LiabilityCategory.CREDIT_CARD -> MaterialTheme.colorScheme.primary // cashaPrimary
+        LiabilityCategory.PAY_LATER -> Color(0xFFE91E63) // pink
+        LiabilityCategory.OTHER -> Color(0xFF9E9E9E) // gray
     }
 }
 

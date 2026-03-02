@@ -6,6 +6,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.SearchOff
 import androidx.compose.material3.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -19,8 +21,6 @@ import com.casha.app.domain.model.CashflowDateSection
 fun TransactionList(
     sections: List<CashflowDateSection>,
     isLoading: Boolean,
-    onDelete: (String) -> Unit,
-    onEdit: (String) -> Unit,
     onClick: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
@@ -36,8 +36,6 @@ fun TransactionList(
                 item {
                     TransactionSectionCard(
                         section = section,
-                        onDelete = onDelete,
-                        onEdit = onEdit,
                         onClick = onClick
                     )
                 }
@@ -68,7 +66,7 @@ private fun EmptyTransactionsState(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No transactions found",
+            text = stringResource(R.string.transactions_empty_state_no_history),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Bold

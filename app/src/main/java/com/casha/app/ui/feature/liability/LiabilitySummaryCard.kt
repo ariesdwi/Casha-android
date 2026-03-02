@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -30,12 +31,17 @@ fun LiabilitySummaryCard(
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(16.dp),
+                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+            )
             .clip(RoundedCornerShape(16.dp))
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFF009033),
-                        Color(0xFF006B25)
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.85f)
                     )
                 )
             )
@@ -55,13 +61,13 @@ fun LiabilitySummaryCard(
                     text = "Total Liabilitas",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = Color.White.copy(alpha = 0.85f)
+                    color = Color.White.copy(alpha = 0.9f)
                 )
                 Icon(
                     imageVector = Icons.Default.AccountBalance,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
-                    tint = Color.White.copy(alpha = 0.7f)
+                    tint = Color.White.copy(alpha = 0.9f)
                 )
             }
 
@@ -80,13 +86,15 @@ fun LiabilitySummaryCard(
                     color = Color.White
                 )
             }
+            
+            HorizontalDivider(color = Color.White.copy(alpha = 0.3f))
 
             // Monthly installment
             Text(
                 text = "Cicilan Bulanan: ${CurrencyFormatter.format(totalMonthlyInstallment)}",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color.White.copy(alpha = 0.85f)
+                color = Color.White.copy(alpha = 0.9f)
             )
 
             // Active / Paid-off counts

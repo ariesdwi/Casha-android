@@ -9,10 +9,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,8 +33,6 @@ import java.util.*
 @Composable
 fun TransactionSectionCard(
     section: CashflowDateSection,
-    onDelete: (String) -> Unit,
-    onEdit: (String) -> Unit,
     onClick: (String, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier
 ) {
@@ -115,7 +114,7 @@ fun TransactionSectionCard(
                 // Right Side (Net, Chevron)
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Net",
+                        text = stringResource(R.string.transactions_net),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -154,8 +153,6 @@ fun TransactionSectionCard(
                         }
                         TransactionListItem(
                             entry = entry,
-                            onEdit = { onEdit(entry.id) },
-                            onDelete = { onDelete(entry.id) },
                             onClick = { onClick(entry.id, entry.type.name) }
                         )
                     }
@@ -165,57 +162,20 @@ fun TransactionSectionCard(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionListItem(
     entry: CashflowEntry,
-    onEdit: () -> Unit,
-    onDelete: () -> Unit,
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val swipeState = rememberSwipeToDismissBoxState(
-        confirmValueChange = {
-            if (it == SwipeToDismissBoxValue.EndToStart) {
-                onDelete()
-                true
-            } else {
-                false
-            }
-        }
-    )
-
-    SwipeToDismissBox(
-        state = swipeState,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            val color = if (swipeState.dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                CashaDanger
-            } else Color.Transparent
-
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color)
-                    .padding(horizontal = 20.dp),
-                contentAlignment = Alignment.CenterEnd
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Delete",
-                    tint = Color.White
-                )
-            }
-        },
-        content = {
-            Row(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .clickable { onClick() }
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
                 // Category Icon with Gradient
                 Box(
                     modifier = Modifier
@@ -298,7 +258,5 @@ fun TransactionListItem(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-            }
-        }
-    )
+    }
 }

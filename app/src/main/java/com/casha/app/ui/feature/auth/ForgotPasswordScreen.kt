@@ -42,6 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,9 +64,7 @@ fun ForgotPasswordScreen(
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            // In iOS, they show a toast/message and dismiss.
-            // For now, we'll just navigate back if success
-            onNavigateBack()
+            snackbarHostState.showSnackbar(uiState.successMessage ?: "Check your email for a reset link.")
         }
     }
 
@@ -74,7 +74,7 @@ fun ForgotPasswordScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "auth.forgot.title", // Should use string resource in real app
+                        stringResource(R.string.auth_forgot_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     ) 
@@ -119,7 +119,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
-                text = "Forgot password?", // auth.forgot.title
+                text = stringResource(R.string.auth_forgot_title),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -128,7 +128,7 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(12.dp))
             
             Text(
-                text = "Enter your email address and we'll send you a link to reset your password.", // auth.forgot.subtitle
+                text = stringResource(R.string.auth_forgot_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -140,7 +140,7 @@ fun ForgotPasswordScreen(
             // Email Field
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = "Email Address",
+                    text = stringResource(R.string.auth_login_email),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -164,8 +164,10 @@ fun ForgotPasswordScreen(
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant
+                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                        focusedContainerColor = MaterialTheme.colorScheme.surface,
+                        unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary
                     )
                 )
             }
@@ -192,7 +194,7 @@ fun ForgotPasswordScreen(
                     )
                 } else {
                     Text(
-                        text = "Send Reset Link",
+                        text = stringResource(R.string.auth_forgot_send_link),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )

@@ -1,12 +1,13 @@
 package com.casha.app.core.network
 
 import kotlinx.serialization.Serializable
+import java.io.IOException
 
 /**
  * Result wrapper for network calls.
  * Similar to custom iOS Error types.
  */
-sealed class NetworkError : Exception() {
+sealed class NetworkError : IOException() {
     data class NoConnection(override val message: String = "No internet connection") : NetworkError()
     data class Timeout(override val message: String = "Request timed out") : NetworkError()
     data class Unauthorized(override val message: String = "Session expired") : NetworkError()

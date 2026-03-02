@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.GoalSummary
@@ -40,7 +42,7 @@ fun GoalTrackerScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Goal Tracker",
+                        text = stringResource(R.string.goal_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -114,19 +116,19 @@ fun GoalSummaryGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         SummaryItem(
-            title = "Active", // TODO: Localize "goal.label.active"
+            title = stringResource(R.string.goal_label_active), // TODO: Localize "goal.label.active"
             value = summary.activeGoals.toString(),
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.weight(1f)
         )
         SummaryItem(
-            title = "Progress", // TODO: Localize "goal.label.progress"
+            title = stringResource(R.string.goal_label_progress), // TODO: Localize "goal.label.progress"
             value = "${summary.overallProgress.toInt()}%",
             color = Color(0xFF4CAF50), // CashaSuccess
             modifier = Modifier.weight(1f)
         )
         SummaryItem(
-            title = "Target", // TODO: Localize "goal.label.target"
+            title = stringResource(R.string.goal_label_target), // TODO: Localize "goal.label.target"
             value = CurrencyFormatter.format(summary.totalTarget.toDouble(), currency),
             color = MaterialTheme.colorScheme.tertiary, // CashaAccent
             modifier = Modifier.weight(1f)
@@ -166,6 +168,7 @@ fun SummaryItem(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 1
             )
             

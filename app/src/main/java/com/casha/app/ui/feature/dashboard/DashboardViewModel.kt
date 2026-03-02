@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.core.network.NetworkMonitor
 import com.casha.app.domain.model.*
+import com.casha.app.domain.repository.IncomeRepository
+import com.casha.app.domain.repository.TransactionRepository
 import com.casha.app.domain.usecase.auth.GetProfileUseCase
 import com.casha.app.domain.usecase.dashboard.*
 import com.casha.app.domain.usecase.goal.GetGoalsUseCase
@@ -54,7 +56,9 @@ class DashboardViewModel @Inject constructor(
     private val getProfileUseCase: GetProfileUseCase,
     private val authManager: AuthManager,
     private val networkMonitor: NetworkMonitor,
-    private val syncEventBus: SyncEventBus
+    private val syncEventBus: SyncEventBus,
+    private val transactionRepository: TransactionRepository,
+    private val incomeRepository: IncomeRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -107,6 +111,34 @@ class DashboardViewModel @Inject constructor(
             
             val period = _uiState.value.selectedPeriod
             val (startDate, endDate) = period.dateRange()
+
+            // For CUSTOM period: read from local DB only, filtered precisely by date range
+            if (period is SpendingPeriod.CUSTOM) {
+                try {
+                    val customSummary = buildLocalSummaryForRange(
+                        start = period.start,
+                        end = period.end,
+                        periodLabel = getPeriodRawTitle(period)
+                    )
+                    val recentLocal = buildLocalHistoryForRange(period.start, period.end).take(5)
+                    val unsyncedTask = getUnsyncTransactionCountUseCase.execute()
+                    val goalsTask = getGoalsUseCase.execute()
+                    val goalSummaryTask = getGoalSummaryUseCase.execute()
+
+                    _uiState.update { it.copy(
+                        cashflowSummary = customSummary,
+                        recentTransactions = recentLocal,
+                        totalSpending = customSummary.totalExpense,
+                        unsyncedCount = unsyncedTask,
+                        goals = goalsTask,
+                        goalSummary = goalSummaryTask,
+                        isSyncing = false
+                    ) }
+                } catch (e: Exception) {
+                    _uiState.update { it.copy(isSyncing = false, errorMessage = "Dashboard refresh failed: ${e.message}") }
+                }
+                return
+            }
             
             // For remote fetching (if supported by server)
             val calendar = Calendar.getInstance()
@@ -122,7 +154,7 @@ class DashboardViewModel @Inject constructor(
                 else -> null
             }
             // For UI display
-            val periodLabel = getPeriodTitle(period)
+            val periodLabel = getPeriodRawTitle(period)
 
             try {
                 coroutineScope {
@@ -167,6 +199,73 @@ class DashboardViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.update { it.copy(isSyncing = false, errorMessage = "Dashboard refresh failed: ${e.message}") }
             }
+    }
+
+    /**
+     * Builds a CashflowSummary from local transactions + incomes filtered to [start, end].
+     * Used for CUSTOM date range where the API cannot filter precisely.
+     */
+    private suspend fun buildLocalSummaryForRange(
+        start: Date,
+        end: Date,
+        periodLabel: String
+    ): CashflowSummary {
+        val transactions = transactionRepository.getTransactions().firstOrNull() ?: emptyList()
+        val incomes = incomeRepository.getIncomes()
+
+        val filteredExpenses = transactions.filter { t ->
+            !t.datetime.before(start) && !t.datetime.after(end)
+        }
+        val filteredIncomes = incomes.filter { i ->
+            !i.datetime.before(start) && !i.datetime.after(end)
+        }
+
+        val totalExpense = filteredExpenses.sumOf { it.amount }
+        val totalIncome = filteredIncomes.sumOf { it.amount }
+        
+        return CashflowSummary(
+            totalIncome = totalIncome,
+            totalExpense = totalExpense,
+            netBalance = totalIncome - totalExpense,
+            periodLabel = periodLabel
+        )
+    }
+
+    /**
+     * Builds a list of CashflowEntry from local transactions + incomes filtered to [start, end],
+     * sorted by date descending.
+     */
+    private suspend fun buildLocalHistoryForRange(start: Date, end: Date): List<CashflowEntry> {
+        val transactions = transactionRepository.getTransactions().firstOrNull() ?: emptyList()
+        val incomes = incomeRepository.getIncomes()
+
+        val expenseEntries = transactions
+            .filter { !it.datetime.before(start) && !it.datetime.after(end) }
+            .map { t ->
+                CashflowEntry(
+                    id = t.id,
+                    title = t.name,
+                    amount = t.amount,
+                    category = t.category,
+                    type = CashflowType.EXPENSE,
+                    date = t.datetime
+                )
+            }
+
+        val incomeEntries = incomes
+            .filter { !it.datetime.before(start) && !it.datetime.after(end) }
+            .map { i ->
+                CashflowEntry(
+                    id = i.id,
+                    title = i.name,
+                    amount = i.amount,
+                    category = i.type.name,
+                    type = CashflowType.INCOME,
+                    date = i.datetime
+                )
+            }
+
+        return (expenseEntries + incomeEntries).sortedByDescending { it.date }
     }
 
     fun syncData() {
@@ -217,6 +316,22 @@ class DashboardViewModel @Inject constructor(
                 if (online) {
                     triggerAutoSync()
                 }
+            }
+        }
+    }
+
+    private fun getPeriodRawTitle(period: SpendingPeriod): String {
+        return when (period) {
+            SpendingPeriod.THIS_WEEK -> "This Week"
+            SpendingPeriod.THIS_MONTH -> "This Month"
+            SpendingPeriod.LAST_MONTH -> "Last Month"
+            SpendingPeriod.LAST_THREE_MONTHS -> "Last 3 Months"
+            SpendingPeriod.THIS_YEAR -> "This Year"
+            SpendingPeriod.ALL_TIME -> "All Time"
+            SpendingPeriod.FUTURE -> "Future"
+            is SpendingPeriod.CUSTOM -> {
+                val formatter = java.text.SimpleDateFormat("MMM yyyy", java.util.Locale.US)
+                formatter.format(period.start)
             }
         }
     }

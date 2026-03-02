@@ -27,17 +27,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import com.casha.app.ui.feature.liability.forminput.CashaFormTextField
 import com.casha.app.ui.feature.liability.forminput.InputCard
 import com.casha.app.ui.feature.portfolio.subviews.AssetTypePicker
+import com.casha.app.ui.util.mapSFSymbolToImageVector
 import java.text.SimpleDateFormat
 import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateAssetScreen(
+    selectedCategory: AssetCategory,
     viewModel: PortfolioViewModel,
     onNavigateBack: () -> Unit,
     onSuccess: (Asset) -> Unit
@@ -50,7 +54,7 @@ fun CreateAssetScreen(
 
     // Form States
     var name by remember { mutableStateOf("") }
-    var selectedType by remember { mutableStateOf(AssetType.SAVINGS_ACCOUNT) }
+    var selectedType by remember { mutableStateOf(selectedCategory.assetTypes.first()) }
     var amount by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     
@@ -96,7 +100,7 @@ fun CreateAssetScreen(
                     .padding(bottom = 12.dp)
             ) {
                 Text(
-                    text = "Tambah Aset",
+                    text = stringResource(R.string.portfolio_asset_create_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -160,7 +164,7 @@ fun CreateAssetScreen(
                         
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Tipe Aset",
+                                text = stringResource(R.string.portfolio_asset_type),
                                 fontSize = 12.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -180,17 +184,17 @@ fun CreateAssetScreen(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    InputCard(title = "Nama Aset") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_name)) {
                         CashaFormTextField(
                             value = name,
                             onValueChange = { name = it },
-                            placeholder = "e.g., Tabungan BCA"
+                            placeholder = stringResource(R.string.portfolio_asset_name_placeholder)
                         )
                     }
 
                     if (isQuantityBased) {
                         // Quantity Section
-                        InputCard(title = "Kuantitas") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_quantity)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CashaFormTextField(
                                     value = quantity,
@@ -214,7 +218,7 @@ fun CreateAssetScreen(
                             }
                         }
 
-                        InputCard(title = "Harga per ${if (unit.isEmpty()) "unit" else unit}") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_price_per_unit, if (unit.isEmpty()) "unit" else unit)) {
                             CashaFormTextField(
                                 value = pricePerUnit,
                                 onValueChange = { pricePerUnit = it },
@@ -235,7 +239,7 @@ fun CreateAssetScreen(
                                     .padding(16.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text("Total Estimasi", style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(R.string.portfolio_asset_total_amount), style = MaterialTheme.typography.bodyMedium)
                                 Text(
                                     text = CurrencyFormatter.format(qtyVal * priceVal, userCurrency),
                                     fontWeight = FontWeight.Bold,
@@ -245,7 +249,7 @@ fun CreateAssetScreen(
                         }
                     } else {
                         // Amount Section
-                        InputCard(title = "Nilai Aset") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_value)) {
                             CashaFormTextField(
                                 value = amount,
                                 onValueChange = { amount = it },
@@ -263,7 +267,7 @@ fun CreateAssetScreen(
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     // Acquisition Date
-                    InputCard(title = "Tanggal Akuisisi (Opsional)") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_acquisition_date)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
@@ -310,21 +314,21 @@ fun CreateAssetScreen(
                         else -> false
                     }
                     if (showLocation) {
-                        InputCard(title = "Lokasi / Deskripsi") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_location)) {
                             CashaFormTextField(
                                 value = location,
                                 onValueChange = { location = it },
-                                placeholder = "e.g., Jakarta Pusat atau B 1234 ABC"
+                                placeholder = stringResource(R.string.portfolio_asset_location_placeholder)
                             )
                         }
                     }
 
                     // Description
-                    InputCard(title = "Catatan (Opsional)") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_description_optional)) {
                         CashaFormTextField(
                             value = description,
                             onValueChange = { description = it },
-                            placeholder = "Tambahkan catatan...",
+                            placeholder = stringResource(R.string.portfolio_asset_description_placeholder),
                             singleLine = false
                         )
                     }
@@ -414,7 +418,7 @@ fun CreateAssetScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(Icons.Default.Save, contentDescription = null, tint = Color.White)
-                            Text("Simpan Aset", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                            Text(stringResource(R.string.portfolio_action_save), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
                         }
                     }
                 }
@@ -438,6 +442,7 @@ fun CreateAssetScreen(
                 )
                 AssetTypePicker(
                     selectedType = selectedType,
+                    category = selectedCategory,
                     onTypeSelected = {
                         selectedType = it
                         unit = it.recommendedUnit ?: ""
@@ -449,9 +454,4 @@ fun CreateAssetScreen(
     }
 }
 
-// Reusing the mapping logic
-private fun mapSFSymbolToImageVector(sfSymbol: String): ImageVector {
-    return when (sfSymbol) {
-        else -> Icons.AutoMirrored.Filled.ArrowBack
-    }
-}
+

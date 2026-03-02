@@ -38,5 +38,8 @@
 -keep @dagger.hilt.android.EntryPoint class *
 -keep @dagger.hilt.InstallIn class *
 
-# Keep public fields for JSON mapping if not already covered
--keepclassmembers class com.casha.app.data.remote.dto.** { *; }
+# Keep all data transfer objects, models, and API interfaces intact for JSON parsing
+-keep class com.casha.app.data.remote.dto.** { *; }
+-keep class com.casha.app.data.remote.api.** { *; }
+-keep class com.casha.app.domain.model.** { *; }
+-keep @kotlinx.serialization.Serializable class * { *; }

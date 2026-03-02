@@ -2,7 +2,6 @@ package com.casha.app.ui.feature.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.casha.app.core.auth.AuthManager
 import com.casha.app.domain.usecase.auth.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,15 +17,17 @@ data class RegisterUiState(
     val phone: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
+    /** True when signup succeeded (email verification pending). */
     val isRegistered: Boolean = false,
+    /** True when signup succeeded for an already-registered but unverified account (re-sent email). */
+    val verificationEmailResent: Boolean = false,
     val toastMessage: String? = null,
     val errorMessage: String? = null
 )
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val registerUseCase: RegisterUseCase,
-    private val authManager: AuthManager
+    private val registerUseCase: RegisterUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RegisterUiState())
@@ -50,34 +51,56 @@ class RegisterViewModel @Inject constructor(
 
     fun register() {
         val state = _uiState.value
-        if (state.name.isBlank() || state.email.isBlank() ||
-            state.phone.isBlank() || state.password.isBlank()
-        ) {
-            _uiState.update { it.copy(errorMessage = "Please fill in all fields") }
+        if (state.email.isBlank() || state.password.isBlank()) {
+            _uiState.update { it.copy(errorMessage = "Email and password are required") }
             return
         }
 
-        if (state.password.length < 6) {
-            _uiState.update { it.copy(errorMessage = "Password must be at least 6 characters") }
+        if (state.password.length < 8) {
+            _uiState.update { it.copy(errorMessage = "Password must be at least 8 characters") }
             return
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val token = registerUseCase(
-                    name = state.name.trim(),
+                val result = registerUseCase(
+                    name = state.name.trim().ifBlank { null },
                     email = state.email.trim(),
-                    phone = state.phone.trim(),
+                    phone = state.phone.trim().ifBlank { null },
                     password = state.password
                 )
-                authManager.saveAccessToken(token)
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        isRegistered = true,
-                        toastMessage = "Account created successfully!"
-                    )
+
+                when {
+                    // Account already verified – shouldn't reach here normally, treated as error
+                    result.isVerified -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = result.message
+                            )
+                        }
+                    }
+                    // Existing unverified account – verification email re-sent
+                    result.userExists -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                verificationEmailResent = true,
+                                toastMessage = result.message
+                            )
+                        }
+                    }
+                    // Brand-new account created
+                    else -> {
+                        _uiState.update {
+                            it.copy(
+                                isLoading = false,
+                                isRegistered = true,
+                                toastMessage = result.message
+                            )
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 _uiState.update {

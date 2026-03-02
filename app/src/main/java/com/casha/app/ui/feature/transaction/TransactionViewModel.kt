@@ -33,7 +33,11 @@ data class TransactionUiState(
     val searchQuery: String = "",
     val isSearching: Boolean = false,
     val cashflowSections: List<CashflowDateSection> = emptyList(),
-    val filteredTransactions: List<CashflowDateSection> = emptyList()
+    val filteredTransactions: List<CashflowDateSection> = emptyList(),
+
+    // Custom date range filter
+    val customStartDate: Date? = null,
+    val customEndDate: Date? = null
 )
 
 @HiltViewModel
@@ -109,6 +113,9 @@ class TransactionViewModel @Inject constructor(
                 selected == "This year" -> {
                     targetYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR).toString()
                 }
+                selected == "Custom" -> {
+                    // Fetch all; we'll filter client-side
+                }
                 selected.matches(Regex("\\d{4}-\\d{2}")) -> {
                     targetMonth = selected
                 }
@@ -116,7 +123,19 @@ class TransactionViewModel @Inject constructor(
 
             // Fetch up to 100 for better client side grouping
             val response = getCashflowHistoryUseCase.execute(targetMonth, targetYear, 1, 100)
-            val sections = groupTransactionsByDate(response.entries)
+
+            // Apply custom date range filter client-side
+            val startDate = _uiState.value.customStartDate
+            val endDate = _uiState.value.customEndDate
+            val filtered = if (selected == "Custom" && startDate != null && endDate != null) {
+                response.entries.filter { entry ->
+                    !entry.date.before(startDate) && !entry.date.after(endDate)
+                }
+            } else {
+                response.entries
+            }
+
+            val sections = groupTransactionsByDate(filtered)
             _uiState.update { it.copy(
                 transactions = response.entries,
                 cashflowSections = sections,
@@ -128,10 +147,34 @@ class TransactionViewModel @Inject constructor(
     }
     
     fun filterTransactionsByMonth(month: String) {
-        _uiState.update { it.copy(selectedMonth = month) }
-        // In a real app, you would pass the month/date range to getCashflowHistoryUseCase
-        // For now, we simulate by fetching history again (which currently loads latest)
+        _uiState.update { it.copy(
+            selectedMonth = month,
+            customStartDate = null,
+            customEndDate = null
+        ) }
         fetchHistory()
+    }
+
+    fun setCustomDateRange(startMillis: Long, endMillis: Long) {
+        val startDate = Date(startMillis)
+        // Set endDate to end-of-day so the entire day is included
+        val endCal = Calendar.getInstance().apply {
+            timeInMillis = endMillis
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }
+        _uiState.update { it.copy(
+            selectedMonth = "Custom",
+            customStartDate = startDate,
+            customEndDate = endCal.time
+        ) }
+        fetchHistory()
+    }
+
+    fun clearCustomDateRange() {
+        filterTransactionsByMonth("This month")
     }
 
     fun searchTransactions(query: String) {

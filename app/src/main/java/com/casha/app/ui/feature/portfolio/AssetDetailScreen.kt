@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Asset
 import com.casha.app.domain.model.AssetTransactionType
@@ -142,7 +144,7 @@ fun AssetDetailScreen(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     Icon(Icons.Default.Delete, contentDescription = null, modifier = Modifier.size(20.dp))
-                    Text("Hapus Aset", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.portfolio_action_delete), fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -153,7 +155,7 @@ fun AssetDetailScreen(
     if (showingDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showingDeleteConfirmation = false },
-            title = { Text("Hapus Aset") },
+            title = { Text(stringResource(R.string.portfolio_action_delete)) },
             text = { Text("Apakah Anda yakin ingin menghapus ${asset.name}? Tindakan ini tidak dapat dibatalkan.") },
             confirmButton = {
                 TextButton(
@@ -165,12 +167,12 @@ fun AssetDetailScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
                 ) {
-                    Text("Hapus")
+                    Text(stringResource(R.string.portfolio_action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showingDeleteConfirmation = false }) {
-                    Text("Batal")
+                    Text(stringResource(R.string.portfolio_action_cancel))
                 }
             }
         )

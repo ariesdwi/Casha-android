@@ -24,6 +24,7 @@ import com.casha.app.domain.model.AssetBreakdown
 import com.casha.app.domain.model.AssetType
 import com.casha.app.domain.model.PortfolioSummary
 import com.casha.app.ui.theme.*
+import com.casha.app.ui.util.mapSFSymbolToImageVector
 import java.util.Date
 
 @Composable
@@ -41,7 +42,7 @@ fun PortfolioSummaryCard(
                 spotColor = Color.Black.copy(alpha = 0.05f),
                 ambientColor = Color.Transparent
             )
-            .background(Color.White, RoundedCornerShape(12.dp)) // Using White as fallback for CashaCard
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
             .clip(RoundedCornerShape(12.dp))
             .clickable { onTap() }
             .padding(16.dp),
@@ -55,28 +56,28 @@ fun PortfolioSummaryCard(
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = "Total Assets", // Placeholder for localization (portfolio.assets.total)
+                    text = "Total Assets",
                     style = CashaTypography.bodyMedium,
-                    color = Color(0xFF757575) // CashaTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier = Modifier.size(24.dp),
                         strokeWidth = 2.dp,
-                        color = CashaPrimaryLight
+                        color = MaterialTheme.colorScheme.primary
                     )
                 } else if (summary != null) {
                     Text(
                         text = CurrencyFormatter.format(summary.totalAssets, summary.currency),
                         style = CashaTypography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        color = Color(0xFF212121) // CashaTextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 } else {
                     Text(
                         text = "--",
                         style = CashaTypography.headlineSmall.copy(fontWeight = FontWeight.Bold),
-                        color = Color(0xFF212121)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
             }
@@ -84,7 +85,7 @@ fun PortfolioSummaryCard(
             Icon(
                 imageVector = Icons.Default.PieChart,
                 contentDescription = null,
-                tint = CashaPrimaryLight,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -100,7 +101,7 @@ fun PortfolioSummaryCard(
                         Icon(
                             imageVector = mapSFSymbolToImageVector(breakdown.type.icon),
                             contentDescription = null,
-                            tint = CashaPrimaryLight,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(16.dp)
                         )
                         
@@ -109,7 +110,7 @@ fun PortfolioSummaryCard(
                         Text(
                             text = breakdown.type.displayName,
                             style = CashaTypography.labelSmall,
-                            color = Color(0xFF212121)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         
                         Spacer(modifier = Modifier.weight(1f))
@@ -117,7 +118,7 @@ fun PortfolioSummaryCard(
                         Text(
                             text = CurrencyFormatter.format(breakdown.amount, summary.currency),
                             style = CashaTypography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                            color = Color(0xFF212121)
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }
@@ -127,21 +128,14 @@ fun PortfolioSummaryCard(
                 Text(
                     text = "+ ${summary.breakdown.size - 3} more",
                     style = CashaTypography.labelSmall.copy(fontSize = 10.sp),
-                    color = Color(0xFF757575)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
     }
 }
 
-/**
- * Maps SwiftUI SF Symbol names used in AssetType.icon to Android Material Icons.
- */
-private fun mapSFSymbolToImageVector(sfSymbol: String): ImageVector {
-    return when (sfSymbol) {
-        else -> Icons.AutoMirrored.Filled.ArrowBack
-    }
-}
+
 
 @Preview(showBackground = true)
 @Composable

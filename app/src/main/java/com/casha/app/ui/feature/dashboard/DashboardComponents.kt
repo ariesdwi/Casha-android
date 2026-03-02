@@ -25,13 +25,19 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.CurrencyFormatter
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.domain.model.*
 import com.casha.app.ui.theme.*
 import com.casha.app.ui.feature.transaction.CashflowUiUtils
 import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
 import java.util.Locale
+import java.util.TimeZone
 import kotlin.math.max
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CardBalanceSection(
     summary: CashflowSummary?,
@@ -40,6 +46,7 @@ fun CardBalanceSection(
 ) {
     var isBalanceVisible by remember { mutableStateOf(true) }
     var showPeriodPicker by remember { mutableStateOf(false) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
 
     val netBalanceValue = summary?.netBalance ?: 0.0
     val amountColor = when {
@@ -67,7 +74,7 @@ fun CardBalanceSection(
             ) {
                 // Label
                 Text(
-                    text = "Net Cashflow", // TODO: Localize "dashboard.balance.net_cashflow"
+                    text = stringResource(R.string.dashboard_balance_net_cashflow),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     fontWeight = FontWeight.Medium
@@ -116,14 +123,14 @@ fun CardBalanceSection(
                         Text(
                             text = getPeriodTitle(selectedPeriod),
                             style = MaterialTheme.typography.labelLarge,
-                            color = CashaSuccess,
+                            color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                         Icon(
                             imageVector = Icons.Default.KeyboardArrowDown,
                             contentDescription = null,
                             modifier = Modifier.size(16.dp),
-                            tint = CashaSuccess
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -137,7 +144,7 @@ fun CardBalanceSection(
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
                     MiniStatItem(
-                        title = "In", // TODO: Localize "dashboard.balance.in"
+                        title = stringResource(R.string.dashboard_balance_in),
                         amount = summary?.totalIncome ?: 0.0,
                         icon = Icons.Default.NorthEast,
                         color = CashaSuccess,
@@ -153,7 +160,7 @@ fun CardBalanceSection(
                     )
 
                     MiniStatItem(
-                        title = "Out", // TODO: Localize "dashboard.balance.out"
+                        title = stringResource(R.string.dashboard_balance_out),
                         amount = summary?.totalExpense ?: 0.0,
                         icon = Icons.Default.SouthEast,
                         color = CashaDanger,
@@ -172,8 +179,78 @@ fun CardBalanceSection(
                 onPeriodChange(it)
                 showPeriodPicker = false
             },
-            onDismiss = { showPeriodPicker = false }
+            onDismiss = { showPeriodPicker = false },
+            onCustomClick = {
+                showPeriodPicker = false
+                showDateRangePicker = true
+            }
         )
+    }
+
+    if (showDateRangePicker) {
+        val initialStart = if (selectedPeriod is SpendingPeriod.CUSTOM) selectedPeriod.start.time else null
+        val initialEnd = if (selectedPeriod is SpendingPeriod.CUSTOM) selectedPeriod.end.time else null
+        val dateRangePickerState = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = initialStart,
+            initialSelectedEndDateMillis = initialEnd
+        )
+        ModalBottomSheet(
+            onDismissRequest = { showDateRangePicker = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { showDateRangePicker = false }) {
+                        Text(stringResource(R.string.add_transaction_cancel))
+                    }
+                    Text(
+                        text = stringResource(R.string.transactions_filter_select_date_range),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    TextButton(
+                        onClick = {
+                            val startMillis = dateRangePickerState.selectedStartDateMillis
+                            val endMillis = dateRangePickerState.selectedEndDateMillis
+                            if (startMillis != null && endMillis != null) {
+                                // Material3 DateRangePicker returns UTC midnight millis.
+                                // Extract year/month/day in UTC, then build local midnight dates.
+                                val utcStart = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { timeInMillis = startMillis }
+                                val utcEnd = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { timeInMillis = endMillis }
+                                val startDate = Calendar.getInstance().apply {
+                                    set(utcStart.get(Calendar.YEAR), utcStart.get(Calendar.MONTH), utcStart.get(Calendar.DAY_OF_MONTH), 0, 0, 0)
+                                    set(Calendar.MILLISECOND, 0)
+                                }.time
+                                val endDate = Calendar.getInstance().apply {
+                                    set(utcEnd.get(Calendar.YEAR), utcEnd.get(Calendar.MONTH), utcEnd.get(Calendar.DAY_OF_MONTH), 23, 59, 59)
+                                    set(Calendar.MILLISECOND, 999)
+                                }.time
+                                onPeriodChange(SpendingPeriod.CUSTOM(startDate, endDate))
+                            }
+                            showDateRangePicker = false
+                        },
+                        enabled = dateRangePickerState.selectedStartDateMillis != null &&
+                                  dateRangePickerState.selectedEndDateMillis != null
+                    ) {
+                        Text(stringResource(R.string.profile_action_done))
+                    }
+                }
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    modifier = Modifier.fillMaxWidth().height(500.dp),
+                    title = null,
+                    headline = null,
+                    showModeToggle = false
+                )
+            }
+        }
     }
 }
 
@@ -218,7 +295,8 @@ fun MiniStatItem(
 fun PeriodPickerBottomSheet(
     selectedPeriod: SpendingPeriod,
     onPeriodSelected: (SpendingPeriod) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onCustomClick: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
@@ -235,7 +313,7 @@ fun PeriodPickerBottomSheet(
                 .padding(bottom = 32.dp)
         ) {
             Text(
-                text = "Select Period",
+                text = stringResource(R.string.dashboard_period_select),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(16.dp)
@@ -249,41 +327,47 @@ fun PeriodPickerBottomSheet(
                 SpendingPeriod.THIS_YEAR,
                 SpendingPeriod.ALL_TIME
             )
-
+ // Custom Range option
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.transactions_filter_custom_range)) },
+                trailingContent = {
+                    if (selectedPeriod is SpendingPeriod.CUSTOM) {
+                        Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    }
+                },
+                modifier = Modifier.clickable { onCustomClick() }
+            )
             periods.forEach { period ->
                 val title = getPeriodTitle(period)
                 ListItem(
                     headlineContent = { Text(title) },
                     trailingContent = {
                         if (selectedPeriod == period) {
-                            Icon(
-                                Icons.Default.Check,
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
+                            Icon(Icons.Default.Check, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
                         }
                     },
-                    modifier = Modifier.clickable {
-                        onPeriodSelected(period)
-                    }
+                    modifier = Modifier.clickable { onPeriodSelected(period) }
                 )
             }
+
+           
         }
     }
 }
 
+@Composable
 fun getPeriodTitle(period: SpendingPeriod): String {
     return when (period) {
         SpendingPeriod.THIS_WEEK -> "This Week"
-        SpendingPeriod.THIS_MONTH -> "This Month"
-        SpendingPeriod.LAST_MONTH -> "Last Month"
+        SpendingPeriod.THIS_MONTH -> stringResource(R.string.dashboard_period_this_month)
+        SpendingPeriod.LAST_MONTH -> stringResource(R.string.dashboard_period_last_month)
         SpendingPeriod.LAST_THREE_MONTHS -> "Last 3 Months"
-        SpendingPeriod.THIS_YEAR -> "This Year"
+        SpendingPeriod.THIS_YEAR -> stringResource(R.string.dashboard_period_this_year)
         SpendingPeriod.ALL_TIME -> "All Time"
         SpendingPeriod.FUTURE -> "Future"
         is SpendingPeriod.CUSTOM -> {
-            val formatter = java.text.SimpleDateFormat("MMM yyyy", java.util.Locale.US)
-            formatter.format(period.start)
+            val formatter = SimpleDateFormat("d MMM", Locale.getDefault())
+            "${formatter.format(period.start)} – ${formatter.format(period.end)}"
         }
     }
 }
@@ -314,7 +398,7 @@ fun ReportSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Spending This Month", // TODO: Localize "dashboard.spending.title"
+                text = stringResource(R.string.dashboard_spending_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -329,7 +413,7 @@ fun ReportSection(
             } else {
                 TextButton(onClick = onSeeAllClick) {
                     Text(
-                        text = "See All",
+                        text = stringResource(R.string.dashboard_goals_see_all),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -378,13 +462,13 @@ fun ReportChartView(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 ChartToggleButton(
-                    title = "Week", // TODO: Localize "report.filter.week"
+                    title = stringResource(R.string.report_filter_week),
                     isSelected = selectedTab == ChartTab.WEEK,
                     onClick = { onTabChange(ChartTab.WEEK) },
                     modifier = Modifier.weight(1f)
                 )
                 ChartToggleButton(
-                    title = "Month", // TODO: Localize "report.filter.month"
+                    title = stringResource(R.string.report_filter_month),
                     isSelected = selectedTab == ChartTab.MONTH,
                     onClick = { onTabChange(ChartTab.MONTH) },
                     modifier = Modifier.weight(1f)
@@ -448,7 +532,7 @@ fun ReportChartView(
                                         .width(24.dp)
                                         .fillMaxHeight(heightState.coerceAtLeast(0.02f))
                                         .background(
-                                            color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                                            color = if (index % 2 == 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary,
                                             shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
                                         )
                                 )
@@ -516,13 +600,13 @@ fun GoalSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Saving Goals", // TODO: Localize "dashboard.goals.title"
+                text = stringResource(R.string.dashboard_goals_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             TextButton(onClick = onSeeAllClick) {
                 Text(
-                    text = "See All", // TODO: Localize "dashboard.goals.see_all"
+                    text = stringResource(R.string.dashboard_goals_see_all),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -582,7 +666,7 @@ fun GoalEmptyState() {
             
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "No goals yet", // TODO: Localize "goal.empty.title"
+                    text = stringResource(R.string.dashboard_empty_state_no_goals),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -702,7 +786,7 @@ fun RecentTransactionsSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Recent Transactions", // TODO: Localize "dashboard.transactions.recent"
+                text = stringResource(R.string.dashboard_transactions_recent),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurface
@@ -731,7 +815,7 @@ fun RecentTransactionsSection(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "No recent transactions", // TODO: Localize "dashboard.empty_state.no_transactions"
+                            text = stringResource(R.string.dashboard_empty_state_no_transactions),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )

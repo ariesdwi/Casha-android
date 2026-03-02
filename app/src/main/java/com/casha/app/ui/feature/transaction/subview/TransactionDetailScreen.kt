@@ -77,7 +77,7 @@ fun TransactionDetailScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = if (cashflowType == CashflowType.INCOME) "Income Detail" else "Transaction Details",
+                        text = if (cashflowType == CashflowType.INCOME) "Income Detail" else stringResource(R.string.transactions_detail_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -102,7 +102,7 @@ fun TransactionDetailScreen(
                         onDismissRequest = { menuExpanded = false }
                     ) {
                         DropdownMenuItem(
-                            text = { Text("Edit") },
+                            text = { Text(stringResource(R.string.transactions_detail_edit)) },
                             leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
@@ -114,7 +114,7 @@ fun TransactionDetailScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Delete", color = MaterialTheme.colorScheme.error) },
+                            text = { Text(stringResource(R.string.transactions_detail_delete_confirm_button), color = MaterialTheme.colorScheme.error) },
                             leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                             onClick = {
                                 menuExpanded = false
@@ -163,7 +163,7 @@ fun TransactionDetailScreen(
                     ) {
                         CircularProgressIndicator(modifier = Modifier.size(48.dp))
                         Text(
-                            text = "Processing...",
+                            text = stringResource(R.string.transactions_detail_processing),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.SemiBold
                         )
@@ -176,8 +176,8 @@ fun TransactionDetailScreen(
     if (showingDeleteAlert) {
         AlertDialog(
             onDismissRequest = { showingDeleteAlert = false },
-            title = { Text("Delete Transaction") },
-            text = { Text("Are you sure you want to delete this transaction? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.transactions_detail_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.transactions_detail_delete_confirm_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -190,12 +190,12 @@ fun TransactionDetailScreen(
                         onNavigateBack() // Auto navigate back after initiating delete
                     }
                 ) {
-                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.transactions_detail_delete_confirm_button), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showingDeleteAlert = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.transactions_detail_cancel))
                 }
             }
         )
@@ -204,8 +204,8 @@ fun TransactionDetailScreen(
     if (showingSyncAlert) {
         AlertDialog(
             onDismissRequest = { showingSyncAlert = false },
-            title = { Text("Sync Required") },
-            text = { Text("This transaction needs to be synced with the server before it can be edited or deleted.") },
+            title = { Text(stringResource(R.string.transactions_detail_sync_required_title)) },
+            text = { Text(stringResource(R.string.transactions_detail_sync_required_message)) },
             confirmButton = {
                 TextButton(onClick = { showingSyncAlert = false }) {
                     Text("OK")
@@ -294,7 +294,7 @@ private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
 @Composable
 private fun AmountStatusSection(transaction: TransactionCasha, type: CashflowType) {
     val color = CashflowUiUtils.colorForType(type)
-    val titleText = if (type == CashflowType.INCOME) "Amount Received" else "Amount Spent"
+    val titleText = if (type == CashflowType.INCOME) stringResource(R.string.transactions_detail_amount_received) else stringResource(R.string.transactions_detail_amount_spent)
 
     Column(
         modifier = Modifier
@@ -331,7 +331,7 @@ private fun CategorySection(transaction: TransactionCasha) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Category",
+            text = stringResource(R.string.transactions_detail_category),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
@@ -369,13 +369,13 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
         Text(
-            text = if (transaction.category.isEmpty() && transaction.amount > 0) "Income Details" else "Transaction Details",
+            text = if (transaction.category.isEmpty() && transaction.amount > 0) "Income Details" else stringResource(R.string.transactions_detail_title),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )
 
-        DetailRow(title = "Date", value = DateHelper.formatDisplayWithTime(transaction.datetime))
-        DetailRow(title = "Updated", value = DateHelper.formatDisplayWithTime(transaction.updatedAt))
+        DetailRow(title = stringResource(R.string.transactions_detail_date), value = DateHelper.formatDisplayWithTime(transaction.datetime))
+        DetailRow(title = stringResource(R.string.transactions_detail_updated), value = DateHelper.formatDisplayWithTime(transaction.updatedAt))
         
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -383,7 +383,7 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
             verticalAlignment = Alignment.Top
         ) {
             Text(
-                text = "Sync Status",
+                text = stringResource(R.string.transactions_detail_sync_status),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.width(100.dp)
             )
@@ -392,7 +392,7 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (transaction.isSynced) "Synced" else "Pending",
+                    text = if (transaction.isSynced) stringResource(R.string.transactions_detail_status_synced) else stringResource(R.string.transactions_detail_status_pending),
                     style = MaterialTheme.typography.bodyLarge,
                     color = if (transaction.isSynced) CashaSuccess else Color(0xFFFF9800),
                     textAlign = TextAlign.End
@@ -426,7 +426,7 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Default.Refresh, contentDescription = null, modifier = Modifier.padding(end = 8.dp))
-                        Text("Convert to Installment")
+                        Text(stringResource(R.string.transactions_detail_convert_installment))
                     }
                     Icon(Icons.AutoMirrored.Filled.KeyboardArrowRight, contentDescription = null)
                 }

@@ -24,10 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.theme.*
 import com.casha.app.domain.model.CreateIncomeRequest
 import com.casha.app.domain.model.IncomeFrequency
 import com.casha.app.domain.model.IncomeType
 import com.casha.app.domain.model.TransactionRequest
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -115,7 +118,7 @@ fun AddTransactionScreen(
     }
 
     val screenTitle = if (isEditMode) "Edit Transaksi"
-        else if (entryType == EntryType.EXPENSE) "Tambah Pengeluaran" else "Tambah Pemasukan"
+        else if (entryType == EntryType.EXPENSE) stringResource(R.string.add_transaction_title_expense) else stringResource(R.string.add_transaction_title_income)
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
 
@@ -123,16 +126,16 @@ fun AddTransactionScreen(
         onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Scaffold(
             modifier = Modifier.fillMaxHeight(0.9f),
-            containerColor = Color(0xFFF8F9FA),
+            containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Color(0xFFF8F9FA))
+                        .background(MaterialTheme.colorScheme.background)
                         .padding(start = 16.dp, end = 16.dp, top = 4.dp, bottom = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
@@ -148,10 +151,10 @@ fun AddTransactionScreen(
                         enabled = isFormValid
                     ) {
                         Text(
-                            "Simpan",
+                            stringResource(R.string.add_transaction_save),
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
-                            color = if (isFormValid) Color(0xFF009033) else Color.Gray
+                            color = if (isFormValid) MaterialTheme.colorScheme.primary else Color.Gray
                         )
                     }
                 }
@@ -200,13 +203,13 @@ fun AddTransactionScreen(
                     CashaFormTextField(
                         value = name,
                         onValueChange = { name = it; errorMessage = null },
-                        placeholder = if (entryType == EntryType.EXPENSE) "e.g., Coffee" else "e.g., Salary"
+                        placeholder = if (entryType == EntryType.EXPENSE) stringResource(R.string.add_transaction_name_placeholder_expense) else stringResource(R.string.add_transaction_name_placeholder_income)
                     )
                 }
 
                 // ── Category / Income Type ───────────────────────
                 if (entryType == EntryType.EXPENSE) {
-                    InputCard(title = "Kategori *") {
+                    InputCard(title = stringResource(R.string.add_transaction_category) + " *") {
                         Box {
                             Surface(
                                 onClick = { showCategoryDropdown = true },
@@ -220,7 +223,7 @@ fun AddTransactionScreen(
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Text(
-                                        text = selectedCategory.ifEmpty { "Pilih Kategori" },
+                                        text = selectedCategory.ifEmpty { stringResource(R.string.add_transaction_select_category) },
                                         fontSize = 15.sp,
                                         fontWeight = if (selectedCategory.isNotEmpty()) FontWeight.SemiBold else FontWeight.Normal,
                                         color = if (selectedCategory.isNotEmpty()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -247,7 +250,7 @@ fun AddTransactionScreen(
                         }
                     }
                 } else {
-                    InputCard(title = "Tipe Pemasukan") {
+                    InputCard(title = stringResource(R.string.add_transaction_income_category)) {
                         Box {
                             Surface(
                                 onClick = { showIncomeTypeDropdown = true },
@@ -290,7 +293,7 @@ fun AddTransactionScreen(
                 }
 
                 // ── Date & Time ──────────────────────────────────
-                InputCard(title = "Tanggal & Waktu") {
+                InputCard(title = stringResource(R.string.add_transaction_datetime)) {
                     Surface(
                         onClick = { showDatePicker = true },
                         shape = RoundedCornerShape(10.dp),
@@ -320,18 +323,18 @@ fun AddTransactionScreen(
                             CashaFormTextField(
                                 value = source,
                                 onValueChange = { source = it },
-                                placeholder = "e.g., Perusahaan (Opsional)"
+                                placeholder = stringResource(R.string.add_transaction_source_placeholder)
                             )
                         }
 
-                        InputCard(title = "Pemasukan Berulang") {
+                        InputCard(title = stringResource(R.string.add_transaction_recurring_income)) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    "Recurring",
+                                    stringResource(R.string.add_transaction_recurring),
                                     fontSize = 15.sp,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
@@ -340,14 +343,14 @@ fun AddTransactionScreen(
                                     onCheckedChange = { isRecurring = it },
                                     colors = SwitchDefaults.colors(
                                         checkedThumbColor = Color.White,
-                                        checkedTrackColor = Color(0xFF009033)
+                                        checkedTrackColor = MaterialTheme.colorScheme.primary
                                     )
                                 )
                             }
                         }
 
                         AnimatedVisibility(visible = isRecurring) {
-                            InputCard(title = "Frekuensi") {
+                            InputCard(title = stringResource(R.string.add_transaction_frequency)) {
                                 Box {
                                     Surface(
                                         onClick = { showFrequencyDropdown = true },
@@ -392,11 +395,11 @@ fun AddTransactionScreen(
                 }
 
                 // ── Note ─────────────────────────────────────────
-                InputCard(title = "Catatan") {
+                InputCard(title = stringResource(R.string.add_transaction_note)) {
                     CashaFormTextField(
                         value = note,
                         onValueChange = { note = it },
-                        placeholder = "Tambah catatan (Opsional)",
+                        placeholder = stringResource(R.string.add_transaction_note_placeholder),
                         singleLine = false
                     )
                 }
@@ -446,10 +449,10 @@ fun AddTransactionScreen(
                             selectedDate = cal.time
                         }
                         showDatePicker = false; showTimePicker = true
-                    }) { Text("OK", color = Color(0xFF009033), fontWeight = FontWeight.Bold) }
+                    }) { Text(stringResource(R.string.add_transaction_ok), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
                 },
                 dismissButton = {
-                    TextButton(onClick = { showDatePicker = false }) { Text("Cancel", color = Color.Gray) }
+                    TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.add_transaction_cancel), color = Color.Gray) }
                 }
             ) { DatePicker(state = datePickerState) }
         }
@@ -460,7 +463,7 @@ fun AddTransactionScreen(
             val timeState = rememberTimePickerState(initialHour = cal.get(Calendar.HOUR_OF_DAY), initialMinute = cal.get(Calendar.MINUTE))
             AlertDialog(
                 onDismissRequest = { showTimePicker = false },
-                containerColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(24.dp),
                 title = { Text("Pilih Waktu", fontWeight = FontWeight.Bold) },
                 text = { TimePicker(state = timeState) },
@@ -472,9 +475,9 @@ fun AddTransactionScreen(
                             set(Calendar.MINUTE, timeState.minute)
                         }
                         selectedDate = updated.time; showTimePicker = false
-                    }) { Text("OK", color = Color(0xFF009033), fontWeight = FontWeight.Bold) }
+                    }) { Text(stringResource(R.string.add_transaction_ok), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold) }
                 },
-                dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text("Cancel", color = Color.Gray) } }
+                dismissButton = { TextButton(onClick = { showTimePicker = false }) { Text(stringResource(R.string.add_transaction_cancel), color = Color.Gray) } }
             )
         }
     }
@@ -563,13 +566,13 @@ private fun TypeSwitcher(entryType: EntryType, onTypeChange: (EntryType) -> Unit
             EntryType.values().forEach { type ->
                 val selected = entryType == type
                 val bgColor = when {
-                    selected && type == EntryType.EXPENSE -> Color(0xFFFF6B6B).copy(alpha = 0.15f)
-                    selected && type == EntryType.INCOME -> Color(0xFF009033).copy(alpha = 0.15f)
+                    selected && type == EntryType.EXPENSE -> CashaDanger.copy(alpha = 0.15f)
+                    selected && type == EntryType.INCOME  -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
                     else -> Color.Transparent
                 }
                 val textColor = when {
-                    selected && type == EntryType.EXPENSE -> Color(0xFFFF6B6B)
-                    selected && type == EntryType.INCOME -> Color(0xFF009033)
+                    selected && type == EntryType.EXPENSE -> CashaDanger
+                    selected && type == EntryType.INCOME  -> MaterialTheme.colorScheme.primary
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
                 Box(
@@ -582,7 +585,7 @@ private fun TypeSwitcher(entryType: EntryType, onTypeChange: (EntryType) -> Unit
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = if (type == EntryType.EXPENSE) "Pengeluaran" else "Pemasukan",
+                        text = if (type == EntryType.EXPENSE) stringResource(R.string.add_transaction_type_expense) else stringResource(R.string.add_transaction_type_income),
                         color = textColor,
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                         fontSize = 14.sp

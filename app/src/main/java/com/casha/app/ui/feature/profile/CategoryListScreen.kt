@@ -14,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
@@ -39,7 +41,7 @@ fun CategoryListScreen(
             .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             TopAppBar(
-                title = { Text("Manage Categories", fontWeight = FontWeight.Bold) },
+                title = { Text(stringResource(R.string.profile_menu_manage_categories), fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
@@ -69,7 +71,7 @@ fun CategoryListScreen(
                 // User Categories Section
                 val userCategories = uiState.categories.filter { !it.isSystem }
                 item {
-                    CategorySectionHeader("User Categories")
+                    CategorySectionHeader(stringResource(R.string.profile_category_user_title))
                 }
                 if (userCategories.isEmpty()) {
                     item {
@@ -81,7 +83,7 @@ fun CategoryListScreen(
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
                             Text(
-                                "No user categories found.",
+                                stringResource(R.string.profile_category_empty),
                                 modifier = Modifier.padding(24.dp),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -101,7 +103,7 @@ fun CategoryListScreen(
                 // System Categories Section
                 val systemCategories = uiState.categories.filter { it.isSystem }
                 item {
-                    CategorySectionHeader("System Categories")
+                    CategorySectionHeader(stringResource(R.string.profile_category_system_title))
                 }
                 items(systemCategories, key = { it.id }) { category ->
                     CategoryRow(category)
@@ -208,7 +210,7 @@ fun CategoryRow(category: CategoryCasha) {
                 )
                 if (!category.isActive) {
                     Text(
-                        "Inactive",
+                        stringResource(R.string.profile_category_inactive),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.error
                     )

@@ -9,6 +9,7 @@ import com.casha.app.data.remote.dto.toDTO
 import com.casha.app.data.remote.dto.toDomain
 import com.casha.app.data.remote.dto.toLoginResult
 import com.casha.app.domain.model.LoginResult
+import com.casha.app.domain.model.RegisterResult
 import com.casha.app.domain.model.UpdateProfileRequest
 import com.casha.app.domain.model.UserCasha
 import com.casha.app.domain.repository.AuthRepository
@@ -45,31 +46,42 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun register(
-        name: String,
+        name: String?,
         email: String,
-        phone: String,
-        password: String
-    ): String {
+        phone: String?,
+        password: String,
+        avatar: String?
+    ): RegisterResult {
         val result = safeApiCall {
             apiService.register(
-                RegisterRequestDTO(name, email, phone, password)
+                RegisterRequestDTO(
+                    email = email,
+                    password = password,
+                    name = name,
+                    phone = phone,
+                    avatar = avatar
+                )
             )
         }
         return result.fold(
             onSuccess = { response ->
-                response.data?.accessToken ?: throw Exception(response.message)
+                val data = response.data
+                RegisterResult(
+                    message = data?.message ?: response.message,
+                    userExists = data?.userExists ?: false,
+                    isVerified = data?.isVerified ?: false
+                )
             },
             onFailure = { error -> throw error }
         )
     }
 
-    override suspend fun resetPassword(email: String) {
+    override suspend fun resetPassword(email: String): String {
         val result = safeApiCall { apiService.resetPassword(ResetPasswordRequestDTO(email)) }
-        result.onSuccess { response ->
-            if (response.code != 200 && response.code != 201) {
-                throw Exception(response.message)
-            }
-        }.onFailure { throw it }
+        return result.fold(
+            onSuccess = { response -> response.message },
+            onFailure = { error -> throw error }
+        )
     }
 
     override suspend fun getProfile(): UserCasha {

@@ -25,6 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.GoalCategory
@@ -116,7 +118,7 @@ fun AddGoalScreen(
                 Spacer(modifier = Modifier.width(16.dp))
                 
                 Text(
-                    text = "New Goal",
+                    text = stringResource(R.string.goal_new_goal),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -148,11 +150,11 @@ fun AddGoalScreen(
             )
 
             // Goal Name Input
-            InputCard(title = "Goal Name") {
+            InputCard(title = stringResource(R.string.goal_input_name)) {
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    placeholder = { Text("e.g. Vacation Fund") },
+                    placeholder = { Text(stringResource(R.string.goal_placeholder_name)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
                     colors = OutlinedTextFieldDefaults.colors(
@@ -163,7 +165,7 @@ fun AddGoalScreen(
             }
 
             // Target Amount Input
-            InputCard(title = "Target Amount") {
+            InputCard(title = stringResource(R.string.goal_input_target_amount)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
                         text = CurrencyFormatter.symbol(userCurrency),
@@ -242,7 +244,7 @@ fun AddGoalScreen(
                     )
                 } else {
                     Text(
-                        text = "Create Goal",
+                        text = stringResource(R.string.goal_action_create),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.White

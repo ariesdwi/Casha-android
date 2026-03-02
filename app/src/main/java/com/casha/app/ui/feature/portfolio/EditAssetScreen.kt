@@ -21,6 +21,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import com.casha.app.ui.feature.liability.forminput.CashaFormTextField
@@ -74,7 +76,7 @@ fun EditAssetScreen(
                     .padding(bottom = 12.dp)
             ) {
                 Text(
-                    text = "Edit Aset",
+                    text = stringResource(R.string.portfolio_action_edit),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -115,7 +117,7 @@ fun EditAssetScreen(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    InputCard(title = "Nama Aset") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_name)) {
                         CashaFormTextField(
                             value = name,
                             onValueChange = { name = it },
@@ -124,7 +126,7 @@ fun EditAssetScreen(
                     }
 
                     if (isQuantityBased) {
-                        InputCard(title = "Kuantitas") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_quantity)) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 CashaFormTextField(
                                     value = quantity,
@@ -141,7 +143,7 @@ fun EditAssetScreen(
                             }
                         }
 
-                        InputCard(title = "Harga per unit") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_price_per_unit, asset.unit ?: asset.type.recommendedUnit ?: "unit")) {
                             CashaFormTextField(
                                 value = pricePerUnit,
                                 onValueChange = { pricePerUnit = it },
@@ -151,7 +153,7 @@ fun EditAssetScreen(
                             )
                         }
                     } else {
-                        InputCard(title = "Nilai Aset") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_value)) {
                             CashaFormTextField(
                                 value = amount,
                                 onValueChange = { amount = it },
@@ -168,7 +170,7 @@ fun EditAssetScreen(
                     modifier = Modifier.padding(horizontal = 20.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    InputCard(title = "Tanggal Akuisisi (Opsional)") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_acquisition_date)) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
@@ -210,20 +212,20 @@ fun EditAssetScreen(
                     }
 
                     if (asset.type.category == AssetCategory.REAL_ESTATE || asset.type.category == AssetCategory.VEHICLES) {
-                        InputCard(title = "Lokasi") {
+                        InputCard(title = stringResource(R.string.portfolio_asset_location)) {
                             CashaFormTextField(
                                 value = location,
                                 onValueChange = { location = it },
-                                placeholder = "e.g., Jakarta, Indonesia"
+                                placeholder = stringResource(R.string.portfolio_asset_location_placeholder)
                             )
                         }
                     }
 
-                    InputCard(title = "Catatan (Opsional)") {
+                    InputCard(title = stringResource(R.string.portfolio_asset_description_optional)) {
                         CashaFormTextField(
                             value = description,
                             onValueChange = { description = it },
-                            placeholder = "Tambahkan catatan...",
+                            placeholder = stringResource(R.string.portfolio_asset_description_placeholder),
                             singleLine = false
                         )
                     }
@@ -312,7 +314,7 @@ fun EditAssetScreen(
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Icon(Icons.Default.Save, contentDescription = null, tint = Color.White)
-                            Text("Simpan Perubahan", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                            Text(stringResource(R.string.portfolio_action_save), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
                         }
                     }
                 }

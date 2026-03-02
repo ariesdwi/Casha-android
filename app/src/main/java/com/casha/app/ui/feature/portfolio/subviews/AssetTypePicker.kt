@@ -18,10 +18,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.domain.model.AssetCategory
 import com.casha.app.domain.model.AssetType
+import com.casha.app.ui.util.mapSFSymbolToImageVector
 
 @Composable
 fun AssetTypePicker(
     selectedType: AssetType,
+    category: AssetCategory? = null,
     onTypeSelected: (AssetType) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -31,12 +33,13 @@ fun AssetTypePicker(
             .padding(vertical = 8.dp),
         contentPadding = PaddingValues(bottom = 32.dp)
     ) {
-        AssetCategory.entries.forEach { category ->
+        val categoriesToShow = category?.let { listOf(it) } ?: AssetCategory.entries
+        categoriesToShow.forEach { cat ->
             item {
-                CategoryHeader(category)
+                CategoryHeader(cat)
             }
             
-            items(category.assetTypes) { type ->
+            items(cat.assetTypes) { type ->
                 AssetTypeItem(
                     type = type,
                     isSelected = selectedType == type,
@@ -114,9 +117,4 @@ private fun AssetTypeItem(
     }
 }
 
-// Reusing the mapping logic (ideally this should be in a shared UI utility)
-private fun mapSFSymbolToImageVector(sfSymbol: String): ImageVector {
-    return when (sfSymbol) {
-        else -> Icons.AutoMirrored.Filled.ArrowBack
-    }
-}
+

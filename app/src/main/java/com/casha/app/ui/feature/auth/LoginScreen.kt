@@ -62,7 +62,9 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import com.google.android.libraries.identity.googleid.GoogleIdTokenParsingException
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import com.casha.app.BuildConfig
+import com.casha.app.R
 import kotlinx.coroutines.launch
 import android.util.Log
 
@@ -174,7 +176,7 @@ fun LoginScreen(
                 // Email Field Group
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Email",
+                        text = stringResource(R.string.auth_login_email),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp)
@@ -182,7 +184,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = uiState.email,
                         onValueChange = viewModel::onEmailChange,
-                        placeholder = { Text("Enter your email", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.6f)) },
+                        placeholder = { Text(stringResource(R.string.auth_login_email_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.6f)) },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next
@@ -190,8 +192,8 @@ fun LoginScreen(
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                             focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent
                         ),
@@ -202,7 +204,7 @@ fun LoginScreen(
                 // Password Field Group
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Password",
+                        text = stringResource(R.string.auth_login_password),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp)
@@ -210,7 +212,7 @@ fun LoginScreen(
                     OutlinedTextField(
                         value = uiState.password,
                         onValueChange = viewModel::onPasswordChange,
-                        placeholder = { Text("auth.login.password_placeholder", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.6f)) },
+                        placeholder = { Text(stringResource(R.string.auth_login_password_placeholder), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha=0.6f)) },
                         trailingIcon = {
                             IconButton(onClick = { passwordVisible = !passwordVisible }) {
                                 Icon(
@@ -230,8 +232,8 @@ fun LoginScreen(
                         singleLine = true,
                         shape = RoundedCornerShape(12.dp),
                         colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                            focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                             focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent
                         ),
@@ -245,7 +247,7 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.End
                 ) {
                     Text(
-                        text = "Forgot Password?",
+                        text = stringResource(R.string.auth_login_forgot_password),
                         style = MaterialTheme.typography.labelMedium,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.clickable { onNavigateToForgotPassword() }
@@ -276,7 +278,7 @@ fun LoginScreen(
                     )
                 } else {
                     Text(
-                        text = "Sign In",
+                        text = stringResource(R.string.auth_login_sign_in),
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
@@ -293,7 +295,7 @@ fun LoginScreen(
             ) {
                 HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
                 Text(
-                    text = "  or continue with  ",
+                    text = "  ${stringResource(R.string.auth_login_continue_with)}  ",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -322,7 +324,7 @@ fun LoginScreen(
                             modifier = Modifier.size(24.dp)
                         )
                         Text(
-                            text = "Sign in with Google",
+                            text = stringResource(R.string.auth_login_apple_sign_in).replace("Apple", "Google"),
                             style = MaterialTheme.typography.labelLarge,
                             fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
@@ -342,12 +344,12 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Don't have an account? ",
+                    text = stringResource(R.string.auth_login_no_account) + " ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Sign Up",
+                    text = stringResource(R.string.auth_login_sign_up),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,

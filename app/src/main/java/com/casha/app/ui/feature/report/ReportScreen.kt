@@ -23,6 +23,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.domain.model.ReportFilterPeriod
 import com.casha.app.ui.feature.report.subview.ReportCategoryList
 import com.casha.app.ui.feature.report.subview.ReportCategoryPieChart
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,7 +36,67 @@ fun ReportScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var showFilterMenu by remember { mutableStateOf(false) }
+    var showDateRangePicker by remember { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    // DateRangePicker ModalBottomSheet
+    if (showDateRangePicker) {
+        val dateRangePickerState = rememberDateRangePickerState(
+            initialSelectedStartDateMillis = uiState.customStartDate?.time,
+            initialSelectedEndDateMillis = uiState.customEndDate?.time
+        )
+        ModalBottomSheet(
+            onDismissRequest = { showDateRangePicker = false },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            containerColor = MaterialTheme.colorScheme.surface
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    TextButton(onClick = { showDateRangePicker = false }) {
+                        Text(stringResource(R.string.add_transaction_cancel))
+                    }
+                    Text(
+                        text = stringResource(R.string.transactions_filter_select_date_range),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    TextButton(
+                        onClick = {
+                            val start = dateRangePickerState.selectedStartDateMillis
+                            val end = dateRangePickerState.selectedEndDateMillis
+                            if (start != null && end != null) {
+                                viewModel.setCustomDateRange(start, end)
+                            }
+                            showDateRangePicker = false
+                        },
+                        enabled = dateRangePickerState.selectedStartDateMillis != null &&
+                                  dateRangePickerState.selectedEndDateMillis != null
+                    ) {
+                        Text(stringResource(R.string.profile_action_done))
+                    }
+                }
+                DateRangePicker(
+                    state = dateRangePickerState,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(500.dp),
+                    title = null,
+                    headline = null,
+                    showModeToggle = false
+                )
+            }
+        }
+    }
 
     Scaffold(
         modifier = Modifier
@@ -42,7 +106,7 @@ fun ReportScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Report",
+                        text = stringResource(R.string.report_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -52,7 +116,7 @@ fun ReportScreen(
                         IconButton(onClick = { showFilterMenu = true }) {
                             Icon(
                                 imageVector = Icons.Default.CalendarMonth,
-                                contentDescription = "Filter",
+                                contentDescription = stringResource(R.string.report_action_filter),
                                 modifier = Modifier.size(24.dp),
                                 tint = MaterialTheme.colorScheme.onSurface
                             )
@@ -62,9 +126,20 @@ fun ReportScreen(
                             expanded = showFilterMenu,
                             onDismissRequest = { showFilterMenu = false }
                         ) {
-                            ReportFilterPeriod.entries.forEach { period ->
+                            // Standard period filters (WEEK, MONTH, YEAR)
+                            ReportFilterPeriod.entries
+                                .filter { it != ReportFilterPeriod.CUSTOM }
+                                .forEach { period ->
                                 DropdownMenuItem(
-                                    text = { Text(period.displayName) },
+                                    text = { 
+                                        val stringResId = when (period) {
+                                            ReportFilterPeriod.WEEK -> R.string.report_filter_week
+                                            ReportFilterPeriod.MONTH -> R.string.report_filter_month
+                                            ReportFilterPeriod.YEAR -> R.string.report_filter_year
+                                            ReportFilterPeriod.CUSTOM -> R.string.transactions_filter_custom_range
+                                        }
+                                        Text(stringResource(stringResId))
+                                    },
                                     onClick = {
                                         viewModel.setFilter(period)
                                         showFilterMenu = false
@@ -74,6 +149,17 @@ fun ReportScreen(
                                     } else null
                                 )
                             }
+                            // Custom Range option
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.transactions_filter_custom_range)) },
+                                onClick = {
+                                    showFilterMenu = false
+                                    showDateRangePicker = true
+                                },
+                                trailingIcon = if (uiState.selectedPeriod == ReportFilterPeriod.CUSTOM) {
+                                    { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                                } else null
+                            )
                         }
                     }
                 },
@@ -94,7 +180,7 @@ fun ReportScreen(
         ) {
             if (uiState.categorySpendings.isEmpty() && !uiState.isLoading) {
                 EmptyStateView(
-                    message = "No data available for this period. Try changing the filter.",
+                    message = stringResource(R.string.report_empty_message),
                     modifier = Modifier.align(Alignment.Center)
                 )
             } else {
@@ -133,13 +219,27 @@ private fun ScrollViewContent(
         // Sub-Header
         Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.padding(top = 8.dp)) {
             Text(
-                text = "Spending by Category",
+                text = stringResource(R.string.report_section_spending_by_category),
                 style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
+            
+            val subtitleText = when (uiState.selectedPeriod) {
+                ReportFilterPeriod.WEEK -> stringResource(R.string.report_filter_week)
+                ReportFilterPeriod.MONTH -> stringResource(R.string.report_filter_month)
+                ReportFilterPeriod.YEAR -> stringResource(R.string.report_filter_year)
+                ReportFilterPeriod.CUSTOM -> {
+                    val fmt = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+                    val start = uiState.customStartDate
+                    val end = uiState.customEndDate
+                    if (start != null && end != null) "${fmt.format(start)} – ${fmt.format(end)}"
+                    else stringResource(R.string.transactions_filter_custom_range)
+                }
+            }
+            
             Text(
-                text = uiState.selectedPeriod.displayName,
+                text = subtitleText,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -176,16 +276,10 @@ private fun EmptyStateView(message: String, modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "No Report Data",
+            text = stringResource(R.string.report_empty_message),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
         )
     }
 }

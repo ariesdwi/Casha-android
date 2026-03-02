@@ -15,6 +15,8 @@ data class ForgotPasswordUiState(
     val email: String = "",
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
+    /** The message returned by the server after a successful request. */
+    val successMessage: String? = null,
     val errorMessage: String? = null
 )
 
@@ -40,19 +42,26 @@ class ForgotPasswordViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                resetPasswordUseCase(email.trim())
-                _uiState.update { it.copy(isLoading = false, isSuccess = true) }
-            } catch (e: Exception) {
-                _uiState.update { 
+                val message = resetPasswordUseCase(email.trim())
+                _uiState.update {
                     it.copy(
-                        isLoading = false, 
+                        isLoading = false,
+                        isSuccess = true,
+                        successMessage = message
+                    )
+                }
+            } catch (e: Exception) {
+                // 400 Bad Request: email not yet verified
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
                         errorMessage = e.message ?: "Failed to send reset link"
-                    ) 
+                    )
                 }
             }
         }
     }
-    
+
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
     }

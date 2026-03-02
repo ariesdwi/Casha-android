@@ -23,12 +23,16 @@ class AuthInterceptor @Inject constructor(
         val originalRequest = chain.request()
 
         val token = runBlocking { authManager.accessToken.firstOrNull() }
-        val locale = Locale.getDefault().toLanguageTag()
+        val locale = Locale.getDefault().language
 
         val newRequest = originalRequest.newBuilder().apply {
-            header("Accept", "application/json")
-            header("Accept-Language", locale)
-            if (!token.isNullOrBlank()) {
+            if (originalRequest.header("Accept") == null) {
+                header("Accept", "application/json")
+            }
+            if (originalRequest.header("Accept-Language") == null) {
+                header("Accept-Language", locale)
+            }
+            if (!token.isNullOrBlank() && originalRequest.header("Authorization") == null) {
                 header("Authorization", "Bearer $token")
             }
         }.build()

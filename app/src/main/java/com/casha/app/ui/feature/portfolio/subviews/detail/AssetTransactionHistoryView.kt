@@ -16,6 +16,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Asset
 import com.casha.app.domain.model.AssetTransaction
@@ -37,7 +39,7 @@ fun AssetTransactionHistoryView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Riwayat Transaksi",
+            text = stringResource(R.string.portfolio_asset_history),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -55,7 +57,7 @@ fun AssetTransactionHistoryView(
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "Belum ada riwayat transaksi",
+                    text = stringResource(R.string.portfolio_asset_history_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                     textAlign = TextAlign.Center

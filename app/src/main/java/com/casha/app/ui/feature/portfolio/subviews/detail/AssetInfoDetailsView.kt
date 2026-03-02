@@ -16,6 +16,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.domain.model.Asset
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,7 +37,7 @@ fun AssetInfoDetailsView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Detail Aset",
+            text = stringResource(R.string.portfolio_asset_details_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -54,7 +56,7 @@ fun AssetInfoDetailsView(
                 InfoRow(
                     icon = Icons.Outlined.Category,
                     iconColor = Color(0xFF1E88E5), // Blue
-                    label = "Kategori",
+                    label = stringResource(R.string.portfolio_asset_category),
                     value = asset.type.category.rawValue
                 )
 
@@ -63,7 +65,7 @@ fun AssetInfoDetailsView(
                 InfoRow(
                     icon = Icons.Outlined.Label,
                     iconColor = Color(0xFF8E24AA), // Purple
-                    label = "Tipe",
+                    label = stringResource(R.string.portfolio_asset_type),
                     value = asset.type.displayName
                 )
 
@@ -72,7 +74,7 @@ fun AssetInfoDetailsView(
                     InfoRow(
                         icon = Icons.Outlined.Event,
                         iconColor = Color(0xFF4CAF50), // Green
-                        label = "Tanggal Akuisisi",
+                        label = stringResource(R.string.portfolio_asset_acquisition_date),
                         value = mediumDateFormatter.format(date)
                     )
                 }
@@ -82,7 +84,7 @@ fun AssetInfoDetailsView(
                     InfoRow(
                         icon = Icons.Outlined.Place,
                         iconColor = Color(0xFFFF9800), // Orange
-                        label = "Lokasi",
+                        label = stringResource(R.string.portfolio_asset_location),
                         value = location
                     )
                 }
@@ -92,7 +94,7 @@ fun AssetInfoDetailsView(
                     InfoRow(
                         icon = Icons.Outlined.Description,
                         iconColor = Color(0xFF757575), // Grey
-                        label = "Deskripsi",
+                        label = stringResource(R.string.portfolio_asset_description),
                         value = description
                     )
                 }
@@ -102,7 +104,7 @@ fun AssetInfoDetailsView(
                 InfoRow(
                     icon = Icons.Outlined.Update,
                     iconColor = Color(0xFF00ACC1), // Cyan
-                    label = "Terakhir Diperbarui",
+                    label = stringResource(R.string.portfolio_asset_last_updated),
                     value = fullDateFormatter.format(asset.updatedAt)
                 )
             }

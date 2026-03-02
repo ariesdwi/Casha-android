@@ -57,6 +57,8 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,6 +79,12 @@ fun RegisterScreen(
         if (uiState.isRegistered) onRegisterSuccess()
     }
 
+    LaunchedEffect(uiState.verificationEmailResent) {
+        if (uiState.verificationEmailResent) {
+            snackbarHostState.showSnackbar(uiState.toastMessage ?: "Verification email sent. Please check your email.")
+        }
+    }
+
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let {
             snackbarHostState.showSnackbar(it)
@@ -91,7 +99,7 @@ fun RegisterScreen(
                 title = { },
                 navigationIcon = {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.auth_common_cancel),
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
@@ -132,14 +140,14 @@ fun RegisterScreen(
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Create Account", // "auth.register.title"
+                text = stringResource(R.string.auth_register_title),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Join us to manage your finances", // "auth.register.subtitle"
+                text = stringResource(R.string.auth_register_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -153,28 +161,28 @@ fun RegisterScreen(
             ) {
                 // Name Field
                 FormField(
-                    title = "Full Name",
+                    title = stringResource(R.string.auth_register_full_name),
                     value = uiState.name,
                     onValueChange = viewModel::onNameChange,
-                    placeholder = "Enter your full name",
+                    placeholder = stringResource(R.string.auth_register_full_name_placeholder),
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next)
                 )
 
                 // Email Field
                 FormField(
-                    title = "Email",
+                    title = stringResource(R.string.auth_login_email),
                     value = uiState.email,
                     onValueChange = viewModel::onEmailChange,
-                    placeholder = "Enter your email",
+                    placeholder = stringResource(R.string.auth_login_email_placeholder),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next)
                 )
 
                 // Password Field
                 FormField(
-                    title = "Password",
+                    title = stringResource(R.string.auth_login_password),
                     value = uiState.password,
                     onValueChange = viewModel::onPasswordChange,
-                    placeholder = "Create a password",
+                    placeholder = stringResource(R.string.auth_register_password_placeholder),
                     isPassword = true,
                     passwordVisible = passwordVisible,
                     onPasswordVisibilityToggle = { passwordVisible = !passwordVisible },
@@ -184,7 +192,7 @@ fun RegisterScreen(
                 // Phone Field with Country Picker
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Phone Number",
+                        text = stringResource(R.string.auth_register_phone),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(horizontal = 4.dp)
@@ -194,7 +202,7 @@ fun RegisterScreen(
                             .fillMaxWidth()
                             .height(56.dp)
                             .background(
-                                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                color = MaterialTheme.colorScheme.surface,
                                 shape = RoundedCornerShape(12.dp)
                             ),
                         verticalAlignment = Alignment.CenterVertically
@@ -242,7 +250,7 @@ fun RegisterScreen(
                             decorationBox = { innerTextField ->
                                 if (uiState.phone.removePrefix(selectedCountry.dialCode).isEmpty()) {
                                     Text(
-                                        text = "Phone Number",
+                                        text = stringResource(R.string.auth_register_phone_placeholder),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                                         fontSize = 16.sp
                                     )
@@ -258,7 +266,7 @@ fun RegisterScreen(
 
             // ── Terms ──
             Text(
-                text = "By creating an account, you agree to our Terms and Conditions", // "auth.register.terms"
+                text = stringResource(R.string.auth_register_terms),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
@@ -268,7 +276,7 @@ fun RegisterScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── Register Button ──
-            val isFormValid = uiState.name.isNotBlank() && uiState.email.isNotBlank() && uiState.password.length >= 6 && uiState.phone.length > selectedCountry.dialCode.length
+            val isFormValid = uiState.email.isNotBlank() && uiState.password.length >= 8
             
             Button(
                 onClick = viewModel::register,
@@ -290,7 +298,7 @@ fun RegisterScreen(
                     )
                 } else {
                     Text(
-                        text = "Create Account", // "auth.register.create_account"
+                        text = stringResource(R.string.auth_register_create_account),
                         style = MaterialTheme.typography.labelLarge,
                         fontSize = 16.sp,
                         fontWeight = FontWeight.SemiBold
@@ -307,7 +315,7 @@ fun RegisterScreen(
             ) {
                 androidx.compose.material3.HorizontalDivider(modifier = Modifier.weight(1f), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f))
                 Text(
-                    text = "  or  ", // "auth.register.or"
+                    text = "  ${stringResource(R.string.auth_register_or)}  ",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -322,12 +330,12 @@ fun RegisterScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Already have an account? ", // "auth.register.has_account"
+                    text = stringResource(R.string.auth_register_has_account) + " ",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = "Sign In", // "auth.login.sign_in"
+                    text = stringResource(R.string.auth_login_sign_in),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.primary,
@@ -387,8 +395,8 @@ fun FormField(
             singleLine = true,
             shape = RoundedCornerShape(12.dp),
             colors = androidx.compose.material3.OutlinedTextFieldDefaults.colors(
-                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                focusedContainerColor = MaterialTheme.colorScheme.surface,
                 unfocusedBorderColor = androidx.compose.ui.graphics.Color.Transparent,
                 focusedBorderColor = androidx.compose.ui.graphics.Color.Transparent
             ),

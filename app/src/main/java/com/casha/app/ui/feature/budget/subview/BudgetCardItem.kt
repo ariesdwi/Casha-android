@@ -23,6 +23,8 @@ import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.BudgetCasha
 import com.casha.app.ui.theme.*
 import kotlin.math.min
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +50,8 @@ fun BudgetCardItem(
     if (showDeleteDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
-            title = { Text(text = "Delete Budget") },
-            text = { Text(text = "Are you sure you want to delete the budget for ${budget.category}?") },
+            title = { Text(text = stringResource(R.string.budget_action_delete)) },
+            text = { Text(text = stringResource(R.string.budget_delete_confirmation, budget.category)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -58,12 +60,12 @@ fun BudgetCardItem(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = CashaDanger)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.budget_action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.budget_action_cancel))
                 }
             }
         )
@@ -80,7 +82,7 @@ fun BudgetCardItem(
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.White),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
             onClick = onEdit
         ) {
@@ -205,7 +207,7 @@ private fun BudgetProgressPart(budget: BudgetCasha) {
             .fillMaxWidth()
             .height(10.dp)
             .clip(CircleShape)
-            .background(Color(0xFFF0F0F0))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Box(
             modifier = Modifier
@@ -224,7 +226,7 @@ private fun BudgetProgressPart(budget: BudgetCasha) {
                         modifier = Modifier
                             .fillMaxHeight()
                             .width(1.5.dp)
-                            .background(Color.White.copy(alpha = 0.5f))
+                            .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.5f))
                     )
                 } else {
                     Spacer(modifier = Modifier.weight(1f))
@@ -250,23 +252,23 @@ private fun BudgetFooterPart(budget: BudgetCasha) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         FooterItem(
-            label = "Spent",
+            label = stringResource(R.string.budget_label_spent),
             value = CurrencyFormatter.format(budget.spent),
             valueColor = MaterialTheme.colorScheme.onSurface,
             alignment = Alignment.Start
         )
         
         FooterItem(
-            label = "Progress",
+            label = stringResource(R.string.budget_label_progress),
             value = progressPercentage,
             valueColor = progressColor,
             alignment = Alignment.CenterHorizontally
         )
         
         FooterItem(
-            label = "Remaining",
+            label = stringResource(R.string.budget_label_remaining),
             value = CurrencyFormatter.format(budget.remaining),
-            valueColor = CashaSuccess,
+            valueColor = if (budget.remaining >= 0) CashaSuccess else CashaDanger,
             alignment = Alignment.End
         )
     }

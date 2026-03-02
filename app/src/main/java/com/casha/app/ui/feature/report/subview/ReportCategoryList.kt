@@ -21,6 +21,8 @@ import com.casha.app.domain.model.ChartCategorySpending
 import com.casha.app.ui.theme.CashaDanger
 import com.casha.app.ui.theme.CashaSuccess
 import kotlin.math.roundToInt
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @Composable
 fun ReportCategoryList(
@@ -95,7 +97,7 @@ private fun CategoryRow(
                 
                 val percentage = (item.percentage * 100).roundToInt()
                 Text(
-                    text = "$percentage% of total",
+                    text = stringResource(R.string.report_percentage_of_total, percentage),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

@@ -19,6 +19,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Asset
+import com.casha.app.domain.model.AssetCategory
+import com.casha.app.ui.util.mapSFSymbolToImageVector
+
+@Composable
+private fun getCategoryColor(category: AssetCategory): Color {
+    return when (category) {
+        AssetCategory.LIQUID -> Color(0xFF2196F3)     // blue
+        AssetCategory.EQUITY -> Color(0xFF9C27B0)     // purple
+        AssetCategory.FIXED_INCOME -> Color(0xFF009688) // teal
+        AssetCategory.COMMODITIES -> Color(0xFFFF9800)  // orange
+        AssetCategory.CRYPTO -> Color(0xFFFFEB3B)       // yellow
+        AssetCategory.REAL_ESTATE -> Color(0xFF4CAF50)  // green
+        AssetCategory.VEHICLES -> Color(0xFF3F51B5)     // indigo
+        AssetCategory.BUSINESS -> Color(0xFFE91E63)     // pink
+        AssetCategory.OTHERS -> Color(0xFF9E9E9E)       // gray
+    }
+}
 
 @Composable
 fun AssetRow(
@@ -47,7 +64,7 @@ fun AssetRow(
                 modifier = Modifier
                     .size(48.dp)
                     .background(
-                        color = Color(0xFFE3F2FD), // Light blue background
+                        color = getCategoryColor(asset.type.category),
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -55,7 +72,7 @@ fun AssetRow(
                 Icon(
                     imageVector = mapSFSymbolToImageVector(asset.type.icon),
                     contentDescription = null,
-                    tint = Color(0xFF2196F3), // Blue icon
+                    tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
             }
@@ -68,7 +85,7 @@ fun AssetRow(
                     text = asset.name,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp
                 )
                 
@@ -79,7 +96,7 @@ fun AssetRow(
                         asset.type.displayName
                     },
                     style = MaterialTheme.typography.bodySmall,
-                    color = Color.Gray,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     fontSize = 14.sp
                 )
             }
@@ -90,7 +107,7 @@ fun AssetRow(
                     text = CurrencyFormatter.format(asset.amount, userCurrency),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 18.sp
                 )
                 
@@ -99,7 +116,7 @@ fun AssetRow(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = null,
-                    tint = Color.LightGray,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -107,10 +124,4 @@ fun AssetRow(
     }
 }
 
-/**
- * Maps SwiftUI SF Symbol names used in AssetType.icon to Android Material Icons.
- */
-private fun mapSFSymbolToImageVector(sfSymbol: String): ImageVector {
-    // Current fallback strategy due to library issues
-    return Icons.AutoMirrored.Filled.ArrowBack
-}
+

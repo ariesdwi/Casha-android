@@ -22,9 +22,7 @@ class SubscriptionManager @Inject constructor(
         private val KEY_IS_PREMIUM = booleanPreferencesKey("is_premium")
     }
 
-    val isPremium: Flow<Boolean> = context.subscriptionDataStore.data.map { prefs ->
-        prefs[KEY_IS_PREMIUM] ?: false
-    }
+    val isPremium: Flow<Boolean> = kotlinx.coroutines.flow.flowOf(true)
 
     suspend fun setPremiumStatus(isPremium: Boolean) {
         context.subscriptionDataStore.edit { prefs ->

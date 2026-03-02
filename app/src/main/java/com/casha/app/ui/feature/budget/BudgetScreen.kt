@@ -21,6 +21,8 @@ import com.casha.app.ui.feature.budget.subview.BudgetList
 import com.casha.app.ui.feature.budget.subview.AddBudgetSheet
 import com.casha.app.ui.feature.budget.subview.BudgetAIAdvisorSheet
 import com.casha.app.ui.theme.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,7 +46,7 @@ fun BudgetScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Budgets",
+                        text = stringResource(R.string.budget_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -53,7 +55,7 @@ fun BudgetScreen(
                     Surface(
                         modifier = Modifier.padding(end = 16.dp),
                         shape = RoundedCornerShape(32.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         tonalElevation = 4.dp,
                         shadowElevation = 2.dp
                     ) {
@@ -68,8 +70,8 @@ fun BudgetScreen(
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = "AI Recommendations",
-                                    tint = Color(0xFF9C27B0),
+                                    contentDescription = stringResource(R.string.budget_advisor_recommendations_title),
+                                    tint = CashaPurple,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
@@ -80,8 +82,8 @@ fun BudgetScreen(
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
-                                    contentDescription = "Add Budget",
-                                    tint = CashaSuccess,
+                                    contentDescription = stringResource(R.string.budget_add_title),
+                                    tint = MaterialTheme.colorScheme.secondary,
                                     modifier = Modifier.size(28.dp)
                                 )
                             }
@@ -95,7 +97,7 @@ fun BudgetScreen(
                                     Icon(
                                         imageVector = Icons.Default.FilterList,
                                         contentDescription = "Filter Month",
-                                        tint = CashaSuccess
+                                        tint = MaterialTheme.colorScheme.secondary
                                     )
                                 }
                                 DropdownMenu(

@@ -13,6 +13,8 @@ import com.casha.app.ui.feature.report.ReportViewModel
 import com.casha.app.ui.feature.transaction.CashflowUiUtils
 import com.casha.app.ui.feature.transaction.CashflowUiUtils.toCashflowEntry
 import com.casha.app.ui.feature.transaction.subview.TransactionList
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +41,7 @@ fun TransactionListByCategoryView(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(imageVector = Icons.Default.ArrowBack, contentDescription = stringResource(R.string.budget_action_cancel))
                     }
                 },
                 windowInsets = WindowInsets(0.dp),
@@ -62,8 +64,6 @@ fun TransactionListByCategoryView(
             TransactionList(
                 sections = sections,
                 isLoading = uiState.isLoading,
-                onDelete = { /* TODO: Implement delete if needed */ },
-                onEdit = { /* TODO: Implement edit if needed */ },
                 onClick = { _, _ -> /* TODO: Navigate to Detail */ }
             )
 

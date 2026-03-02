@@ -15,6 +15,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.casha.app.domain.model.BudgetCasha
 import com.casha.app.domain.model.BudgetSummary
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @Composable
 fun BudgetList(
@@ -88,12 +90,12 @@ private fun BudgetEmptyState(
                 tint = MaterialTheme.colorScheme.primary
             )
             Text(
-                text = "No budgets set yet",
+                text = stringResource(R.string.budget_no_found),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Let AI help you create a personalized budget plan based on your income.",
+                text = stringResource(R.string.budget_advisor_header_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -102,7 +104,7 @@ private fun BudgetEmptyState(
                 onClick = onNavigateToAIRecommendations,
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Get AI Recommendations")
+                Text(stringResource(R.string.budget_advisor_recommendations_title))
             }
         }
     }

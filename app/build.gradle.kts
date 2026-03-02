@@ -18,7 +18,7 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
+        versionCode = 2
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -40,7 +40,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"https://be-casha-apps.vercel.app/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -65,7 +65,7 @@ android {
                 "proguard-rules.pro"
             )
             // Production environment settings
-            buildConfigField("String", "BASE_URL", "\"http://10.168.71.180:3000/\"")
+            buildConfigField("String", "BASE_URL", "\"https://be-casha-apps.vercel.app/\"")
             buildConfigField("String", "ENVIRONMENT", "\"production\"")
             buildConfigField("String", "LOG_LEVEL", "\"error\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "true")
@@ -99,6 +99,7 @@ dependencies {
     // AndroidX Core
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
 
     // Compose
     implementation(platform(libs.compose.bom))

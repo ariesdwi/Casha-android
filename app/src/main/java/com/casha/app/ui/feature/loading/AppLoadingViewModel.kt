@@ -7,6 +7,7 @@ import com.casha.app.domain.usecase.auth.GetProfileUseCase
 import com.casha.app.domain.usecase.dashboard.CashflowSyncUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,39 +45,41 @@ class AppLoadingViewModel @Inject constructor(
             _uiState.update { it.copy(isSyncing = true, isComplete = false, errorMessage = null) }
             
             try {
-                // Run tasks in parallel
-                val profileDeferred = async { getProfileUseCase() }
-                val syncDeferred = async { 
-                    try {
-                        cashflowSyncUseCase.syncAndFetch()
-                    } catch (e: Exception) {
-                        // Log sync error but don't necessarily crash the loading flow
-                        null 
+                coroutineScope {
+                    // Run tasks in parallel
+                    val profileDeferred = async { getProfileUseCase() }
+                    val syncDeferred = async { 
+                        try {
+                            cashflowSyncUseCase.syncAndFetch()
+                        } catch (e: Exception) {
+                            // Log sync error but don't necessarily crash the loading flow
+                            null 
+                        }
                     }
+                    
+                    val profile = profileDeferred.await()
+                    syncDeferred.await()
+                    
+                    // Determine destination based on currency
+                    val isCurrencySet = !profile.currency.isNullOrBlank()
+                    
+                    // Set the global default currency for formatting
+                    if (isCurrencySet) {
+                        CurrencyFormatter.defaultCurrency = profile.currency!!
+                    }
+                    
+                    val destination = if (isCurrencySet) {
+                        AppLoadingDestination.DASHBOARD
+                    } else {
+                        AppLoadingDestination.SETUP_CURRENCY
+                    }
+                    
+                    _uiState.update { it.copy(
+                        isSyncing = false, 
+                        isComplete = true,
+                        destination = destination
+                    ) }
                 }
-                
-                val profile = profileDeferred.await()
-                syncDeferred.await()
-                
-                // Determine destination based on currency
-                val isCurrencySet = !profile.currency.isNullOrBlank()
-                
-                // Set the global default currency for formatting
-                if (isCurrencySet) {
-                    CurrencyFormatter.defaultCurrency = profile.currency!!
-                }
-                
-                val destination = if (isCurrencySet) {
-                    AppLoadingDestination.DASHBOARD
-                } else {
-                    AppLoadingDestination.SETUP_CURRENCY
-                }
-                
-                _uiState.update { it.copy(
-                    isSyncing = false, 
-                    isComplete = true,
-                    destination = destination
-                ) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(
                     isSyncing = false, 

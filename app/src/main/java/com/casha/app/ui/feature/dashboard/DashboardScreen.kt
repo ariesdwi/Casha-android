@@ -21,6 +21,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.navigation.NavController
 import com.casha.app.navigation.Screen
 import com.casha.app.navigation.NavRoutes
@@ -37,14 +39,6 @@ fun DashboardScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     val calendar = remember { Calendar.getInstance() }
-    val greeting = remember {
-        val hour = calendar.get(Calendar.HOUR_OF_DAY)
-        when (hour) {
-            in 0..11 -> "Good Morning"
-            in 12..17 -> "Good Afternoon"
-            else -> "Good Evening"
-        }
-    }
 
     val nickname = remember(uiState.nickname) {
         uiState.nickname.split(" ").firstOrNull() ?: "User"
@@ -136,9 +130,14 @@ fun DashboardScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 item {
+                    val hour = calendar.get(Calendar.HOUR_OF_DAY)
+                    val greetingText = when (hour) {
+                        in 0..11 -> stringResource(R.string.dashboard_title_morning_name, nickname)
+                        in 12..17 -> stringResource(R.string.dashboard_title_afternoon_name, nickname)
+                        else -> stringResource(R.string.dashboard_title_evening_name, nickname)
+                    }
                     WelcomeHeader(
-                        greeting = greeting,
-                        nickname = nickname
+                        greetingText = greetingText
                     )
                 }
                 
@@ -193,25 +192,30 @@ fun DashboardScreen(
 
 @Composable
 fun WelcomeHeader(
-    greeting: String,
-    nickname: String
+    greetingText: String
 ) {
+    val parts = greetingText.split("\n", limit = 2)
+    val greetingPart = parts.getOrNull(0) ?: ""
+    val namePart = parts.getOrNull(1) ?: ""
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp, vertical = 0.dp)
     ) {
         Text(
-            text = greeting,
+            text = greetingPart,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
-        Text(
-            text = nickname,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
+        if (namePart.isNotEmpty()) {
+            Text(
+                text = namePart,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
     }
 }
 

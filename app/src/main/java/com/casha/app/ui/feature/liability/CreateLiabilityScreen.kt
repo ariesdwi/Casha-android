@@ -20,12 +20,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.CreateLiabilityRequest
 import com.casha.app.domain.model.InterestType
@@ -112,6 +114,12 @@ fun CreateLiabilityScreen(
         LiabilityCategory.BUSINESS_LOAN -> "e.g., Modal kerja"
         LiabilityCategory.OTHER -> "e.g., Catatan pinjaman"
     }
+
+    // Pre-resolve strings for use inside onClick lambda (stringResource() can't be called there)
+    val errNameEmpty = stringResource(R.string.liabilities_error_name_empty)
+    val errInterestInvalid = stringResource(R.string.liabilities_error_interest_invalid)
+    val errCreditLimitInvalid = stringResource(R.string.liabilities_error_credit_limit_invalid)
+    val errPrincipalInvalid = stringResource(R.string.liabilities_error_principal_invalid)
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -316,24 +324,24 @@ fun CreateLiabilityScreen(
                         errorMessage = null
                         val interestVal = interestRate.toDoubleOrNull()
                         if (name.isBlank()) {
-                            errorMessage = "Masukkan nama hutang"
+                            errorMessage = errNameEmpty
                             return@Button
                         }
                         if (interestVal == null || interestVal < 0) {
-                            errorMessage = "Masukkan rate bunga yang valid"
+                            errorMessage = errInterestInvalid
                             return@Button
                         }
 
                         if (isCreditBased) {
                             val limitVal = creditLimit.toDoubleOrNull()
                             if (limitVal == null || limitVal <= 0) {
-                                errorMessage = "Masukkan limit kredit yang valid"
+                                errorMessage = errCreditLimitInvalid
                                 return@Button
                             }
                         } else {
                             val principalVal = principal.toDoubleOrNull()
                             if (principalVal == null || principalVal <= 0) {
-                                errorMessage = "Masukkan jumlah pinjaman yang valid"
+                                errorMessage = errPrincipalInvalid
                                 return@Button
                             }
                         }
@@ -398,7 +406,7 @@ fun CreateLiabilityScreen(
                                 tint = Color.White
                             )
                             Text(
-                                "Simpan",
+                                stringResource(R.string.liabilities_action_done),
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White

@@ -1,0 +1,39 @@
+{
+    "project_info": {
+        "project_number": "842221844066",
+        "project_id": "casha-30ee7",
+        "storage_bucket": "casha-30ee7.firebasestorage.app"
+    },
+    "client": [
+        {
+            "client_info": {
+                "mobilesdk_app_id": "1:842221844066:android:fdb101126b760f8918c33b",
+                "android_client_info": {
+                    "package_name": "com.casha.app.staging"
+                }
+            },
+            "oauth_client": [
+                {
+                    "client_id": "842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com",
+                    "client_type": 3
+                }
+            ],
+            "api_key": [
+                {
+                    "current_key": "AIzaSyC9I9g2ptFmSbR7VGz6GK3JL3gQGKpo_cc"
+                }
+            ],
+            "services": {
+                "appinvite_service": {
+                    "other_platform_oauth_client": [
+                        {
+                            "client_id": "842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com",
+                            "client_type": 3
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "configuration_version": "1"
+}

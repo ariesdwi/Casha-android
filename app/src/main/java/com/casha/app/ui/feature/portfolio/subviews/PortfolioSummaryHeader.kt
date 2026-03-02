@@ -12,7 +12,10 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.PortfolioSummary
 import java.text.SimpleDateFormat
@@ -28,9 +31,14 @@ fun PortfolioSummaryHeader(
     Box(
         modifier = modifier
             .fillMaxWidth()
+            .shadow(
+                elevation = 8.dp, 
+                shape = RoundedCornerShape(24.dp), 
+                spotColor = Color(0xFF3380FF).copy(alpha = 0.25f)
+            )
             .background(
                 brush = Brush.linearGradient(
-                    colors = listOf(Color(0xFF0095FF), Color(0xFF00D1FF))
+                    colors = listOf(Color(0xFF3380FF), Color(0xFF00CCCC))
                 ),
                 shape = RoundedCornerShape(24.dp)
             )
@@ -42,7 +50,7 @@ fun PortfolioSummaryHeader(
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
-                text = "Total Aset",
+                text = stringResource(R.string.portfolio_dashboard_total_assets),
                 style = MaterialTheme.typography.labelLarge,
                 color = Color.White.copy(alpha = 0.9f),
                 fontSize = 14.sp
@@ -59,9 +67,9 @@ fun PortfolioSummaryHeader(
             
             summary?.lastUpdated?.let { date ->
                 Text(
-                    text = "Diperbarui: ${dateFormatter.format(date)}",
+                    text = "${stringResource(R.string.portfolio_asset_last_updated)}: ${dateFormatter.format(date)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = Color.White.copy(alpha = 0.8f),
+                    color = Color.White.copy(alpha = 0.7f),
                     fontSize = 12.sp
                 )
             }

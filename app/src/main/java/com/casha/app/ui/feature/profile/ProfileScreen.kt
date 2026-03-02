@@ -9,6 +9,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,6 +46,7 @@ fun ProfileScreen(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     
     var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var showLanguagePicker by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isLoggedOut) {
         if (uiState.isLoggedOut) {
@@ -56,7 +59,7 @@ fun ProfileScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Profile",
+                        text = stringResource(R.string.profile_navigation_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
@@ -127,30 +130,39 @@ fun ProfileScreen(
 
                 // Menu Sections
                 item {
-                    ProfileSectionHeader("Account Settings")
+                    ProfileSectionHeader(stringResource(R.string.profile_section_account_settings))
                 }
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Edit,
-                        title = "Edit Profile",
+                        title = stringResource(R.string.profile_action_edit_profile),
                         onClick = onNavigateToEditProfile
                     )
                 }
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Notifications,
-                        title = "Notifications",
+                        title = stringResource(R.string.profile_action_notifications),
                         onClick = onNavigateToNotifications
+                    )
+                }
+                item {
+                    ProfileMenuItem(
+                        icon = Icons.Default.Language,
+                        title = "Language",
+                        badge = supportedLanguages.firstOrNull { it.code == getCurrentLanguageCode() }?.nativeName,
+                        badgeColor = MaterialTheme.colorScheme.primary,
+                        onClick = { showLanguagePicker = true }
                     )
                 }
 
                 item {
-                    ProfileSectionHeader("Financial Liberty")
+                    ProfileSectionHeader(stringResource(R.string.profile_section_financial_liberty))
                 }
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Work,
-                        title = "Portfolio",
+                        title = stringResource(R.string.profile_menu_portfolio),
                         isLocked = !uiState.isPremium,
                         onClick = onNavigateToPortfolio
                     )
@@ -158,7 +170,7 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.CreditCard,
-                        title = "Liabilities",
+                        title = stringResource(R.string.profile_menu_liabilities),
                         isLocked = !uiState.isPremium,
                         onClick = onNavigateToLiabilities
                     )
@@ -166,7 +178,7 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Flag,
-                        title = "Goal Tracker",
+                        title = stringResource(R.string.profile_menu_goal_tracker),
                         isLocked = !uiState.isPremium,
                         onClick = onNavigateToGoalTracker
                     )
@@ -174,7 +186,7 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                     icon = Icons.Default.Label,
-                    title = "Manage Categories",
+                    title = stringResource(R.string.profile_menu_manage_categories),
                     onClick = onNavigateToCategories
                 )
                 }
@@ -185,8 +197,8 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Star,
-                        title = "Subscription Status",
-                        badge = if (uiState.isPremium) "Active" else "Inactive",
+                        title = stringResource(R.string.profile_subscription_status),
+                        badge = if (uiState.isPremium) stringResource(R.string.profile_subscription_active) else stringResource(R.string.profile_subscription_inactive),
                         badgeColor = if (uiState.isPremium) Color(0xFF4CAF50) else CashaDanger,
                         onClick = onNavigateToSubscription
                     )
@@ -194,7 +206,7 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Delete,
-                        title = "Delete Account",
+                        title = stringResource(R.string.profile_action_delete_account),
                         accentColor = CashaDanger,
                         onClick = { showDeleteConfirmation = true }
                     )
@@ -206,7 +218,7 @@ fun ProfileScreen(
                 item {
                     ProfileMenuItem(
                         icon = Icons.Default.Logout,
-                        title = "Logout",
+                        title = stringResource(R.string.profile_action_logout),
                         accentColor = CashaDanger,
                         onClick = { viewModel.logout() }
                     )
@@ -231,11 +243,15 @@ fun ProfileScreen(
         }
     }
 
+    if (showLanguagePicker) {
+        LanguagePickerDialog(onDismiss = { showLanguagePicker = false })
+    }
+
     if (showDeleteConfirmation) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirmation = false },
-            title = { Text("Delete Account") },
-            text = { Text("Are you sure you want to delete your account? This action cannot be undone.") },
+            title = { Text(stringResource(R.string.profile_delete_confirm_title)) },
+            text = { Text(stringResource(R.string.profile_delete_confirm_message)) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -244,12 +260,12 @@ fun ProfileScreen(
                     },
                     colors = ButtonDefaults.textButtonColors(contentColor = CashaDanger)
                 ) {
-                    Text("Delete")
+                    Text(stringResource(R.string.profile_action_delete))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirmation = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.profile_action_cancel))
                 }
             }
         )
@@ -316,7 +332,7 @@ fun ProfileHeader(profile: UserCasha, isPremium: Boolean) {
                     tint = CashaBlue
                 )
                 Text(
-                    text = if (isPremium) "Premium User" else "Free User",
+                    text = if (isPremium) stringResource(R.string.profile_status_premium) + " User" else stringResource(R.string.profile_status_free) + " User",
                     style = MaterialTheme.typography.labelSmall,
                     color = CashaBlue,
                     fontWeight = FontWeight.Bold
@@ -343,7 +359,7 @@ fun PlaceholderProfileHeader() {
         ) {
             Icon(Icons.Default.Person, contentDescription = null, tint = Color.Gray, modifier = Modifier.size(40.dp))
         }
-        Text(text = "Loading Profile...", color = Color.Gray)
+        Text(text = stringResource(R.string.profile_empty_no_profile), color = Color.Gray)
     }
 }
 
