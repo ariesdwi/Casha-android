@@ -114,6 +114,7 @@
     <string name="report_filter_month">今月</string>
     <string name="report_filter_week">今週</string>
     <string name="dashboard_spending_title">今月の支出</string>
+    <string name="dashboard_title">ダッシュボード</string>
     <string name="dashboard_title_hi_name">こんにちは、%1$s</string>
     <string name="dashboard_title_morning_name">おはようございます 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">こんにちは 👋\n%1$s</string>

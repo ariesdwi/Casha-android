@@ -8,21 +8,35 @@ import com.android.billingclient.api.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * BillingViewModel — handles Google Play Billing lifecycle only.
+ *
+ * SINGLE SOURCE OF TRUTH:
+ *   All premium status reads come from [coreSubscriptionManager.isPremium] (DataStore).
+ *   This ViewModel only WRITES to DataStore (via [coreSubscriptionManager.setPremiumStatus])
+ *   after verifying purchases with the billing client.
+ *
+ *   hasPremiumAccess is a StateFlow backed directly by DataStore — not a separate in-memory copy.
+ */
 @HiltViewModel
 class SubscriptionManager @Inject constructor(
     @ApplicationContext private val context: Context,
     private val coreSubscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel(), PurchasesUpdatedListener {
 
-    // -- State
-    private val _hasPremiumAccess = MutableStateFlow(false)
-    val hasPremiumAccess: StateFlow<Boolean> = _hasPremiumAccess
+    // ── Single source of truth: DataStore-backed via core manager ──────────────
+    val hasPremiumAccess: StateFlow<Boolean> = coreSubscriptionManager.isPremium
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = false
+        )
 
     private val _products = MutableStateFlow<List<ProductDetails>>(emptyList())
     val products: StateFlow<List<ProductDetails>> = _products
@@ -43,19 +57,12 @@ class SubscriptionManager @Inject constructor(
             .setListener(this)
             .enablePendingPurchases()
             .build()
-        
-        
+
         setupBillingClient()
-        
-        // Monitor core status changes (from DataStore) to keep VM state in sync
-        coreSubscriptionManager.isPremium
-            .onEach { isPremium ->
-                _hasPremiumAccess.value = isPremium
-            }
-            .launchIn(viewModelScope)
     }
 
-    // MARK: - Setup
+    // ── Billing Setup ──────────────────────────────────────────────────────────
+
     private fun setupBillingClient() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(result: BillingResult) {
@@ -66,18 +73,19 @@ class SubscriptionManager @Inject constructor(
                     }
                 }
             }
+
             override fun onBillingServiceDisconnected() {
-                // Retry connection if needed or notify user
+                // Will retry on next app foreground; DataStore persists last known state
             }
         })
     }
 
-    // MARK: - Load Products
+    // ── Load Products ──────────────────────────────────────────────────────────
+
     suspend fun loadProducts() {
         _isLoading.value = true
         _errorMessage.value = null
 
-        // Subscriptions
         val subParams = QueryProductDetailsParams.newBuilder()
             .setProductList(listOf(
                 QueryProductDetailsParams.Product.newBuilder()
@@ -87,7 +95,6 @@ class SubscriptionManager @Inject constructor(
             ))
             .build()
 
-        // One-time (lifetime)
         val inappParams = QueryProductDetailsParams.newBuilder()
             .setProductList(listOf(
                 QueryProductDetailsParams.Product.newBuilder()
@@ -99,14 +106,13 @@ class SubscriptionManager @Inject constructor(
 
         val allProducts = mutableListOf<ProductDetails>()
 
-        billingClient.queryProductDetailsAsync(subParams) { result, productDetailsList ->
+        billingClient.queryProductDetailsAsync(subParams) { result, list ->
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                productDetailsList?.let { allProducts.addAll(it) }
+                list?.let { allProducts.addAll(it) }
             }
-            
-            billingClient.queryProductDetailsAsync(inappParams) { resultInapp, productDetailsListInapp ->
+            billingClient.queryProductDetailsAsync(inappParams) { resultInapp, listInapp ->
                 if (resultInapp.responseCode == BillingClient.BillingResponseCode.OK) {
-                    productDetailsListInapp?.let { allProducts.addAll(it) }
+                    listInapp?.let { allProducts.addAll(it) }
                 }
                 _products.value = allProducts
                 _isLoading.value = false
@@ -114,7 +120,8 @@ class SubscriptionManager @Inject constructor(
         }
     }
 
-    // MARK: - Purchase
+    // ── Purchase ───────────────────────────────────────────────────────────────
+
     fun purchase(activity: Activity, productDetails: ProductDetails) {
         _isPurchasing.value = true
         _errorMessage.value = null
@@ -135,26 +142,22 @@ class SubscriptionManager @Inject constructor(
             )
         }
 
-        val billingFlowParams = BillingFlowParams.newBuilder()
-            .setProductDetailsParamsList(productDetailsParamsList)
-            .build()
-
-        billingClient.launchBillingFlow(activity, billingFlowParams)
+        billingClient.launchBillingFlow(
+            activity,
+            BillingFlowParams.newBuilder()
+                .setProductDetailsParamsList(productDetailsParamsList)
+                .build()
+        )
     }
 
-    // MARK: - PurchasesUpdatedListener
+    // ── PurchasesUpdatedListener ───────────────────────────────────────────────
+
     override fun onPurchasesUpdated(result: BillingResult, purchases: List<Purchase>?) {
         _isPurchasing.value = false
         when (result.responseCode) {
-            BillingClient.BillingResponseCode.OK -> {
-                purchases?.forEach { handlePurchase(it) }
-            }
-            BillingClient.BillingResponseCode.USER_CANCELED -> {
-                // User cancelled, no error needed
-            }
-            else -> {
-                _errorMessage.value = "Purchase failed: ${result.debugMessage}"
-            }
+            BillingClient.BillingResponseCode.OK -> purchases?.forEach { handlePurchase(it) }
+            BillingClient.BillingResponseCode.USER_CANCELED -> { /* No error needed */ }
+            else -> _errorMessage.value = "Purchase failed: ${result.debugMessage}"
         }
     }
 
@@ -167,43 +170,42 @@ class SubscriptionManager @Inject constructor(
                         .build()
                     billingClient.acknowledgePurchase(ackParams) { result ->
                         if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                            _hasPremiumAccess.value = true
+                            // Write ONLY to DataStore — hasPremiumAccess flow updates automatically
                             viewModelScope.launch {
                                 coreSubscriptionManager.setPremiumStatus(true)
                             }
                         }
                     }
                 } else {
-                    _hasPremiumAccess.value = true
+                    // Already acknowledged, just persist
                     coreSubscriptionManager.setPremiumStatus(true)
                 }
             }
         }
     }
 
-    // MARK: - Restore / Check Status
+    // ── Restore / Verify ───────────────────────────────────────────────────────
+
     suspend fun checkSubscriptionStatus() {
-        // Check subscriptions
         val subParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-            
+
         billingClient.queryPurchasesAsync(subParams) { result, purchases ->
             val subPurchases = if (result.responseCode == BillingClient.BillingResponseCode.OK) purchases else emptyList()
-            
-            // Check one-time purchases
+
             val inappParams = QueryPurchasesParams.newBuilder()
                 .setProductType(BillingClient.ProductType.INAPP)
                 .build()
-                
+
             billingClient.queryPurchasesAsync(inappParams) { resultInapp, purchasesInapp ->
                 val inappPurchases = if (resultInapp.responseCode == BillingClient.BillingResponseCode.OK) purchasesInapp else emptyList()
-                
-                val allPurchases = subPurchases + inappPurchases
-                val isPremium = allPurchases.any {
+
+                val isPremium = (subPurchases + inappPurchases).any {
                     it.purchaseState == Purchase.PurchaseState.PURCHASED
                 }
-                _hasPremiumAccess.value = isPremium
+
+                // Write ONLY to DataStore — hasPremiumAccess flow updates automatically
                 viewModelScope.launch {
                     coreSubscriptionManager.setPremiumStatus(isPremium)
                 }

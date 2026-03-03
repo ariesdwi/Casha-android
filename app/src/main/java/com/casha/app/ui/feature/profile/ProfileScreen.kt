@@ -122,7 +122,11 @@ fun ProfileScreen(
                 item {
                     val profile = uiState.profile
                     if (profile != null) {
-                        ProfileHeader(profile = profile, isPremium = uiState.isPremium)
+                        ProfileHeader(
+                            profile = profile, 
+                            isPremium = uiState.isPremium,
+                            onNavigateToSubscription = onNavigateToSubscription
+                        )
                     } else {
                         PlaceholderProfileHeader()
                     }
@@ -273,7 +277,7 @@ fun ProfileScreen(
 }
 
 @Composable
-fun ProfileHeader(profile: UserCasha, isPremium: Boolean) {
+fun ProfileHeader(profile: UserCasha, isPremium: Boolean, onNavigateToSubscription: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -318,7 +322,8 @@ fun ProfileHeader(profile: UserCasha, isPremium: Boolean) {
         // Premium Badge
         Surface(
             color = CashaBlue.copy(alpha = 0.1f),
-            shape = CircleShape
+            shape = CircleShape,
+            modifier = Modifier.clickable { onNavigateToSubscription() }
         ) {
             Row(
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),

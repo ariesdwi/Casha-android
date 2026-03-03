@@ -49,6 +49,7 @@
     <string name="report_filter_month">Bulan Ini</string>
     <string name="report_filter_week">Minggu Ini</string>
     <string name="dashboard_spending_title">Pengeluaran Bulan Ini</string>
+    <string name="dashboard_title">Dasbor</string>
     <string name="dashboard_title_hi_name">Hai, %1$s</string>
     <string name="dashboard_title_morning_name">Selamat Pagi 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">Selamat Siang 👋\n%1$s</string>

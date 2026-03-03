@@ -24,6 +24,7 @@ data class BudgetUiState(
     val currentMonthYear: String? = null,
     val isLoading: Boolean = false,
     val isOnline: Boolean = false,
+    val isPremium: Boolean = false,
     val errorMessage: String? = null
 )
 
@@ -38,7 +39,8 @@ class BudgetViewModel @Inject constructor(
     private val applyRecommendationsUseCase: ApplyBudgetRecommendationsUseCase,
     private val budgetSyncUseCase: BudgetSyncUseCase,
     private val categorySyncUseCase: CategorySyncUseCase,
-    private val networkMonitor: NetworkMonitor
+    private val networkMonitor: NetworkMonitor,
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(BudgetUiState())
@@ -53,6 +55,12 @@ class BudgetViewModel @Inject constructor(
 
     private fun loadInitialData() {
         viewModelScope.launch {
+            // Collect Premium status
+            launch {
+                subscriptionManager.isPremium.collect { isPremium ->
+                    _uiState.update { it.copy(isPremium = isPremium) }
+                }
+            }
             // Default to current month
             val currentMonth = DateHelper.generateMonthYearOptions().firstOrNull() ?: ""
             _uiState.update { it.copy(currentMonthYear = currentMonth) }

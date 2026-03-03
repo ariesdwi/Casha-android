@@ -64,8 +64,17 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
     }
 
     fun onFeatureSelected(state: PresentationState) {
-        // Temporarily open all features without premium check
-        _uiState.update { it.copy(presentationState = state) }
+        val requiresPremium = state in listOf(
+            PresentationState.CHAT,
+            PresentationState.CAMERA,
+            PresentationState.PHOTO_LIBRARY
+        )
+
+        if (requiresPremium && !_uiState.value.isPremium) {
+            _uiState.update { it.copy(presentationState = PresentationState.UPGRADE_PROMPT) }
+        } else {
+            _uiState.update { it.copy(presentationState = state) }
+        }
     }
 
     fun refreshData() {

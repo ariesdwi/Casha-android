@@ -114,6 +114,7 @@
     <string name="report_filter_month">Este Mês</string>
     <string name="report_filter_week">Esta Semana</string>
     <string name="dashboard_spending_title">Gastos deste mês</string>
+    <string name="dashboard_title">Painel de controle</string>
     <string name="dashboard_title_hi_name">Olá, %1$s</string>
     <string name="dashboard_title_morning_name">Bom dia 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">Boa tarde 👋\n%1$s</string>

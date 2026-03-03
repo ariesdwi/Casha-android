@@ -27,12 +27,9 @@ import com.casha.app.R
 @Composable
 fun ReportCategoryList(
     data: List<ChartCategorySpending>,
+    hasPremiumAccess: Boolean,
     onCategoryClick: (String) -> Unit
 ) {
-    // Subscriptions simulator (matching iOS/Android pattern)
-    val hasPremiumAccess by remember { mutableStateOf(true) }
-    var showPaywall by remember { mutableStateOf(false) }
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -43,20 +40,9 @@ fun ReportCategoryList(
             CategoryRow(
                 item = item,
                 hasPremiumAccess = hasPremiumAccess,
-                onClick = {
-                    if (hasPremiumAccess) {
-                        onCategoryClick(item.category)
-                    } else {
-                        showPaywall = true
-                    }
-                }
+                onClick = { onCategoryClick(item.category) }
             )
         }
-    }
-
-    if (showPaywall) {
-        // TODO: Show Paywall Dialog/Sheet
-        // For now, we simulate success if user was blocked
     }
 }
 

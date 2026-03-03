@@ -35,6 +35,7 @@
     <string name="auth_toast_session_expired">会话已过期，请重新登录。</string>
     <string name="auth_toast_register_success">注册成功，请验证您的电子邮件。</string>
     <string name="auth_common_cancel">取消</string>
+    <string name="dashboard_title">仪表板</string>
     <string name="budget_action_cancel">取消</string>
     <string name="budget_action_delete">删除预算</string>
     <string name="budget_action_save">保存</string>

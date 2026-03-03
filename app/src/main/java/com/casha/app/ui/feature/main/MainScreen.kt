@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.automirrored.outlined.FormatListBulleted
 import androidx.compose.material.icons.filled.Add
+import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -67,6 +68,7 @@ fun MainScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         viewModel.notificationEvents.collect { notification ->
@@ -210,6 +212,8 @@ fun MainScreen(
                 if (route == NavRoutes.AddTransaction.route) {
                     editTransactionId = null
                     showAddTransactionSheet = true
+                } else if (route == NavRoutes.Subscription.route) {
+                    showPaywallSheet = true
                 } else {
                     navController.navigate(route)
                 }
@@ -365,7 +369,18 @@ fun MainScreen(
                             else showPaywallSheet = true
                         },
                         onNavigateToCategories = { navController.navigate(NavRoutes.Categories.route) },
-                        onNavigateToSubscription = { navController.navigate(NavRoutes.Subscription.route) },
+                        onNavigateToSubscription = {
+                            if (isPremium) {
+                                coroutineScope.launch {
+                                    snackbarHostState.showSnackbar(
+                                        message = "You are already a Premium user! 🌟",
+                                        duration = androidx.compose.material3.SnackbarDuration.Short
+                                    )
+                                }
+                            } else {
+                                showPaywallSheet = true
+                            }
+                        },
                         onLogout = {
                             parentNavController.navigate(NavRoutes.Splash.route) {
                                 popUpTo(NavRoutes.Dashboard.route) { inclusive = true }

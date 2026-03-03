@@ -35,6 +35,7 @@
     <string name="auth_toast_session_expired">Sessão expirada. Por favor, faça login novamente.</string>
     <string name="auth_toast_register_success">Cadastro realizado com sucesso, por favor verifique seu e-mail.</string>
     <string name="auth_common_cancel">Cancelar</string>
+    <string name="dashboard_title">Painel de controle</string>
     <string name="budget_action_cancel">Cancelar</string>
     <string name="budget_action_delete">Excluir orçamento</string>
     <string name="budget_action_save">Salvar</string>

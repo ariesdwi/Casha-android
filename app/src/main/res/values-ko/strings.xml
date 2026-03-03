@@ -114,6 +114,7 @@
     <string name="report_filter_month">이번 달</string>
     <string name="report_filter_week">이번 주</string>
     <string name="dashboard_spending_title">이번 달 지출</string>
+    <string name="dashboard_title">대시보드</string>
     <string name="dashboard_title_hi_name">안녕하세요, %1$s</string>
     <string name="dashboard_title_morning_name">좋은 아침입니다 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">좋은 오후입니다 👋\n%1$s</string>

@@ -114,6 +114,7 @@
     <string name="report_filter_month">هذا الشهر</string>
     <string name="report_filter_week">هذا الأسبوع</string>
     <string name="dashboard_spending_title">المصروفات هذا الشهر</string>
+    <string name="dashboard_title">لوحة القيادة</string>
     <string name="dashboard_title_hi_name">أهلاً، %1$s</string>
     <string name="dashboard_title_morning_name">صباح الخير 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">طاب مساؤك 👋\n%1$s</string>

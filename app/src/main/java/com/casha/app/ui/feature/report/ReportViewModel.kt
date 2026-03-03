@@ -22,19 +22,27 @@ data class ReportUiState(
     val isLoading: Boolean = false,
     val selectedPeriod: ReportFilterPeriod = ReportFilterPeriod.MONTH,
     val customStartDate: Date? = null,
-    val customEndDate: Date? = null
+    val customEndDate: Date? = null,
+    val isPremium: Boolean = false,
+    val showPaywall: Boolean = false
 )
 
 @HiltViewModel
 class ReportViewModel @Inject constructor(
     private val getCategorySpendingUseCase: GetCategorySpendingUseCase,
-    private val getTransactionByCategoryUseCase: GetTransactionByCategoryUseCase
+    private val getTransactionByCategoryUseCase: GetTransactionByCategoryUseCase,
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReportUiState())
     val uiState: StateFlow<ReportUiState> = _uiState.asStateFlow()
 
     init {
+        viewModelScope.launch {
+            subscriptionManager.isPremium.collect { isPremium ->
+                _uiState.update { it.copy(isPremium = isPremium) }
+            }
+        }
         refreshAllData()
     }
 
@@ -92,6 +100,18 @@ class ReportViewModel @Inject constructor(
 
     fun refreshAllData() {
         loadCategorySpending()
+    }
+
+    fun onCategoryClicked(category: String, navigate: (String) -> Unit) {
+        if (_uiState.value.isPremium) {
+            navigate(category)
+        } else {
+            _uiState.update { it.copy(showPaywall = true) }
+        }
+    }
+
+    fun dismissPaywall() {
+        _uiState.update { it.copy(showPaywall = false) }
     }
 
     private fun makeDateRange(): Pair<Date, Date> {

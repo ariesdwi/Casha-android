@@ -98,6 +98,20 @@ fun ReportScreen(
         }
     }
 
+    if (uiState.showPaywall) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.dismissPaywall() },
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+            dragHandle = null,
+            containerColor = Color.Transparent,
+            contentWindowInsets = { WindowInsets(0.dp) }
+        ) {
+            com.casha.app.ui.feature.subscription.PaywallScreen(
+                onDismiss = { viewModel.dismissPaywall() }
+            )
+        }
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -186,7 +200,9 @@ fun ReportScreen(
             } else {
                 ScrollViewContent(
                     uiState = uiState,
-                    onNavigateToCategoryDetail = onNavigateToCategoryDetail
+                    onNavigateToCategoryDetail = { category ->
+                        viewModel.onCategoryClicked(category, onNavigateToCategoryDetail)
+                    }
                 )
             }
 
@@ -254,6 +270,7 @@ private fun ScrollViewContent(
         // List Section 
         ReportCategoryList(
             data = uiState.categorySpendings,
+            hasPremiumAccess = uiState.isPremium,
             onCategoryClick = onNavigateToCategoryDetail
         )
         

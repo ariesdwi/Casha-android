@@ -79,6 +79,7 @@
     <string name="report_filter_month">月</string>
     <string name="report_filter_week">周</string>
     <string name="dashboard_spending_title">本月支出</string>
+    <string name="dashboard_title">仪表板</string>
     <string name="dashboard_title_hi_name">你好，%1$s</string>
     <string name="dashboard_title_morning_name">早上好 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">下午好 👋\n%1$s</string>

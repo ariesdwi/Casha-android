@@ -114,6 +114,7 @@
     <string name="report_filter_month">Ce Mois</string>
     <string name="report_filter_week">Cette Semaine</string>
     <string name="dashboard_spending_title">Dépenses ce mois-ci</string>
+    <string name="dashboard_title">Tableau de bord</string>
     <string name="dashboard_title_hi_name">Salut, %1$s</string>
     <string name="dashboard_title_morning_name">Bonjour 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">Bon après-midi 👋\n%1$s</string>

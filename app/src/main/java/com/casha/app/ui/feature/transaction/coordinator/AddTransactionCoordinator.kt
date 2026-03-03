@@ -191,6 +191,8 @@ fun AddTransactionCoordinator(
                     
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_chat),
+                        isPremiumFeature = true,
+                        hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.CHAT) }
                     )
                     
@@ -198,6 +200,8 @@ fun AddTransactionCoordinator(
                     
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_camera),
+                        isPremiumFeature = true,
+                        hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.CAMERA) }
                     )
                     
@@ -205,6 +209,8 @@ fun AddTransactionCoordinator(
                     
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_photo_library),
+                        isPremiumFeature = true,
+                        hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.PHOTO_LIBRARY) }
                     )
                 }
@@ -216,6 +222,8 @@ fun AddTransactionCoordinator(
 @Composable
 fun CoordinatorOption(
     title: String,
+    isPremiumFeature: Boolean = false,
+    hasPremiumAccess: Boolean = true,
     onClick: () -> Unit
 ) {
     Surface(
@@ -226,13 +234,29 @@ fun CoordinatorOption(
             .height(48.dp)
             .clickable(onClick = onClick)
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )
+            
+            if (isPremiumFeature && !hasPremiumAccess) {
+                androidx.compose.material3.Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "Premium Feature",
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

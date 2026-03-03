@@ -140,6 +140,7 @@
     <string name="report_filter_month">This Month</string>
     <string name="report_filter_week">This Week</string>
     <string name="dashboard_spending_title">Spending This Month</string>
+    <string name="dashboard_title">Dashboard</string>
     <string name="dashboard_title_hi_name">Hi, %1$s</string>
     <string name="dashboard_title_morning_name">Good Morning 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">Good Afternoon 👋\n%1$s</string>

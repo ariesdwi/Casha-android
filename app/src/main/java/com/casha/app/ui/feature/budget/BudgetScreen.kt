@@ -35,8 +35,6 @@ fun BudgetScreen(
     var showAddBudgetSheet by remember { mutableStateOf(false) }
     var showAIAdvisorSheet by remember { mutableStateOf(false) }
     
-    // Subscriptions simulator (for now, as per iOS implementation)
-    val hasPremiumAccess by remember { mutableStateOf(true) } 
     var showPaywall by remember { mutableStateOf(false) }
 
     val pullToRefreshState = rememberPullToRefreshState()
@@ -66,7 +64,7 @@ fun BudgetScreen(
                         ) {
                             // AI Recommendations Button
                             IconButton(onClick = {
-                                if (hasPremiumAccess) showAIAdvisorSheet = true else showPaywall = true
+                                if (uiState.isPremium) showAIAdvisorSheet = true else showPaywall = true
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.AutoAwesome,
@@ -78,7 +76,7 @@ fun BudgetScreen(
 
                             // Add Budget Button
                             IconButton(onClick = {
-                                if (hasPremiumAccess) showAddBudgetSheet = true else showPaywall = true
+                                if (uiState.isPremium) showAddBudgetSheet = true else showPaywall = true
                             }) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
@@ -137,6 +135,20 @@ fun BudgetScreen(
             )
         }
     ) { innerPadding ->
+        if (showPaywall) {
+            ModalBottomSheet(
+                onDismissRequest = { showPaywall = false },
+                sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
+                dragHandle = null,
+                containerColor = Color.Transparent,
+                contentWindowInsets = { WindowInsets(0.dp) }
+            ) {
+                com.casha.app.ui.feature.subscription.PaywallScreen(
+                    onDismiss = { showPaywall = false }
+                )
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()

@@ -114,6 +114,7 @@
     <string name="report_filter_month">इस महीने</string>
     <string name="report_filter_week">इस सप्ताह</string>
     <string name="dashboard_spending_title">इस महीने का खर्च</string>
+    <string name="dashboard_title">डैशबोर्ड</string>
     <string name="dashboard_title_hi_name">नमस्ते, %1$s</string>
     <string name="dashboard_title_morning_name">सुप्रभात 👋\n%1$s</string>
     <string name="dashboard_title_afternoon_name">शुभ दोपहर 👋\n%1$s</string>
