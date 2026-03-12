@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability.forminput
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -17,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.PaymentType
@@ -58,10 +61,11 @@ fun RecordPaymentFormView(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -78,13 +82,13 @@ fun RecordPaymentFormView(
             ) {
                 Column {
                     Text(
-                        text = "Bayar Cicilan",
+                        text = stringResource(R.string.liabilities_payment_record_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "${liability.name} · Sisa: ${CurrencyFormatter.format(liability.currentBalance, userCurrency)}",
+                        text = "${liability.name} · ${stringResource(R.string.liabilities_payment_record_remaining, CurrencyFormatter.format(liability.currentBalance, userCurrency))}",
                         fontSize = 13.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                     )
@@ -102,7 +106,7 @@ fun RecordPaymentFormView(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Amount
-                InputCard(title = "Jumlah Bayar *") {
+                InputCard(title = stringResource(R.string.liabilities_payment_record_amount)) {
                     OutlinedTextField(
                         value = if (paymentAmountFocused) paymentAmountText else if (paymentAmountText.isNotEmpty()) CurrencyFormatter.formatInput(paymentAmountText) else "",
                         onValueChange = { paymentAmountText = it.replace(",", ".") },
@@ -131,15 +135,15 @@ fun RecordPaymentFormView(
                                 paymentType = PaymentType.PARTIAL
                             },
                             shape = RoundedCornerShape(10.dp),
-                            color = Color(0xFFFFF3E0)
+                            color = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.5f)
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
-                                Icon(Icons.Default.Lightbulb, contentDescription = null, modifier = Modifier.size(14.dp), tint = Color(0xFFFF9800))
-                                Text("Cicilan", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color(0xFFFF9800))
+                                Icon(Icons.Default.Lightbulb, contentDescription = null, modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onTertiaryContainer)
+                                Text(stringResource(R.string.liabilities_payment_record_installment), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onTertiaryContainer)
                             }
                         }
                     }
@@ -153,7 +157,7 @@ fun RecordPaymentFormView(
                         color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                     ) {
                         Text(
-                            "Pelunasan",
+                            stringResource(R.string.liabilities_payment_record_full_payoff),
                             fontSize = 12.sp,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.primary,
@@ -163,7 +167,7 @@ fun RecordPaymentFormView(
                 }
 
                 // Date
-                InputCard(title = "Tanggal Bayar *") {
+                InputCard(title = stringResource(R.string.liabilities_payment_record_date)) {
                     Surface(
                         onClick = { showDatePicker = true },
                         shape = RoundedCornerShape(10.dp),
@@ -181,14 +185,14 @@ fun RecordPaymentFormView(
                 }
 
                 // Payment Type
-                InputCard(title = "Jenis Pembayaran") {
+                InputCard(title = stringResource(R.string.liabilities_payment_record_type)) {
                     Row(
                         modifier = Modifier.horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        PaymentTypeChip("Minimum", paymentType == PaymentType.MINIMUM) { paymentType = PaymentType.MINIMUM }
-                        PaymentTypeChip("Sebagian", paymentType == PaymentType.PARTIAL) { paymentType = PaymentType.PARTIAL }
-                        PaymentTypeChip("Lunas", paymentType == PaymentType.FULL) {
+                        PaymentTypeChip(stringResource(R.string.liabilities_payment_record_type_min), paymentType == PaymentType.MINIMUM) { paymentType = PaymentType.MINIMUM }
+                        PaymentTypeChip(stringResource(R.string.liabilities_payment_record_type_partial), paymentType == PaymentType.PARTIAL) { paymentType = PaymentType.PARTIAL }
+                        PaymentTypeChip(stringResource(R.string.liabilities_payment_record_type_full), paymentType == PaymentType.FULL) {
                             paymentType = PaymentType.FULL
                             paymentAmountText = liability.currentBalance.toLong().toString()
                         }
@@ -198,14 +202,14 @@ fun RecordPaymentFormView(
                 HorizontalDivider(color = Color.Gray.copy(alpha = 0.1f))
 
                 // Optional section
-                SectionHeader(title = "OPSIONAL")
+                SectionHeader(title = stringResource(R.string.liabilities_payment_record_optional))
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    InputCard(title = "Porsi Pokok", modifier = Modifier.weight(1f)) {
+                    InputCard(title = stringResource(R.string.liabilities_payment_record_principal_portion), modifier = Modifier.weight(1f)) {
                         OutlinedTextField(
                             value = principalAmountText,
                             onValueChange = { principalAmountText = it.replace(",", ".") },
-                            placeholder = { Text("auto", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
+                            placeholder = { Text(stringResource(R.string.liabilities_payment_record_auto), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -214,11 +218,11 @@ fun RecordPaymentFormView(
                             textStyle = LocalTextStyle.current.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                         )
                     }
-                    InputCard(title = "Porsi Bunga", modifier = Modifier.weight(1f)) {
+                    InputCard(title = stringResource(R.string.liabilities_payment_record_interest_portion), modifier = Modifier.weight(1f)) {
                         OutlinedTextField(
                             value = interestAmountText,
                             onValueChange = { interestAmountText = it.replace(",", ".") },
-                            placeholder = { Text("auto", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
+                            placeholder = { Text(stringResource(R.string.liabilities_payment_record_auto), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
                             singleLine = true,
@@ -228,14 +232,14 @@ fun RecordPaymentFormView(
                         )
                     }
                 }
-                HintRow(text = "Biarkan kosong untuk auto", icon = Icons.Default.Info)
+                HintRow(text = stringResource(R.string.liabilities_payment_record_leave_empty_auto), icon = Icons.Default.Info)
 
                 // Notes
-                InputCard(title = "Catatan") {
+                InputCard(title = stringResource(R.string.liabilities_payment_record_notes)) {
                     CashaFormTextField(
                         value = notesText,
                         onValueChange = { notesText = it },
-                        placeholder = "e.g., Transfer via ATM",
+                        placeholder = stringResource(R.string.liabilities_payment_record_notes_placeholder),
                         singleLine = false
                     )
                 }
@@ -249,7 +253,7 @@ fun RecordPaymentFormView(
                 if (paymentAmountValue > 0) {
                     Surface(
                         shape = RoundedCornerShape(14.dp),
-                        color = Color.White,
+                        color = MaterialTheme.colorScheme.surface,
                         shadowElevation = 1.dp,
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -257,11 +261,11 @@ fun RecordPaymentFormView(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Preview:", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text("Pokok: ${CurrencyFormatter.format(simulatedPrincipal, userCurrency)}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
-                            Text("Bunga: ${CurrencyFormatter.format(simulatedInterest, userCurrency)}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                            Text(stringResource(R.string.liabilities_payment_record_preview), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(R.string.liabilities_payment_record_principal, CurrencyFormatter.format(simulatedPrincipal, userCurrency)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                            Text(stringResource(R.string.liabilities_payment_record_interest, CurrencyFormatter.format(simulatedInterest, userCurrency)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
                             Text(
-                                "Sisa setelah bayar: ${CurrencyFormatter.format(remainingBalance, userCurrency)}",
+                                stringResource(R.string.liabilities_payment_record_balance_after, CurrencyFormatter.format(remainingBalance, userCurrency)),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
@@ -277,7 +281,7 @@ fun RecordPaymentFormView(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF8F9FA))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .navigationBarsPadding()
             ) {
@@ -296,15 +300,15 @@ fun RecordPaymentFormView(
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF009033),
-                        disabledContainerColor = Color.Gray.copy(alpha = 0.3f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
                 ) {
                     if (liabilityState.isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                     } else {
-                        Text("Bayar", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                        Text(stringResource(R.string.liabilities_payment_record_submit), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -319,10 +323,10 @@ fun RecordPaymentFormView(
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { paymentDate = Date(it) }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.liabilities_action_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.liabilities_action_cancel)) }
             }
         ) { DatePicker(state = datePickerState) }
     }
@@ -337,8 +341,8 @@ private fun PaymentTypeChip(
     Surface(
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
-        color = if (selected) MaterialTheme.colorScheme.primary else Color.White,
-        border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, Color.Gray.copy(alpha = 0.15f)),
+        color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+        border = if (selected) null else androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
         shadowElevation = if (selected) 2.dp else 0.dp,
         modifier = Modifier.height(38.dp)
     ) {
@@ -350,7 +354,7 @@ private fun PaymentTypeChip(
                 text = text,
                 fontSize = 14.sp,
                 fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Medium,
-                color = if (selected) Color.White else MaterialTheme.colorScheme.onSurface
+                color = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
             )
         }
     }

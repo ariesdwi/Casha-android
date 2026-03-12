@@ -12,6 +12,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 
@@ -34,7 +36,7 @@ fun LiabilityLoanPaymentSummaryView(
         ) {
             Icon(Icons.Default.PieChart, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
             Text(
-                text = "Ringkasan Pembayaran",
+                text = stringResource(R.string.liabilities_detail_payment_summary),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -48,17 +50,17 @@ fun LiabilityLoanPaymentSummaryView(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 SummaryRow(
-                    label = "Total Dibayar",
+                    label = stringResource(R.string.liabilities_detail_payment_total),
                     value = CurrencyFormatter.format(totalPaid, userCurrency),
                     isBold = true
                 )
                 SummaryRow(
-                    label = "→ Pokok",
+                    label = stringResource(R.string.liabilities_detail_payment_principal),
                     value = CurrencyFormatter.format(totalPrincipal, userCurrency),
                     isBold = false
                 )
                 SummaryRow(
-                    label = "→ Bunga",
+                    label = stringResource(R.string.liabilities_detail_payment_interest),
                     value = CurrencyFormatter.format(totalInterest, userCurrency),
                     isBold = false
                 )

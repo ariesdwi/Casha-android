@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.report
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -46,7 +47,8 @@ fun ReportScreen(
             initialSelectedEndDateMillis = uiState.customEndDate?.time
         )
         ModalBottomSheet(
-            onDismissRequest = { showDateRangePicker = false },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { showDateRangePicker = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = MaterialTheme.colorScheme.surface
         ) {
@@ -100,7 +102,8 @@ fun ReportScreen(
 
     if (uiState.showPaywall) {
         ModalBottomSheet(
-            onDismissRequest = { viewModel.dismissPaywall() },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { viewModel.dismissPaywall() },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             dragHandle = null,
             containerColor = Color.Transparent,

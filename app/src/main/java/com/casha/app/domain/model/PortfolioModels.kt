@@ -19,10 +19,15 @@ data class Asset(
     val quantity: Double? = null,
     val unit: String? = null,
     val pricePerUnit: Double? = null,
+    val returnPercentage: Double? = null,
+    val unrealizedReturn: Double? = null,
     
     // Additional fields
     val acquisitionDate: Date? = null,
-    val location: String? = null
+    val location: String? = null,
+
+    // Gold-specific: karat purity (24, 22, 18, 16, 14, 10, 9)
+    val purity: Int? = null
 )
 
 // MARK: - Asset Type (28 Types)
@@ -223,7 +228,9 @@ data class CreateAssetRequest(
     val pricePerUnit: Double? = null,
     // Additional fields
     val acquisitionDate: Date? = null,
-    val location: String? = null
+    val location: String? = null,
+    // Gold-specific
+    val purity: Int? = null
 )
 
 // MARK: - Update Asset Request
@@ -235,7 +242,9 @@ data class UpdateAssetRequest(
     val pricePerUnit: Double? = null,
     val acquisitionDate: Date? = null,
     val location: String? = null,
-    val description: String? = null
+    val description: String? = null,
+    // Gold-specific
+    val purity: Int? = null
 )
 
 // MARK: - Asset Transaction Type
@@ -291,6 +300,8 @@ data class CreateAssetTransactionRequest(
 data class PortfolioSummary(
     val currency: String,
     val totalAssets: Double,
+    val totalUnrealizedReturn: Double? = null,
+    val totalReturnPercentage: Double? = null,
     val breakdown: List<AssetBreakdown>,
     val assets: List<Asset>,
     val lastUpdated: Date
@@ -300,7 +311,8 @@ data class PortfolioSummary(
 data class AssetBreakdown(
     val type: AssetType,
     val amount: Double,
-    val count: Int
+    val count: Int,
+    val allocationPercentage: Double? = null
 ) {
     val percentage: Double
         get() = 0.0 // Will be calculated based on total assets where needed

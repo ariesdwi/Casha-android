@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.InstallmentPlan
 
@@ -28,7 +30,7 @@ fun ActiveInstallmentsListView(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text(
-            text = "Cicilan Aktif",
+            text = stringResource(R.string.liabilities_detail_active_installments),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -51,7 +53,7 @@ fun ActiveInstallmentsListView(
                     tint = Color(0xFF9E9E9E) // Casha Text Secondary
                 )
                 Text(
-                    text = "Belum ada cicilan aktif",
+                    text = stringResource(R.string.liabilities_detail_no_active_installments),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface // Casha Text Primary
@@ -107,7 +109,7 @@ private fun InstallmentRow(plan: InstallmentPlan, userCurrency: String) {
                 }
                 
                 Text(
-                    text = "${plan.currentMonth} dari ${plan.tenor} Bln",
+                    text = stringResource(R.string.liabilities_detail_installment_month_count, plan.currentMonth, plan.tenor),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface // Casha Text Primary

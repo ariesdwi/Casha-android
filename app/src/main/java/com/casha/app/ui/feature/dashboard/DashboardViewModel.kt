@@ -112,15 +112,14 @@ class DashboardViewModel @Inject constructor(
             val period = _uiState.value.selectedPeriod
             val (startDate, endDate) = period.dateRange()
 
-            // For CUSTOM period: read from local DB only, filtered precisely by date range
-            if (period is SpendingPeriod.CUSTOM) {
+            if (period is com.casha.app.domain.model.SpendingPeriod.CUSTOM) {
                 try {
-                    val customSummary = buildLocalSummaryForRange(
-                        start = period.start,
-                        end = period.end,
-                        periodLabel = getPeriodRawTitle(period)
+                    val customSummary = cashflowSyncUseCase.calculateSummaryFromLocal(
+                        startDate = period.start,
+                        endDate = period.end,
+                        monthLabel = getPeriodRawTitle(period)
                     )
-                    val recentLocal = buildLocalHistoryForRange(period.start, period.end).take(5)
+                    val recentLocal = cashflowSyncUseCase.loadFromLocal(period.start, period.end).take(5)
                     val unsyncedTask = getUnsyncTransactionCountUseCase.execute()
                     val goalsTask = getGoalsUseCase.execute()
                     val goalSummaryTask = getGoalSummaryUseCase.execute()
@@ -158,25 +157,27 @@ class DashboardViewModel @Inject constructor(
 
             try {
                 coroutineScope {
+                    // Always sync from remote first when online
                     if (_uiState.value.isOnline) {
-                        cashflowSyncUseCase.syncAndFetch()
+                        try { cashflowSyncUseCase.syncAndFetch() } catch (_: Exception) { }
                     }
 
                     val spendingTask = async { getTotalSpendingUseCase.execute(period) }
                     val reportsTask = async { getSpendingReportUseCase.execute() }
                     val unsyncedTask = async { getUnsyncTransactionCountUseCase.execute() }
                     
+                    // Always read from local DB (populated by syncAndFetch above when online)
                     val historyTask = async {
-                        if (_uiState.value.isOnline) {
-                            getCashflowHistoryUseCase.execute(monthStr, yearStr, 1, 5).entries
-                        } else {
-                            cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
-                        }
+                        cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
                     }
                     
                     val summaryTask = async {
                         if (_uiState.value.isOnline) {
-                            getCashflowSummaryUseCase.execute(monthStr, yearStr)
+                            try {
+                                getCashflowSummaryUseCase.execute(monthStr, yearStr)
+                            } catch (_: Exception) {
+                                cashflowSyncUseCase.calculateSummaryFromLocal(startDate, endDate ?: Date(), periodLabel)
+                            }
                         } else {
                             cashflowSyncUseCase.calculateSummaryFromLocal(startDate, endDate ?: Date(), periodLabel)
                         }
@@ -201,72 +202,7 @@ class DashboardViewModel @Inject constructor(
             }
     }
 
-    /**
-     * Builds a CashflowSummary from local transactions + incomes filtered to [start, end].
-     * Used for CUSTOM date range where the API cannot filter precisely.
-     */
-    private suspend fun buildLocalSummaryForRange(
-        start: Date,
-        end: Date,
-        periodLabel: String
-    ): CashflowSummary {
-        val transactions = transactionRepository.getTransactions().firstOrNull() ?: emptyList()
-        val incomes = incomeRepository.getIncomes()
 
-        val filteredExpenses = transactions.filter { t ->
-            !t.datetime.before(start) && !t.datetime.after(end)
-        }
-        val filteredIncomes = incomes.filter { i ->
-            !i.datetime.before(start) && !i.datetime.after(end)
-        }
-
-        val totalExpense = filteredExpenses.sumOf { it.amount }
-        val totalIncome = filteredIncomes.sumOf { it.amount }
-        
-        return CashflowSummary(
-            totalIncome = totalIncome,
-            totalExpense = totalExpense,
-            netBalance = totalIncome - totalExpense,
-            periodLabel = periodLabel
-        )
-    }
-
-    /**
-     * Builds a list of CashflowEntry from local transactions + incomes filtered to [start, end],
-     * sorted by date descending.
-     */
-    private suspend fun buildLocalHistoryForRange(start: Date, end: Date): List<CashflowEntry> {
-        val transactions = transactionRepository.getTransactions().firstOrNull() ?: emptyList()
-        val incomes = incomeRepository.getIncomes()
-
-        val expenseEntries = transactions
-            .filter { !it.datetime.before(start) && !it.datetime.after(end) }
-            .map { t ->
-                CashflowEntry(
-                    id = t.id,
-                    title = t.name,
-                    amount = t.amount,
-                    category = t.category,
-                    type = CashflowType.EXPENSE,
-                    date = t.datetime
-                )
-            }
-
-        val incomeEntries = incomes
-            .filter { !it.datetime.before(start) && !it.datetime.after(end) }
-            .map { i ->
-                CashflowEntry(
-                    id = i.id,
-                    title = i.name,
-                    amount = i.amount,
-                    category = i.type.name,
-                    type = CashflowType.INCOME,
-                    date = i.datetime
-                )
-            }
-
-        return (expenseEntries + incomeEntries).sortedByDescending { it.date }
-    }
 
     fun syncData() {
         viewModelScope.launch {

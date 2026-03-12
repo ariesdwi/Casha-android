@@ -382,7 +382,6 @@
     <string name="report_percentage_of_total">전체의 %d%%</string>
     <string name="report_section_spending_by_category">카테고리별 지출</string>
     <string name="report_title">보고서</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">취소</string>
     <string name="profile_action_clear_all">모두 지우기</string>
     <string name="profile_action_delete">삭제</string>
@@ -495,4 +494,164 @@
     <string name="portfolio_validation_amount_required">금액은 필수 항목입니다</string>
     <string name="portfolio_validation_category_required">카테고리는 필수 항목입니다</string>
     <string name="portfolio_validation_name_required">자산 이름은 필수 항목입니다</string>
-<string name="nav_report">보고서</string><string name="nav_dashboard">홈</string><string name="nav_add">추가</string><string name="nav_transactions">거래</string><string name="nav_budget">예산</string></resources>
+    <string name="nav_report">보고서</string>
+    <string name="nav_dashboard">홈</string>
+    <string name="nav_add">추가</string>
+    <string name="nav_transactions">거래</string>
+    <string name="nav_budget">예산</string>
+    <string name="subscription_button_lifetime">평생 이용권 받기</string>
+    <string name="subscription_button_processing">처리 중...</string>
+    <string name="subscription_button_retrying">재시도 중...</string>
+    <string name="subscription_button_select_plan">플랜 선택</string>
+    <string name="subscription_button_start_trial">무료 체험 시작</string>
+    <string name="subscription_button_try_again">다시 시도</string>
+    <string name="subscription_error_load_failed">상품 로드 실패: %s</string>
+    <string name="subscription_error_product_not_found">상품을 사용할 수 없습니다. 나중에 다시 시도해 주세요.</string>
+    <string name="subscription_error_receipt_unavailable">구매를 확인할 수 없습니다. 인터넷 연결을 확인해 주세요.</string>
+    <string name="subscription_error_restore_failed">구매 복원 실패</string>
+    <string name="subscription_error_unknown">알 수 없는 구매 결과</string>
+    <string name="subscription_error_verification_failed">구매 확인 실패. 고객 지원에 문의해 주세요.</string>
+    <string name="subscription_error_view_title">구독을 로드할 수 없습니다</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">포트폴리오와 부채를 심층 분석.</string>
+    <string name="subscription_feature_advanced_analytics_title">고급 분석</string>
+    <string name="subscription_feature_ai_advisor_subtitle">지출에 맞는 맞춤형 인사이트.</string>
+    <string name="subscription_feature_ai_advisor_title">AI 재정 어드바이저</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">사진 한 장으로 즉시 분류.</string>
+    <string name="subscription_feature_receipt_scanner_title">스마트 영수증 스캐너</string>
+    <string name="subscription_feature_smart_alerts_subtitle">예산 한도를 다시는 놓치지 마세요.</string>
+    <string name="subscription_feature_smart_alerts_title">스마트 알림</string>
+    <string name="subscription_footer_cancel_anytime">월간 구독은 App Store 설정에서 언제든지 취소할 수 있습니다.</string>
+    <string name="subscription_link_privacy">개인정보</string>
+    <string name="subscription_link_restore">구매 복원</string>
+    <string name="subscription_link_terms">이용약관</string>
+    <string name="subscription_overlay_securing_access">접근 권한 확보 중...</string>
+    <string name="subscription_plan_best_value">최고 가치</string>
+    <string name="subscription_plan_flexible">유연한</string>
+    <string name="subscription_plan_lifetime_description">일회 결제. 영구 무제한 이용. 반복 요금 없음.</string>
+    <string name="subscription_plan_monthly_description">모든 기능 전체 이용. 언제든지 취소. 3일 무료 체험.</string>
+    <string name="subscription_plan_savings">절약</string>
+    <string name="subscription_status_pending">구매 승인 대기 중</string>
+    <string name="subscription_subtitle_join_users">10,000명 이상의 사용자와 함께
+재정적 미래를 마스터하세요.</string>
+    <string name="subscription_success_subtitle">재정적 자유를 향한 여정이
+훨씬 더 스마트해졌습니다.</string>
+    <string name="subscription_success_welcome">Casha Premium에 오신 것을 환영합니다!</string>
+    <string name="subscription_title_get_premium">프리미엄 받기</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">건너뛰기</string>
+    <string name="onboarding_cta_hook">더 알아보기</string>
+    <string name="onboarding_cta_chat_input">사용 방법 보기</string>
+    <string name="onboarding_cta_revelation">대시보드 둘러보기</string>
+    <string name="onboarding_cta_transaction_history">거래 내역 보기</string>
+    <string name="onboarding_cta_budget_tracker">예산 보기</string>
+    <string name="onboarding_cta_portfolio">포트폴리오 보기</string>
+    <string name="onboarding_cta_liabilities">부채 추적</string>
+    <string name="onboarding_cta_goal_tracker">목표 설정</string>
+    <string name="onboarding_cta_global_power">글로벌 서비스</string>
+    <string name="onboarding_cta_offline_sync">시작하기</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">나의 자산, 완벽하게 관리하세요.</string>
+    <string name="onboarding_hook_subtitle">모든 지출이 한곳에 깔끔하게 기록됩니다.</string>
+    <string name="onboarding_hook_bullet1">거래 내역 자동 기록</string>
+    <string name="onboarding_hook_bullet2">내 돈이 어디로 가는지 확인</string>
+    <string name="onboarding_hook_bullet3">더 현명한 재정 결정</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">타이핑하는 속도만큼\n빠르게 기록하는 지출.</string>
+    <string name="onboarding_chat_subtitle">긴 양식은 필요 없습니다. 그냥 말씀해 주세요.</string>
+    <string name="onboarding_chat_bullet1">자연스러운 입력으로 거래 즉시 기록</string>
+    <string name="onboarding_chat_bullet2">영수증 스캔으로 데이터 자동 입력</string>
+    <string name="onboarding_chat_bullet3">수동 입력 없는 스마트 카테고리 분류</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">온라인</string>
+    <string name="onboarding_chat_mock_timestamp">오늘, 09.41</string>
+    <string name="onboarding_chat_mock_user_msg">커피 2500원</string>
+    <string name="onboarding_chat_mock_ai_confirm">확인했습니다! 기록됨:</string>
+    <string name="onboarding_chat_mock_ai_result">커피 — 2,500원</string>
+    <string name="onboarding_chat_mock_recorded">기록됨</string>
+    <string name="onboarding_chat_mock_input_placeholder">거래 내용을 입력하거나 영수증을 스캔하세요…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">이번 달 순 현금 흐름은\n250만 원입니다. 👏</string>
+    <string name="onboarding_revelation_bullet1">수입 1,500만 원, 지출 1,250만 원</string>
+    <string name="onboarding_revelation_bullet2">주말이 지출이 가장 많은 시기입니다</string>
+    <string name="onboarding_revelation_bullet3">여유 자금을 유지하기 위해 이 추세를 모니터링하세요</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">최근 거래</string>
+    <string name="onboarding_history_title">오늘의 모든 거래가\n깔끔하게 기록되었습니다.</string>
+    <string name="onboarding_history_subtitle">아침 커피부터 프리랜서 수익까지 — 하나도 놓치지 않습니다.</string>
+    <string name="onboarding_history_bullet1">스타벅스, Grab, 수입까지 자동 입력</string>
+    <string name="onboarding_history_bullet2">각 거래가 즉시 카테고리별로 분류됨</string>
+    <string name="onboarding_history_bullet3">채팅처럼 쉽게 거래 내역 검색</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">예산 620만 원 중\n430만 원 사용됨.</string>
+    <string name="onboarding_budget_subtitle">남은 금액 185만 원 — 월말 전에 관리하세요.</string>
+    <string name="onboarding_budget_bullet1">교통비 소진 임박 — 8% 남음</string>
+    <string name="onboarding_budget_bullet2">식비 82% 사용 경고</string>
+    <string name="onboarding_budget_bullet3">예산 임계값 도달 시 자동 알림</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">모든 자산을\n하나의 대시보드에서.</string>
+    <string name="onboarding_portfolio_subtitle">일일이 확인할 필요 없습니다. Casha가 한눈에 요약해 드립니다.</string>
+    <string name="onboarding_portfolio_bullet1">주식 5개, 금 2개 및 예금 — 즉시 모니터링</string>
+    <string name="onboarding_portfolio_bullet2">수익률 +5.8%, 평가 이익 250만 원</string>
+    <string name="onboarding_portfolio_bullet3">가격 자동 업데이트, 수동 새로고침 불필요</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">대출 및 신용카드\n모두 모니터링하세요.</string>
+    <string name="onboarding_liabilities_subtitle">15일 및 25일이 만기 — Casha가 제때 알려드립니다.</string>
+    <string name="onboarding_liabilities_bullet1">주택 담보 대출 4억 8천만 원 — 14년 남음</string>
+    <string name="onboarding_liabilities_bullet2">신용카드 520만 원 사용 (한도 2,000만 원)</string>
+    <string name="onboarding_liabilities_bullet3">월 총 할부금 220만 원 — 자동 추적</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3개 목표 중 1개 완료.\n꾸준히 노력하세요.</string>
+    <string name="onboarding_goal_bullet1">전체 진행률: 목표 5억 원의 30%</string>
+    <string name="onboarding_goal_bullet2">내 집 마련 2억 5천만 원 저축 — 25% 달성</string>
+    <string name="onboarding_goal_bullet3">가장 가까운 마감일 30일 남음 — 휴가 자금</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">글로벌 유저를 위한\n다중 통화 지원.</string>
+    <string name="onboarding_global_bullet1">IDR, USD, EUR, JPY 등 다양한 자산 추적</string>
+    <string name="onboarding_global_bullet2">실시간 환율로 언제나 정확하게</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">오프라인 지원,\n모든 기기 동기화.</string>
+    <string name="onboarding_sync_premium_title">프리미엄 기능</string>
+    <string name="onboarding_sync_feature1">AI 기반 재정 인사이트</string>
+    <string name="onboarding_sync_feature2">스마트 영수증 스캐너</string>
+    <string name="onboarding_sync_feature3">심층 분석 및 보고서</string>
+    <string name="onboarding_sync_feature4">우선 지원 서비스</string>
+    <string name="onboarding_sync_start_button">여정 시작하기 🚀</string>
+    <string name="onboarding_sync_status_offline">오프라인 모드</string>
+    <string name="onboarding_sync_status_syncing">동기화 중…</string>
+    <string name="onboarding_sync_status_done">동기화 완료!</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">이번 달</string>
+    <string name="onboarding_mock_category_food">식비</string>
+    <string name="onboarding_mock_category_transport">교통비</string>
+    <string name="onboarding_mock_category_income">수입</string>
+    <string name="onboarding_mock_trx_coffee">스타벅스 커피</string>
+    <string name="onboarding_mock_trx_ride">Grab 호출</string>
+    <string name="onboarding_mock_trx_freelance">프리랜서 프로젝트</string>
+    <string name="onboarding_mock_budget_total">총 예산</string>
+    <string name="onboarding_mock_asset_saving">BCA 예금</string>
+    <string name="onboarding_mock_asset_stock">BBCA 주식</string>
+    <string name="onboarding_mock_liability_mortgage">주택 담보 대출</string>
+    <string name="onboarding_mock_liability_credit">BCA 플래티넘</string>
+    <string name="onboarding_mock_goal_house">내 집 마련</string>
+    <string name="onboarding_mock_goal_category_home">주거</string>
+    <string name="onboarding_mock_currency">원</string>
+    <string name="day_mon">월</string>
+    <string name="day_tue">화</string>
+    <string name="day_wed">수</string>
+    <string name="day_thu">목</string>
+    <string name="day_fri">금</string>
+    <string name="day_sat">토</string>
+    <string name="day_sun">일</string>
+</resources>

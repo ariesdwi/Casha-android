@@ -425,7 +425,9 @@ fun CountryPickerBottomSheet(
     onDismiss: () -> Unit,
     onCountrySelected: (Country) -> Unit
 ) {
-    androidx.compose.material3.ModalBottomSheet(onDismissRequest = onDismiss) {
+    androidx.compose.material3.ModalBottomSheet(
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss) {
         var searchQuery by remember { mutableStateOf("") }
         val filteredCountries = remember(searchQuery) {
             if (searchQuery.isEmpty()) Country.popularCountries

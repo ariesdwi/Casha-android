@@ -1,6 +1,7 @@
 package com.casha.app.data.remote.dto
 
 import com.casha.app.domain.model.*
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonObject
@@ -22,6 +23,7 @@ data class CategoryBreakdownDTO(
     val category: String? = null,
     val totalBalance: Double? = null,
     val monthlyInterest: Double? = null,
+    @SerialName("liabilitiesCount")
     val loansCount: Int? = null
 ) {
     fun toDomain(): CategoryBreakdown {
@@ -43,11 +45,14 @@ data class LiabilitySummaryDTO(
     val totalMonthlyInterest: Double? = null,
     val totalYearlyInterest: Double? = null,
     val averageInterestRate: Double? = null,
+    @SerialName("activeLiabilitiesCount")
     val activeLoansCount: Int? = null,
+    @SerialName("overdueLiabilitiesCount")
     val overdueLoansCount: Int? = null,
     val nextPaymentDue: String? = null,
     val totalInterestPaid: Double? = null,
     val categoryBreakdown: List<CategoryBreakdownDTO>? = null,
+    val liabilities: List<LiabilityDto>? = null,
     val currency: String? = null
 ) {
     fun toDomain(): LiabilitySummary {
@@ -64,6 +69,7 @@ data class LiabilitySummaryDTO(
             nextPaymentDue = nextPaymentDue,
             totalInterestPaid = totalInterestPaid ?: 0.0,
             categoryBreakdown = categoryBreakdown?.map { it.toDomain() } ?: emptyList(),
+            liabilities = liabilities?.map { it.toDomain() } ?: emptyList(),
             currency = currency
         )
     }
@@ -428,17 +434,17 @@ data class InstallmentPlanDTO(
         val sysFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
         return InstallmentPlan(
             id = id ?: "",
-            liabilityId = liabilityId ?: "",
-            userId = userId ?: "",
+            liabilityId = liabilityId,
+            userId = userId,
             name = name ?: "",
             totalAmount = totalAmount ?: 0.0,
             monthlyAmount = monthlyAmount ?: 0.0,
             tenor = tenor ?: 0,
             currentMonth = currentMonth ?: 0,
             isActive = isActive ?: false,
-            startDate = startDate?.let { try { sysFormat.parse(it) } catch(e:Exception){ null } } ?: Date(),
-            createdAt = createdAt?.let { try { sysFormat.parse(it) } catch(e:Exception){ null } } ?: Date(),
-            updatedAt = updatedAt?.let { try { sysFormat.parse(it) } catch(e:Exception){ null } } ?: Date()
+            startDate = startDate,
+            createdAt = createdAt?.let { try { sysFormat.parse(it) } catch(e:Exception){ null } },
+            updatedAt = updatedAt?.let { try { sysFormat.parse(it) } catch(e:Exception){ null } }
         )
     }
 }

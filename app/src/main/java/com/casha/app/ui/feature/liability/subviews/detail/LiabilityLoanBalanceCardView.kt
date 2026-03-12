@@ -10,6 +10,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 
@@ -40,7 +42,7 @@ fun LiabilityLoanBalanceCardView(
             // Sisa Hutang
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(
-                    text = "Sisa Hutang",
+                    text = stringResource(R.string.liabilities_detail_loan_remaining),
                     fontSize = 15.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -55,8 +57,8 @@ fun LiabilityLoanBalanceCardView(
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
             // Info rows
-            InfoRow(label = "Pinjaman Awal:", value = CurrencyFormatter.format(liability.principal, userCurrency))
-            InfoRow(label = "Sudah Dibayar:", value = "${String.format("%.0f", paidPercentage)}%")
+            InfoRow(label = stringResource(R.string.liabilities_detail_loan_initial), value = CurrencyFormatter.format(liability.principal, userCurrency))
+            InfoRow(label = stringResource(R.string.liabilities_detail_loan_paid), value = "${String.format("%.0f", paidPercentage)}%")
 
             // Progress Bar
             Row(

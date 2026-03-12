@@ -22,6 +22,7 @@ import com.casha.app.ui.feature.auth.RegisterScreen
 import com.casha.app.ui.feature.auth.SetupCurrencyScreen
 import com.casha.app.ui.feature.loading.AppLoadingDestination
 import com.casha.app.ui.feature.loading.AppLoadingScreen
+import com.casha.app.ui.feature.onboarding.OnboardingScreen
 import com.casha.app.ui.feature.splash.SplashScreen
 import kotlinx.coroutines.flow.firstOrNull
 
@@ -95,7 +96,8 @@ fun CashaNavHost(
             deleteAllLocalDataUseCase()
             Toast.makeText(context, "Session expired. Please login again.", Toast.LENGTH_LONG).show()
             navController.navigate(NavRoutes.Login.route) {
-                popUpTo(0) { inclusive = true }
+                popUpTo(navController.graph.id) { inclusive = true }
+                launchSingleTop = true
             }
         }
     }
@@ -116,8 +118,19 @@ fun CashaNavHost(
         composable(NavRoutes.Splash.route) {
             SplashScreen(
                 onSplashComplete = {
-                    navController.navigate(NavRoutes.Login.route) {
+                    navController.navigate(NavRoutes.Onboarding.route) {
                         popUpTo(NavRoutes.Splash.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // ── Onboarding ──
+        composable(NavRoutes.Onboarding.route) {
+            OnboardingScreen(
+                onOnboardingComplete = {
+                    navController.navigate(NavRoutes.Login.route) {
+                        popUpTo(NavRoutes.Onboarding.route) { inclusive = true }
                     }
                 }
             )

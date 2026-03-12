@@ -30,10 +30,15 @@ data class AssetDto(
     val quantity: Double? = null,
     val unit: String? = null,
     val pricePerUnit: Double? = null,
+    val returnPercentage: Double? = null,
+    val unrealizedReturn: Double? = null,
     
     // Additional fields
     val acquisitionDate: String? = null,
-    val location: String? = null
+    val location: String? = null,
+
+    // Gold-specific
+    val purity: Int? = null
 ) {
     fun toDomain(): Asset {
         val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.getDefault())
@@ -85,12 +90,15 @@ data class AssetDto(
             quantity = quantity,
             unit = unit,
             pricePerUnit = pricePerUnit,
+            returnPercentage = returnPercentage,
+            unrealizedReturn = unrealizedReturn,
             acquisitionDate = acquisitionDate?.let { 
                 try { isoFormat.parse(it) } catch (e: Exception) { 
                     try { simpleDateFormat.parse(it) } catch (e2: Exception) { null }
                 }
             },
-            location = location
+            location = location,
+            purity = purity
         )
     }
 }
@@ -148,7 +156,8 @@ data class AssetTransactionDto(
 data class AssetBreakdownDto(
     val type: String? = null,
     val amount: Double? = null,
-    val count: Int? = null
+    val count: Int? = null,
+    val allocationPercentage: Double? = null
 ) {
     fun toDomain(): AssetBreakdown {
         return AssetBreakdown(
@@ -156,7 +165,8 @@ data class AssetBreakdownDto(
                 try { AssetType.valueOf(it.uppercase()) } catch (e: Exception) { AssetType.OTHER } 
             } ?: AssetType.OTHER,
             amount = amount ?: 0.0,
-            count = count ?: 0
+            count = count ?: 0,
+            allocationPercentage = allocationPercentage
         )
     }
 }
@@ -165,6 +175,8 @@ data class AssetBreakdownDto(
 data class PortfolioSummaryDto(
     val currency: String? = null,
     val totalAssets: Double? = null,
+    val totalUnrealizedReturn: Double? = null,
+    val totalReturnPercentage: Double? = null,
     val breakdown: List<AssetBreakdownDto>? = null,
     val assets: List<AssetDto>? = null,
     val lastUpdated: String? = null
@@ -181,6 +193,8 @@ data class PortfolioSummaryDto(
         return PortfolioSummary(
             currency = currency ?: CurrencyFormatter.defaultCurrency,
             totalAssets = totalAssets ?: 0.0,
+            totalUnrealizedReturn = totalUnrealizedReturn,
+            totalReturnPercentage = totalReturnPercentage,
             breakdown = breakdown?.map { it.toDomain() } ?: emptyList(),
             assets = assets?.map { it.toDomain() } ?: emptyList(),
             lastUpdated = parseDate(lastUpdated)
@@ -199,7 +213,9 @@ data class CreateAssetRequestDto(
     val currency: String? = null,
     val description: String? = null,
     val location: String? = null,
-    val acquisitionDate: String? = null
+    val acquisitionDate: String? = null,
+    // Gold-specific
+    val purity: Int? = null
 )
 
 @Serializable
@@ -210,7 +226,9 @@ data class UpdateAssetRequestDto(
     val unit: String? = null,
     val pricePerUnit: Double? = null,
     val location: String? = null,
-    val acquisitionDate: String? = null
+    val acquisitionDate: String? = null,
+    // Gold-specific
+    val purity: Int? = null
 )
 
 @Serializable

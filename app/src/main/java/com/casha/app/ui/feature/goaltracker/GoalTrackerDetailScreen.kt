@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.goaltracker
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -811,7 +812,8 @@ fun AddContributionSheet(
     val isValid = (amount.toDoubleOrNull() ?: 0.0) > 0
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.background, // cashaBackground
         dragHandle = { BottomSheetDefaults.DragHandle() }

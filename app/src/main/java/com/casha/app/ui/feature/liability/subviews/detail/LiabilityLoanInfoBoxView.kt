@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 import java.text.SimpleDateFormat
@@ -35,7 +37,7 @@ fun LiabilityLoanInfoBoxView(
         ) {
             Icon(Icons.Default.BarChart, contentDescription = null, tint = Color(0xFF2196F3), modifier = Modifier.size(20.dp))
             Text(
-                text = "Info Pinjaman",
+                text = stringResource(R.string.liabilities_detail_loan_info),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -51,7 +53,7 @@ fun LiabilityLoanInfoBoxView(
                 DetailRow(
                     icon = Icons.Default.CalendarToday,
                     iconColor = Color(0xFFE53935),
-                    label = "Mulai",
+                    label = stringResource(R.string.liabilities_detail_loan_start),
                     value = dateFormatter.format(liability.startDate)
                 )
                 HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
@@ -59,7 +61,7 @@ fun LiabilityLoanInfoBoxView(
                 DetailRow(
                     icon = Icons.Default.CalendarToday,
                     iconColor = Color(0xFFE53935),
-                    label = "Selesai",
+                    label = stringResource(R.string.liabilities_detail_loan_end),
                     value = dateFormatter.format(liability.endDate)
                 )
                 HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
@@ -67,8 +69,8 @@ fun LiabilityLoanInfoBoxView(
                 DetailRow(
                     icon = Icons.Default.Numbers,
                     iconColor = Color(0xFF2196F3),
-                    label = "Tenor",
-                    value = "${liability.tenor ?: 0} bulan"
+                    label = stringResource(R.string.liabilities_detail_loan_tenor),
+                    value = stringResource(R.string.liabilities_detail_loan_tenor_value, liability.tenor ?: 0)
                 )
                 HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
 
@@ -76,8 +78,8 @@ fun LiabilityLoanInfoBoxView(
                     DetailRow(
                         icon = Icons.Default.HourglassBottom,
                         iconColor = Color(0xFFFF9800),
-                        label = "Sisa Tenor",
-                        value = "${liability.remainingTenor} bulan"
+                        label = stringResource(R.string.liabilities_detail_loan_remaining_tenor),
+                        value = stringResource(R.string.liabilities_detail_loan_remaining_tenor_value, liability.remainingTenor)
                     )
                     HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
                 }
@@ -86,7 +88,7 @@ fun LiabilityLoanInfoBoxView(
                 DetailRow(
                     icon = Icons.Default.TrendingUp,
                     iconColor = Color(0xFFE53935),
-                    label = "Bunga",
+                    label = stringResource(R.string.liabilities_detail_loan_interest),
                     value = "${String.format("%.2f", liability.interestRate)}%$interestSuffix"
                 )
                 HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
@@ -95,7 +97,7 @@ fun LiabilityLoanInfoBoxView(
                     DetailRow(
                         icon = Icons.Default.Payments,
                         iconColor = Color(0xFF4CAF50),
-                        label = "Cicilan/bln",
+                        label = stringResource(R.string.liabilities_detail_loan_monthly),
                         value = CurrencyFormatter.format(installment, userCurrency)
                     )
                     HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
@@ -105,7 +107,7 @@ fun LiabilityLoanInfoBoxView(
                     DetailRow(
                         icon = Icons.Default.Percent,
                         iconColor = Color(0xFF9C27B0),
-                        label = "Bunga/bln",
+                        label = stringResource(R.string.liabilities_detail_loan_monthly_interest),
                         value = CurrencyFormatter.format(interest, userCurrency)
                     )
                     HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
@@ -115,8 +117,8 @@ fun LiabilityLoanInfoBoxView(
                     DetailRow(
                         icon = Icons.Default.Schedule,
                         iconColor = Color(0xFFE53935),
-                        label = "Tgl Bayar",
-                        value = "Tgl $day"
+                        label = stringResource(R.string.liabilities_detail_loan_due_date),
+                        value = stringResource(R.string.liabilities_detail_loan_due_date_value, day)
                     )
                     HorizontalDivider(modifier = Modifier.padding(start = 36.dp))
                 }
@@ -125,7 +127,7 @@ fun LiabilityLoanInfoBoxView(
                     DetailRow(
                         icon = Icons.Default.AccountBalance,
                         iconColor = Color(0xFF2196F3),
-                        label = "Bank",
+                        label = stringResource(R.string.liabilities_detail_info_bank),
                         value = bank
                     )
                 }

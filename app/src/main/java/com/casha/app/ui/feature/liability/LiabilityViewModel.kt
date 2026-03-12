@@ -31,6 +31,7 @@ data class LiabilityState(
     val transactions: List<LiabilityTransaction> = emptyList(),
     val simulationResult: SimulatePayoffResponse? = null,
     val isLoading: Boolean = false,
+    val isSummaryLoading: Boolean = false,
     val error: String? = null
 ) {
     // Computed properties for the list screen
@@ -85,36 +86,34 @@ class LiabilityViewModel @Inject constructor(
             return (Date().time - lastFetch.time) < cacheValidityDuration
         }
 
-    // MARK: - Fetch All Liabilities (ACTIVE + PAID_OFF)
-    fun fetchAllLiabilities() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val activeDeferred = async {
-                    getLiabilitiesUseCase.execute(
-                        status = "ACTIVE",
-                        sortBy = "balance",
-                        sortOrder = "desc"
-                    )
-                }
-                val paidOffDeferred = async {
-                    getLiabilitiesUseCase.execute(status = "PAID_OFF")
-                }
+    // MARK: - Fetch All Liabilities (Combined with Summary)
+    fun fetchAllLiabilities(force: Boolean = false) {
+        if (!force && isFresh && _uiState.value.liabilitySummary != null) {
+            return
+        }
 
-                val active = activeDeferred.await()
-                val paidOff = paidOffDeferred.await()
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSummaryLoading = true, error = null) }
+            try {
+                // Fetch the comprehensive summary payload from the backend
+                val summary = getLiabilitySummaryUseCase.execute()
+                
+                // Extract active and paid off subsets manually from the guaranteed full list
+                val active = summary.liabilities.filter { it.status == "ACTIVE" }
+                val paidOff = summary.liabilities.filter { it.status == "PAID_OFF" || it.isPaid == true }
 
                 _uiState.update {
                     it.copy(
+                        liabilitySummary = summary,
                         activeLiabilities = active,
                         paidOffLiabilities = paidOff,
-                        liabilities = active + paidOff,
-                        isLoading = false
+                        liabilities = summary.liabilities,
+                        isSummaryLoading = false
                     )
                 }
                 lastFetchTime = Date()
             } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
+                _uiState.update { it.copy(error = e.localizedMessage, isSummaryLoading = false) }
             }
         }
     }
@@ -124,22 +123,9 @@ class LiabilityViewModel @Inject constructor(
         fetchAllLiabilities()
     }
 
-    // MARK: - Fetch Liability Summary (still available for other screens)
+    // MARK: - Fetch Liability Summary (Redundant wrapper but kept for compatibility)
     fun fetchLiabilitySummary(force: Boolean = false) {
-        if (!force && isFresh && _uiState.value.liabilitySummary != null) {
-            return
-        }
-
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val summary = getLiabilitySummaryUseCase.execute()
-                lastFetchTime = Date()
-                _uiState.update { it.copy(liabilitySummary = summary, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
-            }
-        }
+        fetchAllLiabilities(force)
     }
 
     // MARK: - Create Liability
@@ -289,7 +275,7 @@ class LiabilityViewModel @Inject constructor(
         liabilityId: String,
         name: String,
         amount: Double,
-        categoryId: String,
+        category: String,
         description: String? = null,
         onSuccess: () -> Unit
     ) {
@@ -300,7 +286,7 @@ class LiabilityViewModel @Inject constructor(
                 val request = CreateLiabilityTransactionRequest(
                     name = name,
                     amount = amount,
-                    categoryId = categoryId,
+                    category = category,
                     datetime = isoFormat.format(Date()),
                     description = description
                 )

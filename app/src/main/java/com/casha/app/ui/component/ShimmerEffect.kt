@@ -25,18 +25,21 @@ fun Modifier.shimmer(): Modifier = composed {
         initialValue = -2 * size.width.toFloat(),
         targetValue = 2 * size.width.toFloat(),
         animationSpec = infiniteRepeatable(
-            animation = tween(1200)
+            animation = tween(durationMillis = 1500, easing = LinearEasing)
         ),
         label = "shimmer"
     )
 
+    val baseColor = androidx.compose.material3.MaterialTheme.colorScheme.onSurface
+    val shimmerColors = listOf(
+        baseColor.copy(alpha = 0.03f),
+        baseColor.copy(alpha = 0.08f),
+        baseColor.copy(alpha = 0.03f)
+    )
+
     background(
         brush = Brush.linearGradient(
-            colors = listOf(
-                Color(0xFFEBEBEB),
-                Color(0xFFF5F5F5),
-                Color(0xFFEBEBEB),
-            ),
+            colors = shimmerColors,
             start = Offset(startOffsetX, 0f),
             end = Offset(startOffsetX + size.width.toFloat(), size.height.toFloat())
         )

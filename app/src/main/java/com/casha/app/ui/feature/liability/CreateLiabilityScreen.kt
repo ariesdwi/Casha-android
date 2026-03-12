@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability
+import androidx.compose.foundation.layout.fillMaxSize
 
 import android.app.DatePickerDialog
 import android.widget.DatePicker
@@ -82,37 +83,37 @@ fun CreateLiabilityScreen(
 
     // Title based on category
     val screenTitle = when (selectedCategory) {
-        LiabilityCategory.CREDIT_CARD -> "Tambah Kartu Kredit"
-        LiabilityCategory.PAY_LATER -> "Tambah Pay Later"
-        LiabilityCategory.MORTGAGE -> "Tambah KPR"
-        LiabilityCategory.AUTO_LOAN -> "Tambah Kredit Kendaraan"
-        LiabilityCategory.STUDENT_LOAN -> "Tambah Pinjaman Pendidikan"
-        LiabilityCategory.BUSINESS_LOAN -> "Tambah Pinjaman Usaha"
-        LiabilityCategory.PERSONAL_LOAN -> "Tambah Pinjaman"
-        LiabilityCategory.OTHER -> "Tambah Hutang"
+        LiabilityCategory.CREDIT_CARD -> stringResource(R.string.liabilities_create_title_credit_card)
+        LiabilityCategory.PAY_LATER -> stringResource(R.string.liabilities_create_title_pay_later)
+        LiabilityCategory.MORTGAGE -> stringResource(R.string.liabilities_create_title_mortgage)
+        LiabilityCategory.AUTO_LOAN -> stringResource(R.string.liabilities_create_title_auto_loan)
+        LiabilityCategory.STUDENT_LOAN -> stringResource(R.string.liabilities_create_title_student_loan)
+        LiabilityCategory.BUSINESS_LOAN -> stringResource(R.string.liabilities_create_title_business_loan)
+        LiabilityCategory.PERSONAL_LOAN -> stringResource(R.string.liabilities_create_title_personal_loan)
+        LiabilityCategory.OTHER -> stringResource(R.string.liabilities_create_title_other)
     }
 
     // Name placeholder based on category
     val namePlaceholder = when (selectedCategory) {
-        LiabilityCategory.CREDIT_CARD -> "e.g., BCA Platinum"
-        LiabilityCategory.PAY_LATER -> "e.g., Shopee PayLater"
-        LiabilityCategory.MORTGAGE -> "e.g., KPR Rumah"
-        LiabilityCategory.AUTO_LOAN -> "e.g., Kredit Mobil Brio"
-        LiabilityCategory.STUDENT_LOAN -> "e.g., Pinjaman Kuliah"
-        LiabilityCategory.PERSONAL_LOAN -> "e.g., Pinjaman KTA"
-        LiabilityCategory.BUSINESS_LOAN -> "e.g., Modal Kerja"
-        LiabilityCategory.OTHER -> "e.g., Hutang Lainnya"
+        LiabilityCategory.CREDIT_CARD -> stringResource(R.string.liabilities_create_ph_cc_name)
+        LiabilityCategory.PAY_LATER -> stringResource(R.string.liabilities_create_ph_paylater_name)
+        LiabilityCategory.MORTGAGE -> stringResource(R.string.liabilities_create_ph_mortgage_name)
+        LiabilityCategory.AUTO_LOAN -> stringResource(R.string.liabilities_create_ph_auto_name)
+        LiabilityCategory.STUDENT_LOAN -> stringResource(R.string.liabilities_create_ph_student_name)
+        LiabilityCategory.PERSONAL_LOAN -> stringResource(R.string.liabilities_create_ph_personal_name)
+        LiabilityCategory.BUSINESS_LOAN -> stringResource(R.string.liabilities_create_ph_business_name)
+        LiabilityCategory.OTHER -> stringResource(R.string.liabilities_create_ph_other_name)
     }
 
     val notesPlaceholder = when (selectedCategory) {
-        LiabilityCategory.CREDIT_CARD -> "e.g., Kartu utama belanja"
-        LiabilityCategory.PAY_LATER -> "e.g., Saldo e-commerce"
-        LiabilityCategory.MORTGAGE -> "e.g., Rumah Serpong Blok A"
-        LiabilityCategory.AUTO_LOAN -> "e.g., Cicilan mobil Brio"
-        LiabilityCategory.STUDENT_LOAN -> "e.g., Biaya semester 3"
-        LiabilityCategory.PERSONAL_LOAN -> "e.g., Modal renovasi"
-        LiabilityCategory.BUSINESS_LOAN -> "e.g., Modal kerja"
-        LiabilityCategory.OTHER -> "e.g., Catatan pinjaman"
+        LiabilityCategory.CREDIT_CARD -> stringResource(R.string.liabilities_create_ph_cc_notes)
+        LiabilityCategory.PAY_LATER -> stringResource(R.string.liabilities_create_ph_paylater_notes)
+        LiabilityCategory.MORTGAGE -> stringResource(R.string.liabilities_create_ph_mortgage_notes)
+        LiabilityCategory.AUTO_LOAN -> stringResource(R.string.liabilities_create_ph_auto_notes)
+        LiabilityCategory.STUDENT_LOAN -> stringResource(R.string.liabilities_create_ph_student_notes)
+        LiabilityCategory.PERSONAL_LOAN -> stringResource(R.string.liabilities_create_ph_personal_notes)
+        LiabilityCategory.BUSINESS_LOAN -> stringResource(R.string.liabilities_create_ph_business_notes)
+        LiabilityCategory.OTHER -> stringResource(R.string.liabilities_create_ph_other_notes)
     }
 
     // Pre-resolve strings for use inside onClick lambda (stringResource() can't be called there)
@@ -124,10 +125,11 @@ fun CreateLiabilityScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onNavigateBack,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -148,7 +150,7 @@ fun CreateLiabilityScreen(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Mohon lengkapi detail informasi berikut",
+                    text = stringResource(R.string.liabilities_create_desc),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
@@ -185,7 +187,7 @@ fun CreateLiabilityScreen(
                 ) {
                     // Name
                     InputCard(
-                        title = if (isCreditCard) "Nama Kartu *" else if (isPayLater) "Nama Layanan *" else "Nama Hutang *"
+                        title = if (isCreditCard) stringResource(R.string.liabilities_create_name_cc) else if (isPayLater) stringResource(R.string.liabilities_create_name_paylater) else stringResource(R.string.liabilities_create_name_loan)
                     ) {
                         CashaFormTextField(
                             value = name,
@@ -196,11 +198,11 @@ fun CreateLiabilityScreen(
 
                     // Bank Name (not for PayLater)
                     if (!isPayLater) {
-                        InputCard(title = "Bank *") {
+                        InputCard(title = stringResource(R.string.liabilities_create_bank)) {
                             CashaFormTextField(
                                 value = bankName,
                                 onValueChange = { bankName = it },
-                                placeholder = "e.g., BCA, Mandiri"
+                                placeholder = stringResource(R.string.liabilities_create_bank_placeholder)
                             )
                         }
                     }
@@ -299,7 +301,7 @@ fun CreateLiabilityScreen(
 
                 // ── Notes ───────────────────────────────────────────
                 Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                    InputCard(title = "Catatan") {
+                    InputCard(title = stringResource(R.string.liabilities_create_notes)) {
                         CashaFormTextField(
                             value = description,
                             onValueChange = { description = it },
@@ -314,7 +316,7 @@ fun CreateLiabilityScreen(
 
             // ── Submit Section ──────────────────────────────────
             Surface(
-                color = Color(0xFFF8F9FA),
+                color = MaterialTheme.colorScheme.background,
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
@@ -380,8 +382,8 @@ fun CreateLiabilityScreen(
                     shape = RoundedCornerShape(16.dp),
                     enabled = !uiState.isLoading,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF009033),
-                        disabledContainerColor = Color(0xFF009033).copy(alpha = 0.4f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                     ),
                     elevation = ButtonDefaults.buttonElevation(
                         defaultElevation = 4.dp,
@@ -402,14 +404,12 @@ fun CreateLiabilityScreen(
                             Icon(
                                 Icons.Default.Save,
                                 contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = Color.White
+                                modifier = Modifier.size(20.dp)
                             )
                             Text(
                                 stringResource(R.string.liabilities_action_done),
                                 fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
+                                fontWeight = FontWeight.Bold
                             )
                         }
                     }

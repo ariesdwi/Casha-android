@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.auth
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
@@ -222,8 +223,9 @@ fun CurrencySearchSheet(
     }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false),
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         containerColor = MaterialTheme.colorScheme.surface,
         contentColor = MaterialTheme.colorScheme.onSurface
     ) {

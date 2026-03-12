@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -35,6 +36,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.android.billingclient.api.ProductDetails
 import com.casha.app.R
 import com.casha.app.ui.theme.CashaPrimaryLight
+import com.casha.app.ui.component.ShimmerEffectOverlay
 import kotlinx.coroutines.delay
 
 @Composable
@@ -57,12 +59,14 @@ fun PaywallScreen(
     var appearAnimation by remember { mutableStateOf(false) }
 
     val lifetimeProduct = products.find { it.productId == "premium.casha.lifetime" }
+    val yearlyProduct = products.find { it.productId == "casha.premium.yearly" }
     val monthlyProduct = products.find { it.productId == "premium.casha.monthly" }
+    val weeklyProduct = products.find { it.productId == "com.casha.premium.weekly" }
 
     // Initialize selection
     LaunchedEffect(products) {
         if (selectedProductId == null && products.isNotEmpty()) {
-            selectedProductId = lifetimeProduct?.productId ?: monthlyProduct?.productId
+            selectedProductId = lifetimeProduct?.productId ?: yearlyProduct?.productId ?: monthlyProduct?.productId
         }
     }
 
@@ -101,17 +105,23 @@ fun PaywallScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
-                    .padding(top = 32.dp),
+                    .padding(top = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ) {
-                FeatureSection(appearAnimation)
+                SocialProofSection(appearAnimation)
                 
                 PlansSection(
                     lifetimeProduct = lifetimeProduct,
+                    yearlyProduct = yearlyProduct,
                     monthlyProduct = monthlyProduct,
+                    weeklyProduct = weeklyProduct,
                     selectedProductId = selectedProductId,
                     onSelect = { selectedProductId = it }
                 )
+                
+                FeatureSection(appearAnimation)
+                
+                TestimonialSection(appearAnimation)
 
                 ActionButton(
                     isPurchasing = isPurchasing,
@@ -122,8 +132,8 @@ fun PaywallScreen(
                         if (product != null && activity != null) {
                             purchaseSuccess = false
                             viewModel.purchase(activity, product)
-                            // We assume success if hasPremiumAccess changes to true later
-                            purchaseSuccess = true 
+                            // Success is triggered from the viewmodel via hasPremiumAccess state
+                            purchaseSuccess = true
                         }
                     }
                 )
@@ -377,7 +387,9 @@ fun FeatureRow(icon: ImageVector, title: String, subtitle: String) {
 @Composable
 fun PlansSection(
     lifetimeProduct: ProductDetails?,
+    yearlyProduct: ProductDetails?,
     monthlyProduct: ProductDetails?,
+    weeklyProduct: ProductDetails?,
     selectedProductId: String?,
     onSelect: (String) -> Unit
 ) {
@@ -390,7 +402,23 @@ fun PlansSection(
                 onClick = { onSelect(it.productId) }
             )
         }
+        yearlyProduct?.let {
+            SubscriptionPlanCard(
+                product = it,
+                isSelected = selectedProductId == it.productId,
+                isBestValue = false,
+                onClick = { onSelect(it.productId) }
+            )
+        }
         monthlyProduct?.let {
+            SubscriptionPlanCard(
+                product = it,
+                isSelected = selectedProductId == it.productId,
+                isBestValue = false,
+                onClick = { onSelect(it.productId) }
+            )
+        }
+        weeklyProduct?.let {
             SubscriptionPlanCard(
                 product = it,
                 isSelected = selectedProductId == it.productId,
@@ -419,7 +447,7 @@ fun ActionButton(
         contentColor = Color.White,
         shadowElevation = 8.dp
     ) {
-        Box(contentAlignment = Alignment.Center) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 if (isPurchasing) {
                     CircularProgressIndicator(
@@ -434,6 +462,9 @@ fun ActionButton(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
+            }
+            if (!isPurchasing) {
+                ShimmerEffectOverlay()
             }
         }
     }
@@ -559,10 +590,116 @@ fun SuccessOverlay() {
     }
 }
 
+@Composable
 private fun getActionButtonLabel(isPurchasing: Boolean, selectedProduct: ProductDetails?): String {
-    if (isPurchasing) return "Processing..."
-    if (selectedProduct == null) return "Select Plan"
-    return if (selectedProduct.productId.contains("lifetime")) "Get Lifetime Access" else "Start Free Trial"
+    if (isPurchasing) return stringResource(R.string.subscription_button_processing)
+    if (selectedProduct == null) return stringResource(R.string.subscription_button_select_plan)
+    return if (selectedProduct.productId.contains("lifetime")) stringResource(R.string.subscription_button_lifetime) 
+           else stringResource(R.string.subscription_title_get_premium)
+}
+
+@Composable
+fun SocialProofSection(visible: Boolean) {
+    val opacity by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(700, delayMillis = 250),
+        label = "opacity"
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer { alpha = opacity }
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy((-8).dp)) {
+            AvatarView("😊")
+            AvatarView("🙂")
+            AvatarView("😄")
+            AvatarView("🤗")
+        }
+        
+        Spacer(modifier = Modifier.width(10.dp))
+        
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                repeat(5) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = Color(0xFFFF9800),
+                        modifier = Modifier.size(13.dp)
+                    )
+                }
+            }
+            Text(
+                text = stringResource(R.string.subscription_social_proof),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                fontSize = 11.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun AvatarView(emoji: String) {
+    Box(
+        modifier = Modifier
+            .size(28.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
+            .border(2.dp, MaterialTheme.colorScheme.background, CircleShape),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(text = emoji, fontSize = 13.sp)
+    }
+}
+
+@Composable
+fun TestimonialSection(visible: Boolean) {
+    val opacity by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(700, delayMillis = 600),
+        label = "opacity"
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .graphicsLayer { alpha = opacity }
+            .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+            .border(1.dp, Color.Black.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+            repeat(5) {
+                Icon(
+                    imageVector = Icons.Default.Star,
+                    contentDescription = null,
+                    tint = Color(0xFFFF9800),
+                    modifier = Modifier.size(14.dp)
+                )
+            }
+        }
+        
+        Text(
+            text = stringResource(R.string.subscription_testimonial_quote),
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Normal,
+            color = MaterialTheme.colorScheme.onSurface,
+            lineHeight = 22.sp,
+            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+        )
+        
+        Text(
+            text = stringResource(R.string.subscription_testimonial_author),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
+        )
+    }
 }
 
 

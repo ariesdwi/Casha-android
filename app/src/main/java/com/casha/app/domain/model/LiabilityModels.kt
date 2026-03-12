@@ -1,6 +1,8 @@
 package com.casha.app.domain.model
 
 import java.util.Date
+import androidx.annotation.StringRes
+import com.casha.app.R
 
 enum class LiabilityCategory(val rawValue: String) {
     MORTGAGE("MORTGAGE"),
@@ -137,7 +139,10 @@ data class Liability(
     val tenor: Int? = null,
     val remainingTenor: Int? = null,
     val remainingInstallment: Double? = null,
-    val installmentPlans: List<InstallmentPlan>? = null
+    val installmentPlans: List<InstallmentPlan>? = null,
+    val gracePeriodMonths: Int? = null,
+    val minimumPayment: Double? = null,
+    val statements: List<LiabilityStatement>? = null
 )
 
 // ── Requests ──
@@ -184,7 +189,7 @@ data class CreateLiabilityInstallmentRequest(
 data class CreateLiabilityTransactionRequest(
     val name: String,
     val amount: Double,
-    val categoryId: String,
+    val category: String,
     val datetime: String,
     val description: String? = null
 )
@@ -214,6 +219,7 @@ data class LiabilitySummary(
     val nextPaymentDue: String? = null,
     val totalInterestPaid: Double = 0.0,
     val categoryBreakdown: List<CategoryBreakdown> = emptyList(),
+    val liabilities: List<Liability> = emptyList(),
     val currency: String? = null
 )
 
@@ -259,10 +265,10 @@ data class LiabilityTransaction(
     }
 }
 
-enum class SimulationStrategy(val rawValue: String, val displayName: String) {
-    AVALANCHE("AVALANCHE", "Suku Bunga Tertinggi (Avalanche)"),
-    SNOWBALL("SNOWBALL", "Saldo Terkecil (Snowball)"),
-    CUSTOM("CUSTOM", "Kustom");
+enum class SimulationStrategy(val rawValue: String, @StringRes val displayNameRes: Int) {
+    AVALANCHE("AVALANCHE", R.string.liabilities_simulation_strategy_avalanche),
+    SNOWBALL("SNOWBALL", R.string.liabilities_simulation_strategy_snowball),
+    CUSTOM("CUSTOM", R.string.liabilities_simulation_strategy_custom);
 
     companion object {
         fun fromValue(value: String): SimulationStrategy {
@@ -347,8 +353,8 @@ data class LiabilityPaymentHistory(
 
 data class InstallmentPlan(
     val id: String,
-    val liabilityId: String,
-    val userId: String,
+    val liabilityId: String? = null,
+    val userId: String? = null,
     val name: String,
     val totalAmount: Double,
     val monthlyAmount: Double,
@@ -358,7 +364,7 @@ data class InstallmentPlan(
     val progress: Int? = null,
     val remainingAmount: Double? = null,
     val remainingMonths: Int? = null,
-    val startDate: Date,
-    val createdAt: Date,
-    val updatedAt: Date
+    val startDate: String? = null,
+    val createdAt: Date? = null,
+    val updatedAt: Date? = null
 )

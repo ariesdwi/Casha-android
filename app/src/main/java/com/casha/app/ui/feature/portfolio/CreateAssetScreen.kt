@@ -34,6 +34,10 @@ import com.casha.app.domain.model.*
 import com.casha.app.ui.feature.liability.forminput.CashaFormTextField
 import com.casha.app.ui.feature.liability.forminput.InputCard
 import com.casha.app.ui.feature.portfolio.subviews.AssetTypePicker
+import com.casha.app.ui.feature.portfolio.subviews.create.CreateAssetAmountSection
+import com.casha.app.ui.feature.portfolio.subviews.create.CreateAssetGenericInvestmentSection
+import com.casha.app.ui.feature.portfolio.subviews.create.CreateAssetOptionalFieldsSection
+import com.casha.app.ui.feature.portfolio.subviews.create.CreateAssetStockSection
 import com.casha.app.ui.util.mapSFSymbolToImageVector
 import java.text.SimpleDateFormat
 import java.util.*
@@ -67,12 +71,21 @@ fun CreateAssetScreen(
     var acquisitionDate by remember { mutableStateOf(Date()) }
     var showAcquisitionDate by remember { mutableStateOf(false) }
     var location by remember { mutableStateOf("") }
+
+    // Gold karat purity (only applicable for GOLD_PHYSICAL, GOLD_DIGITAL, SILVER_PHYSICAL)
+    var selectedPurity by remember { mutableStateOf<Int?>(null) }
     
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var showingTypePicker by remember { mutableStateOf(false) }
 
     val isQuantityBased = selectedType.isQuantityBased
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    val calculatedAmount = remember(quantity, pricePerUnit) {
+        val qty = quantity.toDoubleOrNull()
+        val price = pricePerUnit.toDoubleOrNull()
+        if (qty != null && price != null && qty > 0) qty * price else null
+    }
 
     // Reset unit when type changes
     LaunchedEffect(selectedType) {
@@ -82,6 +95,7 @@ fun CreateAssetScreen(
     }
 
     ModalBottomSheet(
+        modifier = Modifier.fillMaxSize(),
         onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
@@ -133,6 +147,7 @@ fun CreateAssetScreen(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .padding(horizontal = 20.dp)
                     .verticalScroll(rememberScrollState()),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -140,8 +155,7 @@ fun CreateAssetScreen(
                 Surface(
                     onClick = { showingTypePicker = true },
                     shape = RoundedCornerShape(16.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest
                 ) {
                     Row(
                         modifier = Modifier.padding(16.dp),
@@ -180,159 +194,56 @@ fun CreateAssetScreen(
                 }
 
                 // Basic Info Section
-                Column(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    InputCard(title = stringResource(R.string.portfolio_asset_name)) {
-                        CashaFormTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            placeholder = stringResource(R.string.portfolio_asset_name_placeholder)
+                InputCard(title = stringResource(R.string.portfolio_asset_name)) {
+                    CashaFormTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        placeholder = stringResource(R.string.portfolio_asset_name_placeholder)
+                    )
+                }
+
+                if (isQuantityBased) {
+                    if (selectedType == AssetType.STOCK) {
+                        CreateAssetStockSection(
+                            unit = unit, onUnitChange = { unit = it },
+                            quantity = quantity, onQuantityChange = { quantity = it },
+                            pricePerUnit = pricePerUnit, onPricePerUnitChange = { pricePerUnit = it },
+                            calculatedAmount = calculatedAmount,
+                            currencySymbol = currencySymbol,
+                            formatCurrency = { CurrencyFormatter.format(it, userCurrency) }
                         )
-                    }
-
-                    if (isQuantityBased) {
-                        // Quantity Section
-                        InputCard(title = stringResource(R.string.portfolio_asset_quantity)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                CashaFormTextField(
-                                    value = quantity,
-                                    onValueChange = { quantity = it },
-                                    placeholder = "0",
-                                    keyboardType = KeyboardType.Decimal,
-                                    modifier = Modifier.weight(1f)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    text = "|",
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                CashaFormTextField(
-                                    value = unit,
-                                    onValueChange = { unit = it },
-                                    placeholder = selectedType.recommendedUnit ?: "unit",
-                                    modifier = Modifier.width(80.dp)
-                                )
-                            }
-                        }
-
-                        InputCard(title = stringResource(R.string.portfolio_asset_price_per_unit, if (unit.isEmpty()) "unit" else unit)) {
-                            CashaFormTextField(
-                                value = pricePerUnit,
-                                onValueChange = { pricePerUnit = it },
-                                placeholder = "0",
-                                keyboardType = KeyboardType.Decimal,
-                                leadingText = currencySymbol
-                            )
-                        }
-
-                        // Total Amount Preview
-                        val qtyVal = quantity.toDoubleOrNull() ?: 0.0
-                        val priceVal = pricePerUnit.toDoubleOrNull() ?: 0.0
-                        if (qtyVal > 0 && priceVal > 0) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp))
-                                    .padding(16.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(stringResource(R.string.portfolio_asset_total_amount), style = MaterialTheme.typography.bodyMedium)
-                                Text(
-                                    text = CurrencyFormatter.format(qtyVal * priceVal, userCurrency),
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
                     } else {
-                        // Amount Section
-                        InputCard(title = stringResource(R.string.portfolio_asset_value)) {
-                            CashaFormTextField(
-                                value = amount,
-                                onValueChange = { amount = it },
-                                placeholder = "0",
-                                keyboardType = KeyboardType.Decimal,
-                                leadingText = currencySymbol
-                            )
-                        }
-                    }
-                }
-
-                // Optional Info Section
-                Column(
-                    modifier = Modifier.padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    // Acquisition Date
-                    InputCard(title = stringResource(R.string.portfolio_asset_acquisition_date)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Icon(Icons.Default.CalendarToday, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Spacer(Modifier.width(8.dp))
-                            Surface(
-                                onClick = {
-                                    val cal = Calendar.getInstance().apply { time = acquisitionDate }
-                                    DatePickerDialog(
-                                        context,
-                                        { _, y, m, d ->
-                                            cal.set(y, m, d)
-                                            acquisitionDate = cal.time
-                                            showAcquisitionDate = true
-                                        },
-                                        cal.get(Calendar.YEAR),
-                                        cal.get(Calendar.MONTH),
-                                        cal.get(Calendar.DAY_OF_MONTH)
-                                    ).show()
-                                },
-                                shape = RoundedCornerShape(8.dp),
-                                color = MaterialTheme.colorScheme.surfaceContainerLow,
-                                modifier = Modifier.weight(1f)
-                            ) {
-                                Text(
-                                    text = if (showAcquisitionDate) displayDateFormatter.format(acquisitionDate) else "Pilih Tanggal",
-                                    modifier = Modifier.padding(12.dp),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-                            if (showAcquisitionDate) {
-                                IconButton(onClick = { showAcquisitionDate = false }) {
-                                    Icon(Icons.Default.Close, contentDescription = "Clear", modifier = Modifier.size(18.dp))
-                                }
-                            }
-                        }
-                    }
-
-                    // Location
-                    val showLocation = when (selectedType.category) {
-                        AssetCategory.REAL_ESTATE, AssetCategory.VEHICLES -> true
-                        else -> false
-                    }
-                    if (showLocation) {
-                        InputCard(title = stringResource(R.string.portfolio_asset_location)) {
-                            CashaFormTextField(
-                                value = location,
-                                onValueChange = { location = it },
-                                placeholder = stringResource(R.string.portfolio_asset_location_placeholder)
-                            )
-                        }
-                    }
-
-                    // Description
-                    InputCard(title = stringResource(R.string.portfolio_asset_description_optional)) {
-                        CashaFormTextField(
-                            value = description,
-                            onValueChange = { description = it },
-                            placeholder = stringResource(R.string.portfolio_asset_description_placeholder),
-                            singleLine = false
+                        CreateAssetGenericInvestmentSection(
+                            selectedType = selectedType,
+                            unit = unit, onUnitChange = { unit = it },
+                            quantity = quantity, onQuantityChange = { quantity = it },
+                            pricePerUnit = pricePerUnit, onPricePerUnitChange = { pricePerUnit = it },
+                            calculatedAmount = calculatedAmount,
+                            currencySymbol = currencySymbol,
+                            formatCurrency = { CurrencyFormatter.format(it, userCurrency) },
+                            selectedPurity = selectedPurity,
+                            onPurityChange = { selectedPurity = it }
                         )
                     }
+                } else {
+                    CreateAssetAmountSection(
+                        amount = amount, onAmountChange = { amount = it },
+                        currencySymbol = currencySymbol
+                    )
                 }
+
+                val showLocation = when (selectedType.category) {
+                    AssetCategory.REAL_ESTATE, AssetCategory.VEHICLES -> true
+                    else -> false
+                }
+                
+                CreateAssetOptionalFieldsSection(
+                    showAcquisitionDate = showAcquisitionDate, onShowAcquisitionDateChange = { showAcquisitionDate = it },
+                    acquisitionDate = acquisitionDate, onAcquisitionDateChange = { acquisitionDate = it },
+                    shouldShowLocation = showLocation,
+                    location = location, onLocationChange = { location = it },
+                    description = description, onDescriptionChange = { description = it }
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
             }
@@ -354,10 +265,19 @@ fun CreateAssetScreen(
                         val request = if (isQuantityBased) {
                             val qtyVal = quantity.toDoubleOrNull()
                             val priceVal = pricePerUnit.toDoubleOrNull()
-                            if (qtyVal == null || qtyVal <= 0 || priceVal == null || priceVal <= 0) {
-                                errorMessage = "Kuantitas dan harga harus valid"
+                            if (qtyVal == null || priceVal == null) {
+                                errorMessage = "Kuantitas dan harga wajib diisi" // Should match iOS portfolio.error.quantity_price_required
                                 return@Button
                             }
+                            if (qtyVal <= 0) {
+                                errorMessage = "Kuantitas tidak valid" // portfolio.error.invalid_quantity
+                                return@Button
+                            }
+                            if (priceVal <= 0) {
+                                errorMessage = "Harga tidak valid" // portfolio.error.invalid_price
+                                return@Button
+                            }
+
                             CreateAssetRequest(
                                 name = name,
                                 type = selectedType,
@@ -367,12 +287,13 @@ fun CreateAssetScreen(
                                 pricePerUnit = priceVal,
                                 description = description.takeIf { it.isNotBlank() },
                                 acquisitionDate = if (showAcquisitionDate) acquisitionDate else null,
-                                location = location.takeIf { it.isNotBlank() }
+                                location = location.takeIf { it.isNotBlank() },
+                                purity = selectedPurity
                             )
                         } else {
                             val amtVal = amount.toDoubleOrNull()
                             if (amtVal == null || amtVal <= 0) {
-                                errorMessage = "Nilai aset harus valid"
+                                errorMessage = "Nilai aset tidak valid" // portfolio.error.invalid_amount
                                 return@Button
                             }
                             CreateAssetRequest(
@@ -428,6 +349,7 @@ fun CreateAssetScreen(
 
     if (showingTypePicker) {
         ModalBottomSheet(
+            modifier = Modifier.fillMaxSize(),
             onDismissRequest = { showingTypePicker = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             dragHandle = { BottomSheetDefaults.DragHandle() },
@@ -453,5 +375,3 @@ fun CreateAssetScreen(
         }
     }
 }
-
-

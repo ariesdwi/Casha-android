@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.budget.subview
+import androidx.compose.foundation.layout.fillMaxSize
 
 import com.casha.app.ui.feature.budget.BudgetViewModel
 import androidx.compose.foundation.background
@@ -63,10 +64,11 @@ fun AddBudgetSheet(
 
     val isValid = selectedCategoryName.isNotEmpty() && (amountText.toDoubleOrNull() ?: 0.0) > 0
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = MaterialTheme.colorScheme.background

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
@@ -137,10 +138,10 @@ fun AddMessageScreen(
     }
 
     Scaffold(
-        containerColor = Color.White,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             Surface(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.background,
                 shadowElevation = 0.dp
             ) {
                 Row(
@@ -153,7 +154,7 @@ fun AddMessageScreen(
                     Box(
                         modifier = Modifier
                             .size(38.dp)
-                            .background(Color(0xFFE8F5E9), CircleShape),
+                            .background(Color(0xFF00C896).copy(alpha = 0.12f), CircleShape),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
@@ -171,12 +172,12 @@ fun AddMessageScreen(
                             text = stringResource(R.string.add_transaction_chat_header),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A2E)
+                            color = MaterialTheme.colorScheme.onBackground
                         )
                         Text(
                             text = stringResource(R.string.add_transaction_chat_subheadline),
                             style = MaterialTheme.typography.bodySmall,
-                            color = Color(0xFF888AAA)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     
@@ -190,12 +191,12 @@ fun AddMessageScreen(
                         enabled = !uiState.isSending,
                         modifier = Modifier
                             .size(32.dp)
-                            .background(Color(0xFFF0F0F0), CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant, CircleShape)
                     ) {
                         Icon(
                             Icons.Default.Close, 
                             contentDescription = "Close", 
-                            tint = Color(0xFF888AAA),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(16.dp)
                         )
                     }
@@ -204,16 +205,15 @@ fun AddMessageScreen(
         },
         bottomBar = {
             Surface(
-                color = Color.White,
+                color = MaterialTheme.colorScheme.background,
                 shadowElevation = 0.dp
             ) {
                 Column(modifier = Modifier.imePadding()) {
-                    // Transparent-to-white gradient to match the screenshot's floating effect
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(1.dp)
-                            .background(Color(0xFFEEEEF8))
+                            .background(MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
                     )
                     
                     Row(
@@ -227,7 +227,7 @@ fun AddMessageScreen(
                             onClick = { showSourceSelection = true },
                             modifier = Modifier
                                 .size(42.dp)
-                                .background(Color(0xFFE8F5E9), CircleShape)
+                                .background(Color(0xFF00C896).copy(alpha = 0.12f), CircleShape)
                         ) {
                             Icon(
                                 Icons.Default.CameraAlt, 
@@ -242,7 +242,7 @@ fun AddMessageScreen(
                         // Pill-shaped TextField
                         Surface(
                             shape = RoundedCornerShape(24.dp),
-                            color = Color(0xFFF5F6F7),
+                            color = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier.weight(1f)
                         ) {
                             Row(
@@ -259,7 +259,7 @@ fun AddMessageScreen(
                                         Text(
                                             text = stringResource(R.string.add_transaction_chat_input_placeholder),
                                             style = MaterialTheme.typography.bodyMedium,
-                                            color = Color(0xFF888AAA).copy(alpha = 0.6f)
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
                                         )
                                     }
                                     
@@ -267,7 +267,7 @@ fun AddMessageScreen(
                                     androidx.compose.foundation.text.BasicTextField(
                                         value = messageInput,
                                         onValueChange = { messageInput = it },
-                                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = Color(0xFF1A1A2E)),
+                                        textStyle = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onSurface),
                                         modifier = Modifier.fillMaxWidth(),
                                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                                         keyboardActions = KeyboardActions(
@@ -286,7 +286,20 @@ fun AddMessageScreen(
                         
                         Spacer(modifier = Modifier.width(10.dp))
                         
-                        // Grey Send Icon
+                        // Animated Send Button – green when typing, grey when empty
+                        val isTyping = messageInput.isNotBlank()
+                        val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
+                        val sendBgColor by animateColorAsState(
+                            targetValue = if (isTyping) Color(0xFF00C896) else surfaceVariantColor,
+                            animationSpec = tween(durationMillis = 250),
+                            label = "sendBg"
+                        )
+                        val onSurfaceVariantColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        val sendIconColor by animateColorAsState(
+                            targetValue = if (isTyping) Color.White else onSurfaceVariantColor.copy(alpha = 0.5f),
+                            animationSpec = tween(durationMillis = 250),
+                            label = "sendIcon"
+                        )
                         IconButton(
                             onClick = {
                                 if (messageInput.isNotBlank()) {
@@ -298,12 +311,12 @@ fun AddMessageScreen(
                             enabled = messageInput.isNotBlank(),
                             modifier = Modifier
                                 .size(42.dp)
-                                .background(Color(0xFFF0F0F0), CircleShape)
+                                .background(sendBgColor, CircleShape)
                         ) {
                             Icon(
                                 Icons.AutoMirrored.Filled.Send, 
                                 contentDescription = "Send", 
-                                tint = if (messageInput.isNotBlank()) Color(0xFF888AAA) else Color(0xFFAAAAAA).copy(alpha = 0.5f),
+                                tint = sendIconColor,
                                 modifier = Modifier.size(20.dp)
                             )
                         }
@@ -392,7 +405,7 @@ fun WelcomeMessageView(
     var isExpanded by remember { mutableStateOf(false) }
 
     Surface(
-        color = Color(0xFFF5F6F7),
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -414,7 +427,7 @@ fun WelcomeMessageView(
                     text = stringResource(R.string.add_transaction_chat_welcome_greeting),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A2E),
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
@@ -439,21 +452,21 @@ fun WelcomeMessageView(
             Text(
                 text = stringResource(R.string.add_transaction_chat_welcome_description),
                 style = MaterialTheme.typography.bodyMedium,
-                color = Color(0xFF888AAA),
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 22.sp
             )
 
             AnimatedVisibility(visible = isExpanded) {
                 Column {
                     Spacer(modifier = Modifier.height(16.dp))
-                    HorizontalDivider(color = Color(0xFFEEEEF8))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                     Spacer(modifier = Modifier.height(12.dp))
                     
                     Text(
                         stringResource(R.string.add_transaction_chat_welcome_try_these).uppercase(), 
                         style = MaterialTheme.typography.labelSmall, 
                         fontWeight = FontWeight.Bold, 
-                        color = Color(0xFF888AAA)
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     
@@ -582,7 +595,7 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
     }
     
     Surface(
-        color = Color(0xFFF5F6F7),
+        color = MaterialTheme.colorScheme.surfaceVariant,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -606,7 +619,7 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                         text = if (isSuccess) "Transaction Logged" else stringResource(R.string.add_transaction_chat_error_oops),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A2E)
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     
                     if (isSuccess && intent.isNotEmpty()) {
@@ -630,7 +643,7 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                 Text(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = Color(0xFF888AAA)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

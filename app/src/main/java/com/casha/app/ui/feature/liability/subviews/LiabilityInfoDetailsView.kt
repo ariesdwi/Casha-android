@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 
@@ -32,7 +34,7 @@ fun LiabilityInfoDetailsView(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Info Tagihan",
+            text = stringResource(R.string.liabilities_detail_info_title),
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
@@ -52,8 +54,8 @@ fun LiabilityInfoDetailsView(
                 DetailRow(
                     icon = Icons.Outlined.Event,
                     iconColor = Color(0xFF1E88E5), // Blue
-                    label = "Tgl Cetak Tagihan",
-                    value = "Tanggal ${liability.billingDay ?: "-"}"
+                    label = stringResource(R.string.liabilities_detail_info_statement_date),
+                    value = stringResource(R.string.liabilities_detail_info_statement_date_value, liability.billingDay ?: "-")
                 )
                 
                 DividerRow()
@@ -62,8 +64,8 @@ fun LiabilityInfoDetailsView(
                 DetailRow(
                     icon = Icons.Outlined.CalendarToday,
                     iconColor = Color(0xFFE53935), // Red
-                    label = "Jatuh Tempo",
-                    value = "Tanggal ${liability.dueDay ?: "-"}"
+                    label = stringResource(R.string.liabilities_detail_info_due_date),
+                    value = stringResource(R.string.liabilities_detail_info_due_date_value, liability.dueDay ?: "-")
                 )
                 
                 // Bunga per Bulan
@@ -73,7 +75,7 @@ fun LiabilityInfoDetailsView(
                     DetailRow(
                         icon = Icons.Outlined.TrendingUp,
                         iconColor = Color(0xFFFF9800), // Orange
-                        label = "Bunga per Bulan",
+                        label = stringResource(R.string.liabilities_detail_info_monthly_interest),
                         value = CurrencyFormatter.format(interestAmount, userCurrency)
                     )
                 }
@@ -85,7 +87,7 @@ fun LiabilityInfoDetailsView(
                     DetailRow(
                         icon = Icons.Outlined.ReportProblem,
                         iconColor = Color(0xFFE53935), // Red
-                        label = "Denda Keterlambatan",
+                        label = stringResource(R.string.liabilities_detail_info_late_fee),
                         value = CurrencyFormatter.format(lateFee, userCurrency)
                     )
                 }
@@ -96,7 +98,7 @@ fun LiabilityInfoDetailsView(
                     DetailRow(
                         icon = Icons.Outlined.AccountBalance,
                         iconColor = Color(0xFF1E88E5), // Blue
-                        label = "Bank",
+                        label = stringResource(R.string.liabilities_detail_info_bank),
                         value = bank
                     )
                 }

@@ -28,17 +28,17 @@ data class LiabilityInlineInstallmentPlanDTO(
         } ?: Date()
         return InstallmentPlan(
             id = id ?: "",
-            liabilityId = "",
-            userId = "",
+            liabilityId = null,
+            userId = null,
             name = name ?: "",
             totalAmount = totalAmount ?: 0.0,
             monthlyAmount = monthlyAmount ?: 0.0,
             tenor = tenor ?: 0,
             currentMonth = currentMonth ?: 0,
             isActive = isActive ?: false,
-            startDate = parsedStart,
-            createdAt = Date(),
-            updatedAt = Date()
+            startDate = startDate,
+            createdAt = null,
+            updatedAt = null
         )
     }
 }
@@ -87,7 +87,8 @@ data class LiabilityDto(
     val gracePeriodMonths: Int? = null,
     val remainingInstallment: Double? = null,
     val installmentPlans: List<LiabilityInlineInstallmentPlanDTO>? = null,
-    val statements: List<LiabilityInlineStatementDTO>? = null
+    val statements: List<LiabilityInlineStatementDTO>? = null,
+    val minimumPayment: Double? = null
 ) {
     fun toDomain(): Liability {
         val simpleDateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
@@ -133,7 +134,9 @@ data class LiabilityDto(
             tenor = tenor,
             remainingTenor = remainingTenor,
             remainingInstallment = remainingInstallment?.let { if (it > 0) it else null },
-            installmentPlans = installmentPlans?.map { it.toDomain() }
+            installmentPlans = installmentPlans?.map { it.toDomain() },
+            gracePeriodMonths = gracePeriodMonths,
+            minimumPayment = minimumPayment
         )
     }
 }

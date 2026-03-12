@@ -11,9 +11,6 @@ interface PortfolioApiService {
         @Body request: CreateAssetRequestDto
     ): BaseResponse<AssetDto>
 
-    @GET(ApiEndpoints.ASSET_LIST)
-    suspend fun getAssets(): BaseResponse<List<AssetDto>>
-
     @GET(ApiEndpoints.PORTFOLIO_SUMMARY)
     suspend fun getPortfolioSummary(): BaseResponse<PortfolioSummaryDto>
 

@@ -28,21 +28,14 @@ class PortfolioRepositoryImpl @Inject constructor(
             currency = request.currency,
             description = request.description,
             location = request.location,
-            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) }
+            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) },
+            purity = request.purity
         )
 
         val result = safeApiCall { api.createAsset(dto) }
         return result.fold(
             onSuccess = { response -> response.data?.toDomain() ?: throw NetworkError.RequestFailed("Invalid response") },
             onFailure = { throw it }
-        )
-    }
-
-    override suspend fun getAssets(): List<Asset> {
-        val result = safeApiCall { api.getAssets() }
-        return result.fold(
-            onSuccess = { response -> response.data?.map { it.toDomain() } ?: emptyList() },
-            onFailure = { emptyList() }
         )
     }
 
@@ -62,7 +55,8 @@ class PortfolioRepositoryImpl @Inject constructor(
             unit = request.unit,
             pricePerUnit = request.pricePerUnit,
             location = request.location,
-            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) }
+            acquisitionDate = request.acquisitionDate?.let { simpleDateFormatter.format(it) },
+            purity = request.purity
         )
 
         val result = safeApiCall { api.updateAsset(id, dto) }

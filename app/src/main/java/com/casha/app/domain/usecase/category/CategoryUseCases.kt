@@ -18,11 +18,23 @@ class CategorySyncUseCase @Inject constructor(
     private val categoryDao: CategoryDao
 ) {
     suspend fun fetchCategories(): List<CategoryCasha> {
-        // 1. Read local first (instant UI)
+        // 1. Read local first (instant UI if we have data)
         val localEntities = categoryDao.getAllCategories().firstOrNull() ?: emptyList()
-        val localCategories = localEntities.map { it.toDomain() }
 
-        // 2. Background sync with remote (non-blocking)
+        // 2. If local is empty (first install, fresh login), wait for the API sync
+        //    so we don't show an empty category list.
+        if (localEntities.isEmpty()) {
+            return try {
+                // This syncs: fetches API → saves to Room → returns domain list
+                val remote = categoryRepository.getAllCategories()
+                remote.filter { it.isActive }
+            } catch (_: Exception) {
+                // Network unavailable and no local data — return empty
+                emptyList()
+            }
+        }
+
+        // 3. Local data exists — return it immediately and refresh in background
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 categoryRepository.getAllCategories() // fetches API → saves to Room
@@ -31,7 +43,9 @@ class CategorySyncUseCase @Inject constructor(
             }
         }
 
-        return localCategories
+        return localEntities
+            .filter { it.isActive }
+            .map { it.toDomain() }
     }
 
     private fun com.casha.app.data.local.entity.CategoryEntity.toDomain() = CategoryCasha(

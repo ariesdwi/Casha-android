@@ -382,7 +382,6 @@
     <string name="report_percentage_of_total">%d%% du total</string>
     <string name="report_section_spending_by_category">Dépenses par Catégorie</string>
     <string name="report_title">Rapport</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">Annuler</string>
     <string name="profile_action_clear_all">Tout effacer</string>
     <string name="profile_action_delete">Supprimer</string>
@@ -495,4 +494,154 @@
     <string name="portfolio_validation_amount_required">Le montant est requis</string>
     <string name="portfolio_validation_category_required">La catégorie est requise</string>
     <string name="portfolio_validation_name_required">Le nom de l\'actif est requis</string>
-<string name="nav_report">Rapport</string><string name="nav_dashboard">Accueil</string><string name="nav_add">Ajouter</string><string name="nav_transactions">Transactions</string><string name="nav_budget">Budget</string></resources>
+    <string name="nav_report">Rapport</string>
+    <string name="nav_dashboard">Accueil</string>
+    <string name="nav_add">Ajouter</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_budget">Budget</string>
+    <string name="subscription_button_lifetime">Obtenir l accès à vie</string>
+    <string name="subscription_button_processing">Traitement en cours...</string>
+    <string name="subscription_button_retrying">Nouvelle tentative...</string>
+    <string name="subscription_button_select_plan">Choisir un forfait</string>
+    <string name="subscription_button_start_trial">Commencer l essai gratuit</string>
+    <string name="subscription_button_try_again">Réessayer</string>
+    <string name="subscription_error_load_failed">Impossible de charger les produits : %s</string>
+    <string name="subscription_error_product_not_found">Produit non disponible. Veuillez réessayer plus tard.</string>
+    <string name="subscription_error_receipt_unavailable">Impossible de vérifier l\'achat. Vérifiez votre connexion internet.</string>
+    <string name="subscription_error_restore_failed">Échec de la restauration des achats</string>
+    <string name="subscription_error_unknown">Résultat d\'achat inconnu</string>
+    <string name="subscription_error_verification_failed">Vérification de l\'achat échouée. Contactez le support.</string>
+    <string name="subscription_error_view_title">Impossible de charger les abonnements</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">Analyse approfondie de votre portefeuille et passifs.</string>
+    <string name="subscription_feature_advanced_analytics_title">Analyses Avancées</string>
+    <string name="subscription_feature_ai_advisor_subtitle">Informations personnalisées pour vos dépenses.</string>
+    <string name="subscription_feature_ai_advisor_title">Conseiller Financier IA</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">Catégorisation instantanée avec juste une photo.</string>
+    <string name="subscription_feature_receipt_scanner_title">Scanner de Reçus Intelligent</string>
+    <string name="subscription_feature_smart_alerts_subtitle">Ne manquez plus jamais un seuil de budget.</string>
+    <string name="subscription_feature_smart_alerts_title">Alertes Intelligentes</string>
+    <string name="subscription_footer_cancel_anytime">Annulez l\'abonnement mensuel à tout moment dans les réglages de l\'App Store.</string>
+    <string name="subscription_link_privacy">Confidentialité</string>
+    <string name="subscription_link_restore">Restaurer les achats</string>
+    <string name="subscription_link_terms">Conditions</string>
+    <string name="subscription_overlay_securing_access">Sécurisation de votre accès...</string>
+    <string name="subscription_plan_best_value">Meilleure Offre</string>
+    <string name="subscription_plan_flexible">Flexible</string>
+    <string name="subscription_plan_lifetime_description">Paiement unique. Accès illimité pour toujours. Pas de frais récurrents.</string>
+    <string name="subscription_plan_monthly_description">Accès complet. Annulez à tout moment. Essai gratuit de 3 jours.</string>
+    <string name="subscription_plan_savings">ÉCONOMIE</string>
+    <string name="subscription_status_pending">Achat en attente d\'approbation</string>
+    <string name="subscription_subtitle_join_users">Rejoignez plus de 10 000 utilisateurs maîtrisant
+leur avenir financier.</string>
+    <string name="subscription_success_subtitle">Votre parcours vers la liberté financière
+vient de devenir beaucoup plus intelligent.</string>
+    <string name="subscription_success_welcome">Bienvenue dans Casha Premium !</string>
+    <string name="subscription_title_get_premium">Obtenir Premium</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Ignorer</string>
+    <string name="onboarding_cta_hook">En savoir plus</string>
+    <string name="onboarding_cta_chat_input">Voir comment ça marche</string>
+    <string name="onboarding_cta_revelation">Explorer le tableau de bord</string>
+    <string name="onboarding_cta_transaction_history">Voir les transactions</string>
+    <string name="onboarding_cta_budget_tracker">Voir le budget</string>
+    <string name="onboarding_cta_portfolio">Voir le portefeuille</string>
+    <string name="onboarding_cta_liabilities">Suivre les dettes</string>
+    <string name="onboarding_cta_goal_tracker">Fixer des objectifs</string>
+    <string name="onboarding_cta_global_power">Devenir mondial</string>
+    <string name="onboarding_cta_offline_sync">Commencer</string>
+
+    <string name="onboarding_hook_title">Votre argent, sous contrôle total.</string>
+    <string name="onboarding_hook_subtitle">Toutes les dépenses enregistrées au même endroit.</string>
+    <string name="onboarding_hook_bullet1">Enregistre les transactions automatiquement</string>
+    <string name="onboarding_hook_bullet2">Voyez où va votre argent</string>
+    <string name="onboarding_hook_bullet3">Prenez de meilleures décisions financières</string>
+
+    <string name="onboarding_chat_title">Enregistrez les dépenses\\naussi vite que vous écrivez.</string>
+    <string name="onboarding_chat_subtitle">Pas de longs formulaires. Dites-le moi simplement.</string>
+    <string name="onboarding_chat_bullet1">Écrivez naturellement, enregistrement instantané</string>
+    <string name="onboarding_chat_bullet2">Scannez les reçus, données remplies automatiquement</string>
+    <string name="onboarding_chat_bullet3">Catégories intelligentes sans saisie manuelle</string>
+    <string name="onboarding_chat_mock_ai_name">IA Casha</string>
+    <string name="onboarding_chat_mock_online">En ligne</string>
+    <string name="onboarding_chat_mock_timestamp">Aujourd\'hui, 09h41</string>
+    <string name="onboarding_chat_mock_user_msg">Café 5€</string>
+    <string name="onboarding_chat_mock_ai_confirm">C\'est noté ! Enregistré :</string>
+    <string name="onboarding_chat_mock_ai_result">Café — 5,00 €</string>
+    <string name="onboarding_chat_mock_recorded">Enregistré</string>
+    <string name="onboarding_chat_mock_input_placeholder">Saisissez une transaction ou scannez un reçu…</string>
+
+    <string name="onboarding_revelation_title">Votre flux de trésorerie net est de\\n2 500 € ce mois-ci. 👏</string>
+    <string name="onboarding_revelation_bullet1">De 15 000 € d\'entrées, 12 500 € de sorties</string>
+    <string name="onboarding_revelation_bullet2">Les week-ends sont vos pics de dépenses</string>
+    <string name="onboarding_revelation_bullet3">Surveillez cette tendance pour maintenir votre surplus</string>
+
+    <string name="onboarding_history_recent_title">Transactions récentes</string>
+    <string name="onboarding_history_title">Toutes les transactions d\'aujourd\'hui\\nbien enregistrées.</string>
+    <string name="onboarding_history_subtitle">Du café du matin au freelance — rien n\'est oublié.</string>
+    <string name="onboarding_history_bullet1">Starbucks, Grab et revenus entrés automatiquement</string>
+    <string name="onboarding_history_bullet2">Chaque transaction est immédiatement catégorisée</string>
+    <string name="onboarding_history_bullet3">Recherchez l\'historique aussi facilement qu\'un chat</string>
+
+    <string name="onboarding_budget_title">4 300 € utilisés sur\\nun budget de 6 200 €.</string>
+    <string name="onboarding_budget_subtitle">1 850 € restants — gérez-les avant la fin du mois.</string>
+    <string name="onboarding_budget_bullet1">Transport presque épuisé — seulement 8% restants</string>
+    <string name="onboarding_budget_bullet2">Alerte nourriture et boisson à 82%</string>
+    <string name="onboarding_budget_bullet3">Notifications automatiques en cas de budget critique</string>
+
+    <string name="onboarding_portfolio_title">Tous vos actifs,\\nun seul tableau de bord.</string>
+    <string name="onboarding_portfolio_subtitle">Plus besoin de vérifier un par un. Casha résume tout.</string>
+    <string name="onboarding_portfolio_bullet1">5 actions, 2 or et épargne — suivis instantanément</string>
+    <string name="onboarding_portfolio_bullet2">Rendement +5,8%, gain non réalisé 2 500 €</string>
+    <string name="onboarding_portfolio_bullet3">Prix mis à jour automatiquement, pas de rafraîchissement manuel</string>
+
+    <string name="onboarding_liabilities_title">Hypothèque et cartes de crédit\\ntous surveillés.</string>
+    <string name="onboarding_liabilities_subtitle">Échéance les 15 et 25 — Casha vous rappelle à temps.</string>
+    <string name="onboarding_liabilities_bullet1">Hypothèque 480 000 € — 14 ans restants</string>
+    <string name="onboarding_liabilities_bullet2">Carte de crédit 5 200 € utilisés sur 20 000 €</string>
+    <string name="onboarding_liabilities_bullet3">Mensualités totales 2 200 € par mois — suivies automatiquement</string>
+
+    <string name="onboarding_goal_title">3 objectifs, 1 atteint.\\nRestez régulier.</string>
+    <string name="onboarding_goal_bullet1">Progression totale 30% de l\'objectif de 500 000 €</string>
+    <string name="onboarding_goal_bullet2">Maison de rêve 250 000 € épargnés — 25% atteints</string>
+    <string name="onboarding_goal_bullet3">Prochaine échéance dans 30 jours — Fonds Vacances</string>
+
+    <string name="onboarding_global_title">Support multi-devises\\npour les citoyens du monde.</string>
+    <string name="onboarding_global_bullet1">Suivez les actifs en IDR, USD, EUR, JPY et plus</string>
+    <string name="onboarding_global_bullet2">Taux de change en temps réel, toujours précis</string>
+
+    <string name="onboarding_sync_title">Fonctionne hors ligne,\\nsynchronise partout.</string>
+    <string name="onboarding_sync_premium_title">Fonctionnalités Premium</string>
+    <string name="onboarding_sync_feature1">Analyses financières par IA</string>
+    <string name="onboarding_sync_feature2">Scanner de reçus intelligent</string>
+    <string name="onboarding_sync_feature3">Analyses et rapports avancés</string>
+    <string name="onboarding_sync_feature4">Support prioritaire</string>
+    <string name="onboarding_sync_start_button">Commencer votre voyage 🚀</string>
+    <string name="onboarding_sync_status_offline">Mode hors ligne</string>
+    <string name="onboarding_sync_status_syncing">Synchronisation…</string>
+    <string name="onboarding_sync_status_done">Tout est synchronisé !</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">Ce mois-ci</string>
+    <string name="onboarding_mock_category_food">Nourriture et boisson</string>
+    <string name="onboarding_mock_category_transport">Transport</string>
+    <string name="onboarding_mock_category_income">Revenus</string>
+    <string name="onboarding_mock_trx_coffee">Café Starbucks</string>
+    <string name="onboarding_mock_trx_ride">Course Grab</string>
+    <string name="onboarding_mock_trx_freelance">Projet Freelance</string>
+    <string name="onboarding_mock_budget_total">Budget total</string>
+    <string name="onboarding_mock_asset_saving">Épargne BCA</string>
+    <string name="onboarding_mock_asset_stock">Actions BBCA</string>
+    <string name="onboarding_mock_liability_mortgage">Hypothèque BTN</string>
+    <string name="onboarding_mock_liability_credit">BCA Platinum</string>
+    <string name="onboarding_mock_goal_house">Maison de rêve</string>
+    <string name="onboarding_mock_goal_category_home">Maison</string>
+    <string name="onboarding_mock_currency">€</string>
+    <string name="day_mon">Lun</string>
+    <string name="day_tue">Mar</string>
+    <string name="day_wed">Mer</string>
+    <string name="day_thu">Jeu</string>
+    <string name="day_fri">Ven</string>
+    <string name="day_sat">Sam</string>
+    <string name="day_sun">Dim</string>
+</resources>

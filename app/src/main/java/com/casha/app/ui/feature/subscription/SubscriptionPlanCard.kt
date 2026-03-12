@@ -56,21 +56,47 @@ fun SubscriptionPlanCard(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Radio Button
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .border(2.dp, if (isSelected) CashaPrimaryLight else Color.Black.copy(alpha = 0.2f), androidx.compose.foundation.shape.CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                if (isSelected) {
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(androidx.compose.foundation.shape.CircleShape)
+                            .background(CashaPrimaryLight)
+                    )
+                }
+            }
+            
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = product.name,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                
+                val subtitle = when {
+                    product.productId.contains("yearly") -> stringResource(R.string.subscription_plan_yearly_save)
+                    product.productId.contains("monthly") -> stringResource(R.string.subscription_plan_monthly_desc)
+                    product.productId.contains("weekly") -> stringResource(R.string.subscription_plan_weekly_desc)
+                    product.productId.contains("lifetime") -> stringResource(R.string.subscription_plan_lifetime_desc)
+                    else -> product.description
+                }
+                
                 Text(
-                    text = product.description,
+                    text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = if (product.productId.contains("yearly")) CashaPrimaryLight else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    fontWeight = if (product.productId.contains("yearly")) FontWeight.Medium else FontWeight.Normal
                 )
             }
 
@@ -82,15 +108,16 @@ fun SubscriptionPlanCard(
                 Text(
                     text = price,
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Black,
-                    color = if (isSelected) CashaPrimaryLight else MaterialTheme.colorScheme.onSurface,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
                     letterSpacing = (-0.5).sp
                 )
                 
-                val suffix = if (product.productType == BillingClient.ProductType.SUBS) {
-                    stringResource(R.string.subscription_label_per_month)
-                } else {
-                    stringResource(R.string.subscription_label_one_time)
+                val suffix = when {
+                    product.productId.contains("yearly") -> stringResource(R.string.subscription_label_per_year)
+                    product.productId.contains("monthly") -> stringResource(R.string.subscription_label_per_month)
+                    product.productId.contains("weekly") -> stringResource(R.string.subscription_label_per_week)
+                    else -> stringResource(R.string.subscription_label_one_time)
                 }
                 
                 Text(

@@ -21,6 +21,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.casha.app.core.auth.AuthManager
+import com.casha.app.domain.usecase.notification.FcmRegistrationUseCase
 
 @AndroidEntryPoint
 class CashaFirebaseMessagingService : FirebaseMessagingService() {
@@ -31,24 +33,41 @@ class CashaFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var notificationManager: com.casha.app.core.notification.NotificationManager
 
+    @Inject
+    lateinit var authManager: AuthManager
+
+    @Inject
+    lateinit var fcmRegistrationUseCase: FcmRegistrationUseCase
+
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
-        Log.d("FCM", "New token: $token")
+        Log.d("FCM", "New token received from Firebase: $token")
         serviceScope.launch {
             try {
-                authRepository.registerPushToken(token)
+                // 1. Store token as pending
+                authManager.savePendingFcmToken(token)
+                
+                // 2. Try to register it (only succeeds if user is logged in)
+                fcmRegistrationUseCase()
             } catch (e: Exception) {
-                Log.e("FCM", "Failed to register token: ${e.message}")
+                Log.e("FCM", "Error processing new FCM token: ${e.message}")
             }
         }
     }
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
-        Log.d("FCM", "Message received: ${remoteMessage.data}")
-
+        
+        Log.d("FCM_PAYLOAD", "--- Incoming FCM Message ---")
+        Log.d("FCM_PAYLOAD", "From: ${remoteMessage.from}")
+        Log.d("FCM_PAYLOAD", "Data payload: ${remoteMessage.data}")
+        remoteMessage.notification?.let {
+            Log.d("FCM_PAYLOAD", "Notification Title: ${it.title}")
+            Log.d("FCM_PAYLOAD", "Notification Body: ${it.body}")
+        }
+        Log.d("FCM_PAYLOAD", "--------------------------")
         val data = remoteMessage.data
         val typeStr = data["type"] ?: "UNKNOWN"
         val type = try {

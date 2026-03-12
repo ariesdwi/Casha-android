@@ -21,6 +21,7 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -34,7 +35,7 @@ import com.casha.app.R
 import com.casha.app.domain.model.Asset
 import com.casha.app.domain.model.AssetCategory
 import com.casha.app.ui.feature.portfolio.subviews.AssetRow
-import com.casha.app.ui.feature.portfolio.subviews.PortfolioSummaryHeader
+import com.casha.app.ui.feature.portfolio.subviews.PortfolioSummaryCard
 import com.casha.app.ui.util.mapSFSymbolToImageVector
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -51,7 +52,6 @@ fun AssetsScreen(
     var showCategoryPicker by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<AssetCategory?>(null) }
     var showCreateAsset by remember { mutableStateOf(false) }
-    var assetToEdit by remember { mutableStateOf<Asset?>(null) }
     var isRefreshing by remember { mutableStateOf(false) }
 
     // Handlers for modals
@@ -59,7 +59,6 @@ fun AssetsScreen(
         showCreateAsset = false 
         selectedCategory = null
     }
-    val onDismissEdit = { assetToEdit = null }
 
     if (showCategoryPicker) {
         SelectAssetCategoryScreen(
@@ -84,24 +83,14 @@ fun AssetsScreen(
         )
     }
 
-    assetToEdit?.let { asset ->
-        EditAssetScreen(
-            asset = asset,
-            viewModel = viewModel,
-            onNavigateBack = onDismissEdit
-        )
-    }
-    
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
-            viewModel.fetchAssets()
             viewModel.fetchPortfolioSummary(force = true)
             isRefreshing = false
         }
     }
     
     LaunchedEffect(Unit) {
-        viewModel.fetchAssets()
         viewModel.fetchPortfolioSummary()
     }
 
@@ -113,48 +102,35 @@ fun AssetsScreen(
                 .fillMaxSize()
                 .padding(bottom = padding.calculateBottomPadding())
         ) {
-            // Custom Header matching LiabilitiesListScreen style
+            // Toolbar Header
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                IconButton(
-                    onClick = onNavigateBack,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .shadow(elevation = 2.dp, shape = CircleShape)
-                        .background(MaterialTheme.colorScheme.surface, CircleShape)
-                ) {
+                IconButton(onClick = onNavigateBack) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack, // using AutoMirrored for RTL support
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(20.dp)
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
                 Text(
-                    text = stringResource(R.string.portfolio_dashboard_title),
+                    text = "Portfolio",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
 
-                IconButton(
-                    onClick = { showCategoryPicker = true },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .shadow(elevation = 2.dp, shape = CircleShape)
-                        .background(Color.White, CircleShape)
-                ) {
+                IconButton(onClick = { showCategoryPicker = true }) {
                     Icon(
                         imageVector = Icons.Default.AddCircle,
                         contentDescription = "Add Asset",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(45.dp)
+                        modifier = Modifier.size(28.dp)
                     )
                 }
             }
@@ -207,12 +183,14 @@ private fun AssetsList(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 120.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Summary Header
-        item {
-            PortfolioSummaryHeader(
-                summary = summary,
-                modifier = Modifier.padding(vertical = 8.dp)
-            )
+        // Summary Card
+        if (summary != null) {
+            item {
+                PortfolioSummaryCard(
+                    summary = summary,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+            }
         }
         
         // Grouped Assets
@@ -221,10 +199,22 @@ private fun AssetsList(
             if (assetsInCategory.isNotEmpty()) {
                 // Category Header
                 item {
+                    val categoryColorMap = mapOf(
+                        AssetCategory.LIQUID to Color(0xFF2196F3),
+                        AssetCategory.EQUITY to Color(0xFF9C27B0),
+                        AssetCategory.FIXED_INCOME to Color(0xFF009688),
+                        AssetCategory.COMMODITIES to Color(0xFFFF9800),
+                        AssetCategory.CRYPTO to Color(0xFFFFEB3B),
+                        AssetCategory.REAL_ESTATE to Color(0xFF4CAF50),
+                        AssetCategory.VEHICLES to Color(0xFF3F51B5),
+                        AssetCategory.BUSINESS to Color(0xFFE91E63),
+                        AssetCategory.OTHERS to Color(0xFF9E9E9E)
+                    )
+                    
                     SectionHeader(
                         icon = mapSFSymbolToImageVector(category.icon),
                         title = category.rawValue,
-                        iconTint = Color(0xFF009033) // Match secondary style tint if needed, or default
+                        iconBgColor = categoryColorMap[category] ?: Color.Gray
                     )
                 }
                 
@@ -245,74 +235,117 @@ private fun EmptyStateView(
     onAddAssetClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(32.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.PieChart,
-            contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Text(
-            text = stringResource(R.string.portfolio_empty_title),
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = stringResource(R.string.portfolio_empty_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center
-        )
-        
-        Spacer(modifier = Modifier.height(32.dp))
-        
-        Button(
-            onClick = onAddAssetClick,
-            shape = MaterialTheme.shapes.medium,
-            modifier = Modifier.height(50.dp)
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(Icons.Default.Add, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(stringResource(R.string.portfolio_action_add_asset))
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(
+                        androidx.compose.ui.graphics.Brush.linearGradient(
+                            listOf(Color(0xFF1565C0).copy(alpha = 0.15f), Color(0xFF0097A7).copy(alpha = 0.15f))
+                        )
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.PieChart,
+                    contentDescription = null,
+                    modifier = Modifier.size(52.dp),
+                    tint = Color(0xFF1565C0).copy(alpha = 0.5f)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Text(
+                text = stringResource(R.string.portfolio_empty_title),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = stringResource(R.string.portfolio_empty_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Gradient Add Button
+            Button(
+                onClick = onAddAssetClick,
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier.height(52.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                contentPadding = PaddingValues(0.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .defaultMinSize(minWidth = 180.dp)
+                        .height(52.dp)
+                        .shadow(6.dp, RoundedCornerShape(14.dp))
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(
+                            androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                listOf(Color(0xFF1565C0), Color(0xFF0097A7))
+                            )
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                        Text(stringResource(R.string.portfolio_action_add_asset), color = Color.White, fontWeight = FontWeight.Bold)
+                    }
+                }
+            }
         }
-    }
 }
 
 @Composable
 private fun SectionHeader(
     icon: ImageVector,
     title: String,
-    iconTint: Color
+    iconBgColor: Color
 ) {
     Row(
-        modifier = Modifier.padding(vertical = 4.dp),
+        modifier = Modifier.padding(top = 20.dp, bottom = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp),
-            tint = iconTint
-        )
+        Box(
+            modifier = Modifier
+                .size(28.dp)
+                .clip(CircleShape)
+                .background(iconBgColor),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(15.dp),
+                tint = Color.White
+            )
+        }
+
         Text(
             text = title,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onBackground
         )
     }
 }

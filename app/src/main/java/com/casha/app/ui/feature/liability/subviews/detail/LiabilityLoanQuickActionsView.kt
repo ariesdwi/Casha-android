@@ -19,6 +19,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @Composable
 fun LiabilityLoanQuickActionsView(
@@ -42,7 +44,7 @@ fun LiabilityLoanQuickActionsView(
         ) {
             LoanQuickActionButton(
                 icon = Icons.Default.AttachMoney,
-                title = "Bayar Cicilan",
+                title = stringResource(R.string.liabilities_detail_action_pay_installment),
                 color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f),
                 onClick = onRecordPayment
@@ -50,7 +52,7 @@ fun LiabilityLoanQuickActionsView(
 
             LoanQuickActionButton(
                 icon = Icons.Default.BarChart,
-                title = "Simulasi Pelunasan",
+                title = stringResource(R.string.liabilities_detail_action_simulate),
                 color = Color(0xFF2196F3),
                 modifier = Modifier.weight(1f),
                 onClick = onSimulatePayment

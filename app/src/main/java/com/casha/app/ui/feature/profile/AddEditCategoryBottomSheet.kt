@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.profile
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -18,12 +19,13 @@ fun AddEditCategoryBottomSheet(
     onDismiss: () -> Unit,
     onConfirm: (name: String, isActive: Boolean) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var name by remember { mutableStateOf(category?.name ?: "") }
     var isActive by remember { mutableStateOf(category?.isActive ?: true) }
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
         dragHandle = { BottomSheetDefaults.DragHandle() }

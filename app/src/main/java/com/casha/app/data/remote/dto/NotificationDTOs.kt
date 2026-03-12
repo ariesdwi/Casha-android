@@ -4,7 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterTokenRequestDTO(
-    val token: String,
+    val deviceToken: String,
     val platform: String = "android"
 )
 

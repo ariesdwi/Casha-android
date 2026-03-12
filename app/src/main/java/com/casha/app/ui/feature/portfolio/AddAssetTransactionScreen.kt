@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.portfolio
+import androidx.compose.foundation.layout.fillMaxSize
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
@@ -72,7 +73,8 @@ fun AddAssetTransactionScreen(
     }
 
     ModalBottomSheet(
-        onDismissRequest = onNavigateBack,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = Color(0xFFF8F9FA)

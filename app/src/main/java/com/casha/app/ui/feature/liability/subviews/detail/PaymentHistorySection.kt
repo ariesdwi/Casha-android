@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.LiabilityPayment
 import java.text.SimpleDateFormat
@@ -39,7 +41,7 @@ fun PaymentHistorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Riwayat Pembayaran",
+                text = stringResource(R.string.liabilities_detail_history_title),
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -47,7 +49,7 @@ fun PaymentHistorySection(
 
             if (payments.size > 3) {
                 TextButton(onClick = onViewAll) {
-                    Text("Lihat Semua", fontWeight = FontWeight.SemiBold)
+                    Text(stringResource(R.string.liabilities_detail_history_view_all), fontWeight = FontWeight.SemiBold)
                 }
             }
         }
@@ -78,7 +80,7 @@ fun PaymentHistorySection(
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
-                                text = "Lihat ${payments.size - 3} pembayaran lainnya",
+                                text = stringResource(R.string.liabilities_detail_history_view_more, payments.size - 3),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -107,7 +109,7 @@ fun PaymentHistorySection(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
                 Text(
-                    text = "Belum ada pembayaran",
+                    text = stringResource(R.string.liabilities_detail_history_no_payments),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
@@ -177,7 +179,7 @@ fun PaymentRow(
 
             payment.principalPaid?.let { pokok ->
                 Text(
-                    text = "Pokok: ${CurrencyFormatter.format(pokok, userCurrency)}",
+                    text = stringResource(R.string.liabilities_detail_history_principal_value, CurrencyFormatter.format(pokok, userCurrency)),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -185,7 +187,7 @@ fun PaymentRow(
 
             payment.interestPaid?.let { bunga ->
                 Text(
-                    text = "Bunga: ${CurrencyFormatter.format(bunga, userCurrency)}",
+                    text = stringResource(R.string.liabilities_detail_history_interest_value, CurrencyFormatter.format(bunga, userCurrency)),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -193,7 +195,7 @@ fun PaymentRow(
 
             payment.balanceAfterPayment?.let { balance ->
                 Text(
-                    text = "Sisa: ${CurrencyFormatter.format(balance, userCurrency)}",
+                    text = stringResource(R.string.liabilities_detail_history_remaining, CurrencyFormatter.format(balance, userCurrency)),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

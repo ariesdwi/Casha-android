@@ -89,7 +89,15 @@ class SubscriptionManager @Inject constructor(
         val subParams = QueryProductDetailsParams.newBuilder()
             .setProductList(listOf(
                 QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId("casha.premium.yearly")
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
                     .setProductId("premium.casha.monthly")
+                    .setProductType(BillingClient.ProductType.SUBS)
+                    .build(),
+                QueryProductDetailsParams.Product.newBuilder()
+                    .setProductId("com.casha.premium.weekly")
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build()
             ))

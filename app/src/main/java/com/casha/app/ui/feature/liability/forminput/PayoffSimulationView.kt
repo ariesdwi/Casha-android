@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability.forminput
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,10 +18,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.SimulationStrategy
 import com.casha.app.domain.model.SimulatePayoffResponse
@@ -46,10 +49,11 @@ fun PayoffSimulationView(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -64,13 +68,13 @@ fun PayoffSimulationView(
                     .padding(bottom = 12.dp)
             ) {
                 Text(
-                    text = "Simulasi Pelunasan",
+                    text = stringResource(R.string.liabilities_simulation_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Lihat estimasi pelunasan hutang kamu secara otomatis",
+                    text = stringResource(R.string.liabilities_simulation_subtitle),
                     fontSize = 13.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )
@@ -84,7 +88,7 @@ fun PayoffSimulationView(
                 verticalArrangement = Arrangement.spacedBy(20.dp)
             ) {
                 // Strategy Picker
-                InputCard(title = "Strategi Pembayaran") {
+                InputCard(title = stringResource(R.string.liabilities_simulation_strategy)) {
                     Row(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
@@ -94,8 +98,8 @@ fun PayoffSimulationView(
                             Surface(
                                 onClick = { selectedStrategy = strategy },
                                 shape = RoundedCornerShape(12.dp),
-                                color = if (isSelected) Color(0xFF009033).copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                                border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF009033)) else null,
+                                color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                                border = if (isSelected) androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary) else null,
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Box(
@@ -103,10 +107,10 @@ fun PayoffSimulationView(
                                     contentAlignment = Alignment.Center
                                 ) {
                                     Text(
-                                        text = strategy.displayName,
+                                        text = stringResource(strategy.displayNameRes),
                                         fontSize = 13.sp,
                                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                                        color = if (isSelected) Color(0xFF009033) else MaterialTheme.colorScheme.onSurfaceVariant
+                                        color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                             }
@@ -115,7 +119,7 @@ fun PayoffSimulationView(
                 }
 
                 // Additional Payment Input
-                InputCard(title = "Budget Tambahan per Bulan") {
+                InputCard(title = stringResource(R.string.liabilities_simulation_additional_budget)) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -166,20 +170,20 @@ fun PayoffSimulationView(
                     enabled = additionalPaymentValue >= 0 && !liabilityState.isLoading,
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF009033),
-                        disabledContainerColor = Color(0xFF009033).copy(alpha = 0.4f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                 ) {
                     if (liabilityState.isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                     } else {
                         Row(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(Icons.Default.Analytics, contentDescription = null, modifier = Modifier.size(20.dp))
-                            Text("Hitung Simulasi", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(R.string.liabilities_simulation_calculate), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -192,7 +196,7 @@ fun PayoffSimulationView(
                     )
                 } else if (hasSimulated && !liabilityState.isLoading && liabilityState.simulationResult == null) {
                     Text(
-                        text = "Tidak ada data simulasi untuk budget ini",
+                        text = stringResource(R.string.liabilities_simulation_no_data),
                         fontSize = 14.sp,
                         color = Color.Gray,
                         modifier = Modifier.padding(vertical = 16.dp).fillMaxWidth(),
@@ -216,7 +220,7 @@ private fun ResultSection(result: SimulatePayoffResponse, userCurrency: String) 
             modifier = Modifier.padding(vertical = 4.dp)
         ) {
             Box(modifier = Modifier.height(1.dp).weight(1f).background(Color.Gray.copy(alpha = 0.2f)))
-            Text("HASIL ANALISA", fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+            Text(stringResource(R.string.liabilities_simulation_analysis_result), fontSize = 11.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
             Box(modifier = Modifier.height(1.dp).weight(1f).background(Color.Gray.copy(alpha = 0.2f)))
         }
 
@@ -225,17 +229,17 @@ private fun ResultSection(result: SimulatePayoffResponse, userCurrency: String) 
             SummaryCard(
                 icon = Icons.Default.CalendarToday,
                 iconColor = Color(0xFF3F51B5),
-                title = "Estimasi Lunas",
+                title = stringResource(R.string.liabilities_simulation_estimated_payoff),
                 mainValue = formatPayoffDate(result.estimatedPayoffDate),
-                subtitle = "${result.totalMonthsToPayOff} bln",
+                subtitle = "${result.totalMonthsToPayOff} ${stringResource(R.string.liabilities_tenure_months)}",
                 modifier = Modifier.weight(1f)
             )
             SummaryCard(
                 icon = Icons.Default.Timer,
                 iconColor = Color(0xFFFFA500),
-                title = "Waktu Hemat",
-                mainValue = "${result.monthsSaved} bln",
-                subtitle = "Lebih cepat",
+                title = stringResource(R.string.liabilities_simulation_time_saved),
+                mainValue = "${result.monthsSaved} ${stringResource(R.string.liabilities_tenure_months)}",
+                subtitle = stringResource(R.string.liabilities_simulation_faster),
                 modifier = Modifier.weight(1f)
             )
         }
@@ -243,9 +247,9 @@ private fun ResultSection(result: SimulatePayoffResponse, userCurrency: String) 
         SummaryCard(
             icon = Icons.Default.Savings,
             iconColor = Color(0xFF009033),
-            title = "Bunga Dihemat",
+            title = stringResource(R.string.liabilities_simulation_interest_saved),
             mainValue = CurrencyFormatter.format(result.interestSaved, userCurrency),
-            subtitle = "Potensi penghematan total",
+            subtitle = stringResource(R.string.liabilities_simulation_potential_savings),
             modifier = Modifier.fillMaxWidth()
         )
 
@@ -254,15 +258,15 @@ private fun ResultSection(result: SimulatePayoffResponse, userCurrency: String) 
             Surface(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(14.dp),
-                color = Color(0xFF009033).copy(alpha = 0.05f),
-                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF009033).copy(alpha = 0.1f))
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.2f))
             ) {
                 Row(
                     modifier = Modifier.padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                     verticalAlignment = Alignment.Top
                 ) {
-                    Icon(Icons.Default.Lightbulb, contentDescription = null, tint = Color(0xFF009033), modifier = Modifier.size(20.dp))
+                    Icon(Icons.Default.Lightbulb, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
                     Text(
                         text = result.recommendation,
                         fontSize = 13.sp,
@@ -276,7 +280,7 @@ private fun ResultSection(result: SimulatePayoffResponse, userCurrency: String) 
         // Per Liability Breakdown
         if (result.liabilityBreakdown.isNotEmpty()) {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Urutan Pelunasan", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                Text(stringResource(R.string.liabilities_simulation_payoff_order), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
 
                 result.liabilityBreakdown.forEachIndexed { index, item ->
                     BreakdownRow(index = index + 1, item = item, userCurrency = userCurrency)
@@ -298,7 +302,7 @@ private fun SummaryCard(
     Surface(
         modifier = modifier,
         shape = RoundedCornerShape(16.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp
     ) {
         Column(
@@ -315,10 +319,10 @@ private fun SummaryCard(
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(title, fontSize = 11.sp, color = Color.Gray)
+                Text(title, fontSize = 11.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(mainValue, fontSize = 15.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 if (subtitle != null) {
-                    Text(subtitle, fontSize = 10.sp, color = Color.Gray)
+                    Text(subtitle, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
             }
         }
@@ -330,7 +334,7 @@ private fun BreakdownRow(index: Int, item: LiabilityBreakdown, userCurrency: Str
     Surface(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(14.dp),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shadowElevation = 1.dp
     ) {
         Row(
@@ -355,20 +359,20 @@ private fun BreakdownRow(index: Int, item: LiabilityBreakdown, userCurrency: Str
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(item.name, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
                 Text(
-                    "Bayar: ${CurrencyFormatter.format(item.monthlyPayment, userCurrency)}/bln",
+                    stringResource(R.string.liabilities_simulation_pay_per_month, CurrencyFormatter.format(item.monthlyPayment, userCurrency)),
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
             Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Text(
-                    text = "${item.monthsToPayOff} bln",
+                    text = "${item.monthsToPayOff} ${stringResource(R.string.liabilities_tenure_months)}",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF009033)
+                    color = MaterialTheme.colorScheme.primary
                 )
-                Text("Lunas", fontSize = 10.sp, color = Color.Gray)
+                Text(stringResource(R.string.liabilities_simulation_paid_off), fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }

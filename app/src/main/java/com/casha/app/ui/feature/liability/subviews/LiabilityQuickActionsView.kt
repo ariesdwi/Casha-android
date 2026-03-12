@@ -21,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 
 @Composable
 fun LiabilityQuickActionsView(
@@ -38,7 +40,7 @@ fun LiabilityQuickActionsView(
         ) {
             QuickActionButton(
                 icon = Icons.Default.AttachMoney,
-                title = "Bayar\nTagihan",
+                title = stringResource(R.string.liabilities_detail_action_pay),
                 color = Color(0xFF4CAF50),
                 modifier = Modifier.weight(1f),
                 onClick = onRecordPayment
@@ -46,7 +48,7 @@ fun LiabilityQuickActionsView(
 
             QuickActionButton(
                 icon = Icons.Default.ShoppingCart,
-                title = "Catat\nTrans.",
+                title = stringResource(R.string.liabilities_detail_action_add_transaction),
                 color = Color(0xFFE53935),
                 modifier = Modifier.weight(1f),
                 onClick = onAddTransaction
@@ -55,7 +57,7 @@ fun LiabilityQuickActionsView(
             if (onAddInstallment != null) {
                 QuickActionButton(
                     icon = Icons.Default.AddCircle,
-                    title = "Tambah\nCicilan",
+                    title = stringResource(R.string.liabilities_detail_action_add_installment),
                     color = Color(0xFFE53935),
                     modifier = Modifier.weight(1f),
                     onClick = onAddInstallment

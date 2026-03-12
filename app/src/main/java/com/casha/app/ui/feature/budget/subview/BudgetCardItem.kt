@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -25,6 +26,16 @@ import com.casha.app.ui.theme.*
 import kotlin.math.min
 import androidx.compose.ui.res.stringResource
 import com.casha.app.R
+
+@Composable
+private fun getProgressColor(progress: Float): Color {
+    val isDark = isSystemInDarkTheme()
+    return when {
+        progress < 0.7f -> if (isDark) Color(0xFF81C784) else CashaSuccess
+        progress < 0.9f -> if (isDark) Color(0xFFFFB74D) else CashaWarning
+        else -> if (isDark) Color(0xFFE57373) else CashaDanger
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,9 +114,12 @@ fun BudgetCardItem(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun BudgetSwipeBackground(dismissState: SwipeToDismissBoxState) {
+    val isDark = isSystemInDarkTheme()
+    val dangerColor = if (isDark) Color(0xFFE57373) else CashaDanger
+
     val color by animateColorAsState(
         targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
-            CashaDanger
+            dangerColor
         } else {
             Color.Transparent
         },
@@ -135,11 +149,7 @@ private fun BudgetSwipeBackground(dismissState: SwipeToDismissBoxState) {
 @Composable
 private fun BudgetHeaderPart(budget: BudgetCasha) {
     val progress = if (budget.amount > 0) min(budget.spent / budget.amount, 1.0).toFloat() else 0f
-    val progressColor = when {
-        progress < 0.7f -> CashaSuccess
-        progress < 0.9f -> CashaWarning
-        else -> CashaDanger
-    }
+    val progressColor = getProgressColor(progress)
     val progressPercentage = "${(progress * 100).toInt()}%"
 
     Row(
@@ -190,11 +200,7 @@ private fun BudgetHeaderPart(budget: BudgetCasha) {
 @Composable
 private fun BudgetProgressPart(budget: BudgetCasha) {
     val progress = if (budget.amount > 0) min(budget.spent / budget.amount, 1.0).toFloat() else 0f
-    val progressColor = when {
-        progress < 0.7f -> CashaSuccess
-        progress < 0.9f -> CashaWarning
-        else -> CashaDanger
-    }
+    val progressColor = getProgressColor(progress)
 
     val animatedProgress by animateFloatAsState(
         targetValue = progress,
@@ -240,12 +246,12 @@ private fun BudgetProgressPart(budget: BudgetCasha) {
 @Composable
 private fun BudgetFooterPart(budget: BudgetCasha) {
     val progress = if (budget.amount > 0) min(budget.spent / budget.amount, 1.0).toFloat() else 0f
-    val progressColor = when {
-        progress < 0.7f -> CashaSuccess
-        progress < 0.9f -> CashaWarning
-        else -> CashaDanger
-    }
+    val progressColor = getProgressColor(progress)
     val progressPercentage = "${(progress * 100).toInt()}%"
+
+    val isDark = isSystemInDarkTheme()
+    val successColor = if (isDark) Color(0xFF81C784) else CashaSuccess
+    val dangerColor = if (isDark) Color(0xFFE57373) else CashaDanger
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -268,7 +274,7 @@ private fun BudgetFooterPart(budget: BudgetCasha) {
         FooterItem(
             label = stringResource(R.string.budget_label_remaining),
             value = CurrencyFormatter.format(budget.remaining),
-            valueColor = if (budget.remaining >= 0) CashaSuccess else CashaDanger,
+            valueColor = if (budget.remaining >= 0) successColor else dangerColor,
             alignment = Alignment.End
         )
     }

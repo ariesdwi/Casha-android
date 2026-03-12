@@ -95,7 +95,7 @@ fun AddTransactionCoordinator(
     }
 
     val uiState by viewModel.uiState.collectAsState()
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(isPresented) {
         if (isPresented && uiState.presentationState == PresentationState.IDLE) {

@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability.forminput
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 import com.casha.app.ui.feature.liability.LiabilityState
@@ -54,10 +57,11 @@ fun AddInstallmentFormView(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -69,7 +73,7 @@ fun AddInstallmentFormView(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = "Tambah Cicilan",
+                    text = stringResource(R.string.liabilities_add_installment_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -92,16 +96,16 @@ fun AddInstallmentFormView(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Name
-                InputCard(title = "Nama Cicilan *") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_name)) {
                     CashaFormTextField(
                         value = name,
                         onValueChange = { name = it },
-                        placeholder = "e.g., iPhone 16 Pro"
+                        placeholder = stringResource(R.string.liabilities_add_installment_name_placeholder)
                     )
                 }
 
                 // Total Amount
-                InputCard(title = "Total Cicilan *") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_total)) {
                     OutlinedTextField(
                         value = if (totalAmountFocused) totalAmount else if (totalAmount.isNotEmpty()) CurrencyFormatter.formatInput(totalAmount) else "",
                         onValueChange = { totalAmount = it.replace(",", ".") },
@@ -117,7 +121,7 @@ fun AddInstallmentFormView(
                 }
 
                 // Monthly Amount
-                InputCard(title = "Cicilan per Bulan *") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_per_month)) {
                     OutlinedTextField(
                         value = if (monthlyAmountFocused) monthlyAmount else if (monthlyAmount.isNotEmpty()) CurrencyFormatter.formatInput(monthlyAmount) else "",
                         onValueChange = { monthlyAmount = it.replace(",", ".") },
@@ -133,7 +137,7 @@ fun AddInstallmentFormView(
                 }
 
                 // Tenor with quick picks
-                InputCard(title = "Tenor (bulan) *") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_tenor)) {
                     CashaFormTextField(
                         value = tenor,
                         onValueChange = { tenor = it },
@@ -153,7 +157,7 @@ fun AddInstallmentFormView(
                 }
 
                 // Current Month
-                InputCard(title = "Sudah Berjalan (bulan)") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_current_month)) {
                     CashaFormTextField(
                         value = currentMonth,
                         onValueChange = { currentMonth = it },
@@ -161,10 +165,10 @@ fun AddInstallmentFormView(
                         keyboardType = KeyboardType.Number
                     )
                 }
-                HintRow(text = "Isi jika cicilan sudah berjalan sebelum pakai Casha", icon = Icons.Default.Info)
+                HintRow(text = stringResource(R.string.liabilities_add_installment_current_month_hint), icon = Icons.Default.Info)
 
                 // Start Date
-                InputCard(title = "Tanggal Mulai Cicilan") {
+                InputCard(title = stringResource(R.string.liabilities_add_installment_start_date)) {
                     Surface(
                         onClick = { showDatePicker = true },
                         shape = RoundedCornerShape(10.dp),
@@ -188,7 +192,7 @@ fun AddInstallmentFormView(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF8F9FA))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .navigationBarsPadding()
             ) {
@@ -207,17 +211,17 @@ fun AddInstallmentFormView(
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF009033),
-                        disabledContainerColor = Color(0xFF009033).copy(alpha = 0.4f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
                 ) {
                     if (liabilityState.isLoading) {
-                        CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                     } else {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.White)
-                            Text("Simpan", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Icon(Icons.Default.Save, contentDescription = null, modifier = Modifier.size(20.dp))
+                            Text(stringResource(R.string.portfolio_action_save), fontSize = 16.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -233,10 +237,10 @@ fun AddInstallmentFormView(
                 TextButton(onClick = {
                     datePickerState.selectedDateMillis?.let { startDate = Date(it) }
                     showDatePicker = false
-                }) { Text("OK") }
+                }) { Text(stringResource(R.string.liabilities_action_ok)) }
             },
             dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) { Text("Cancel") }
+                TextButton(onClick = { showDatePicker = false }) { Text(stringResource(R.string.liabilities_action_cancel)) }
             }
         ) { DatePicker(state = datePickerState) }
     }

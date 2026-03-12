@@ -5,20 +5,23 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
-import com.casha.app.R
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Asset
+import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,85 +30,105 @@ fun AssetInfoDetailsView(
     asset: Asset,
     modifier: Modifier = Modifier
 ) {
-    val mediumDateFormatter = remember { SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()) }
-    val fullDateFormatter = remember { SimpleDateFormat("MMM dd, yyyy, HH:mm", Locale.getDefault()) }
+    val fullDateFormatter = remember { SimpleDateFormat("d MMM yyyy, HH:mm", Locale.getDefault()) }
 
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
-            text = stringResource(R.string.portfolio_asset_details_title),
-            fontSize = 18.sp,
+            text = "Asset Details",
+            fontSize = 17.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onSurface
         )
 
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(4.dp, RoundedCornerShape(20.dp), spotColor = Color(0x1A000000))
+                .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(20.dp))
+                .padding(vertical = 6.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                InfoRow(
-                    icon = Icons.Outlined.Category,
-                    iconColor = Color(0xFF1E88E5), // Blue
-                    label = stringResource(R.string.portfolio_asset_category),
-                    value = asset.type.category.rawValue
-                )
+            Column {
+                // Category & Type
+                DetailRow(icon = Icons.Default.Category, iconBg = Color(0xFFE3F2FD), iconTint = Color(0xFF1E88E5), label = "Category", value = asset.type.category.rawValue)
+                DetailDivider()
+                DetailRow(icon = Icons.Default.Label, iconBg = Color(0xFFE8F5E9), iconTint = Color(0xFF43A047), label = "Type", value = asset.type.displayName)
 
-                DividerRow()
-
-                InfoRow(
-                    icon = Icons.Outlined.Label,
-                    iconColor = Color(0xFF8E24AA), // Purple
-                    label = stringResource(R.string.portfolio_asset_type),
-                    value = asset.type.displayName
-                )
-
-                asset.acquisitionDate?.let { date ->
-                    DividerRow()
-                    InfoRow(
-                        icon = Icons.Outlined.Event,
-                        iconColor = Color(0xFF4CAF50), // Green
-                        label = stringResource(R.string.portfolio_asset_acquisition_date),
-                        value = mediumDateFormatter.format(date)
+                // Gold purity
+                val isGold = asset.type == com.casha.app.domain.model.AssetType.GOLD_PHYSICAL
+                        || asset.type == com.casha.app.domain.model.AssetType.GOLD_DIGITAL
+                if (isGold && asset.purity != null) {
+                    DetailDivider()
+                    DetailRow(
+                        icon = Icons.Default.Star,
+                        iconBg = Color(0xFFFFF8E1),
+                        iconTint = Color(0xFFFF8F00),
+                        label = "Karat Emas",
+                        value = "${asset.purity}K",
+                        valueColor = Color(0xFFFF8F00)
                     )
                 }
 
-                asset.location?.let { location ->
-                    DividerRow()
-                    InfoRow(
-                        icon = Icons.Outlined.Place,
-                        iconColor = Color(0xFFFF9800), // Orange
-                        label = stringResource(R.string.portfolio_asset_location),
-                        value = location
-                    )
+                // Quantity-based fields
+                if (asset.type.isQuantityBased && asset.quantity != null && asset.unit != null) {
+                    val unitStr = asset.unit
+                    DetailDivider()
+                    DetailRow(icon = Icons.Default.Numbers, iconBg = Color(0xFFEDE7F6), iconTint = Color(0xFF7E57C2), label = "Jumlah", value = "${formatNumber(asset.quantity)} $unitStr")
+
+                    if (asset.pricePerUnit != null) {
+                        DetailDivider()
+                        DetailRow(icon = Icons.Default.ShoppingCart, iconBg = Color(0xFFE3F2FD), iconTint = Color(0xFF1E88E5), label = "Harga Beli/$unitStr", value = formatCurrencyCompact(asset.pricePerUnit, asset.currency))
+                    }
+
+                    val marketPrice = if (asset.quantity > 0) asset.amount / asset.quantity else 0.0
+                    val isUp = asset.pricePerUnit != null && marketPrice >= asset.pricePerUnit
+                    val marketPriceColor = if (isUp) Color(0xFF43A047) else Color(0xFFE53935)
+                    DetailDivider()
+                    DetailRow(icon = if (isUp) Icons.Default.TrendingUp else Icons.Default.TrendingDown, iconBg = if (isUp) Color(0xFFE8F5E9) else Color(0xFFFCE4EC), iconTint = marketPriceColor, label = "Harga Pasar/$unitStr", value = formatCurrencyCompact(marketPrice, asset.currency), valueColor = marketPriceColor)
+
+                    if (asset.unrealizedReturn != null) {
+                        val isPositive = asset.unrealizedReturn >= 0
+                        val color = if (isPositive) Color(0xFF43A047) else Color(0xFFE53935)
+                        val sign = if (isPositive) "+" else ""
+                        DetailDivider()
+                        DetailRow(
+                            icon = if (isPositive) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
+                            iconBg = if (isPositive) Color(0xFFE8F5E9) else Color(0xFFFCE4EC),
+                            iconTint = color,
+                            label = "Keuntungan/Kerugian",
+                            value = "$sign${CurrencyFormatter.format(asset.unrealizedReturn, asset.currency)}",
+                            valueColor = color
+                        )
+                    }
+
+                    if (asset.returnPercentage != null) {
+                        val isPositive = asset.returnPercentage >= 0
+                        val color = if (isPositive) Color(0xFF43A047) else Color(0xFFE53935)
+                        val sign = if (isPositive) "+" else ""
+                        DetailDivider()
+                        DetailRow(
+                            icon = Icons.Default.Percent,
+                            iconBg = if (isPositive) Color(0xFFE8F5E9) else Color(0xFFFCE4EC),
+                            iconTint = color,
+                            label = "Return (%)",
+                            value = "$sign${String.format(Locale.US, "%.2f", asset.returnPercentage)}%",
+                            valueColor = color
+                        )
+                    }
                 }
 
-                asset.description?.let { description ->
-                    DividerRow()
-                    InfoRow(
-                        icon = Icons.Outlined.Description,
-                        iconColor = Color(0xFF757575), // Grey
-                        label = stringResource(R.string.portfolio_asset_description),
-                        value = description
-                    )
-                }
-
-                DividerRow()
-
-                InfoRow(
-                    icon = Icons.Outlined.Update,
-                    iconColor = Color(0xFF00ACC1), // Cyan
-                    label = stringResource(R.string.portfolio_asset_last_updated),
-                    value = fullDateFormatter.format(asset.updatedAt)
+                DetailDivider()
+                DetailRow(
+                    icon = Icons.Default.AccessTime,
+                    iconBg = Color(0xFFF3E5F5),
+                    iconTint = Color(0xFF8E24AA),
+                    label = "Last Updated",
+                    value = fullDateFormatter.format(asset.updatedAt),
+                    valueColor = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -113,29 +136,29 @@ fun AssetInfoDetailsView(
 }
 
 @Composable
-private fun InfoRow(
+private fun DetailRow(
     icon: ImageVector,
-    iconColor: Color,
+    iconBg: Color,
+    iconTint: Color,
     label: String,
-    value: String
+    value: String,
+    valueColor: Color = MaterialTheme.colorScheme.onSurface
 ) {
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(40.dp)
-                .background(iconColor.copy(alpha = 0.1f), CircleShape),
+                .size(34.dp)
+                .clip(CircleShape)
+                .background(iconBg),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = iconColor,
-                modifier = Modifier.size(20.dp)
-            )
+            Icon(icon, contentDescription = null, tint = iconTint, modifier = Modifier.size(18.dp))
         }
 
         Text(
@@ -148,16 +171,37 @@ private fun InfoRow(
         Text(
             text = value,
             fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onSurface
+            fontWeight = FontWeight.SemiBold,
+            color = valueColor
         )
     }
 }
 
 @Composable
-private fun DividerRow() {
+private fun DetailDivider() {
     HorizontalDivider(
-        modifier = Modifier.padding(start = 52.dp),
+        modifier = Modifier.padding(horizontal = 16.dp),
+        thickness = 0.5.dp,
         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.1f)
     )
+}
+
+private fun formatNumber(number: Double): String {
+    val symbols = DecimalFormatSymbols(Locale("id", "ID"))
+    val decimalFormat = DecimalFormat("#,##0.####", symbols)
+    return decimalFormat.format(number)
+}
+
+private fun formatCurrencyCompact(amount: Double, userCurrency: String): String {
+    val symbol = CurrencyFormatter.symbol(userCurrency)
+    val symbols = DecimalFormatSymbols(Locale("id", "ID"))
+    val format2 = DecimalFormat("#,##0.##", symbols)
+    val format0 = DecimalFormat("#,##0", symbols)
+    
+    return when {
+        amount >= 1_000_000_000 -> "$symbol ${format2.format(amount / 1_000_000_000)} M"
+        amount >= 1_000_000 -> "$symbol ${format2.format(amount / 1_000_000)} jt"
+        amount >= 1_000 -> "$symbol ${format0.format(amount / 1_000)} rb"
+        else -> CurrencyFormatter.format(amount, userCurrency)
+    }
 }

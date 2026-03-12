@@ -17,6 +17,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.*
 import java.text.SimpleDateFormat
@@ -76,14 +78,14 @@ private fun PaymentSection(
                 Icon(Icons.Default.CalendarToday, contentDescription = null, tint = Color(0xFFE53935), modifier = Modifier.size(20.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Jatuh Tempo: ${liabilityState.latestStatement?.dueDate?.let { formatShortDate(it) } ?: "N/A"}",
+                    text = stringResource(R.string.liabilities_detail_due_date, liabilityState.latestStatement?.dueDate?.let { formatShortDate(it) } ?: "N/A"),
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(text = "Minimum Payment", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(text = stringResource(R.string.liabilities_detail_min_payment), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Text(
                     text = CurrencyFormatter.format(liabilityState.latestStatement?.minimumPayment ?: 0.0, userCurrency),
                     fontSize = 18.sp,
@@ -102,7 +104,7 @@ private fun PaymentSection(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Bayar Minimum", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.liabilities_detail_pay_min), fontWeight = FontWeight.Bold)
                 }
 
                 Button(
@@ -114,7 +116,7 @@ private fun PaymentSection(
                     ),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("Bayar Penuh", fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.liabilities_detail_pay_full), fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -132,8 +134,8 @@ private fun LatestStatementSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Billing Statements", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            Text("${liabilityState.statements.size} statements", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(stringResource(R.string.liabilities_detail_statements_title), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.liabilities_detail_statements_count, liabilityState.statements.size), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
 
         if (liabilityState.statements.isNotEmpty()) {
@@ -163,7 +165,7 @@ private fun LatestStatementSection(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Text(
-                    text = "No statements available",
+                    text = stringResource(R.string.liabilities_detail_no_statements),
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -214,9 +216,9 @@ private fun UnbilledTransactionsSection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("Transaksi Belum Tertagih", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+            Text(stringResource(R.string.liabilities_detail_unbilled_transactions), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             liabilityState.unbilledTransactions?.let { unbilled ->
-                Text("${unbilled.transactionCount} transaksi", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.liabilities_detail_unbilled_desc, unbilled.transactionCount), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
 
@@ -251,7 +253,7 @@ private fun UnbilledTransactionsSection(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
             ) {
                 Text(
-                    text = "Belum ada transaksi",
+                    text = stringResource(R.string.liabilities_detail_no_unbilled),
                     modifier = Modifier.padding(16.dp).fillMaxWidth(),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -295,7 +297,7 @@ private fun TransactionRow(transaction: LiabilityTransaction, userCurrency: Stri
                         .padding(horizontal = 6.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = if (isBilled) "Billed" else "Unbilled",
+                        text = if (isBilled) stringResource(R.string.liabilities_detail_billed_label) else stringResource(R.string.liabilities_detail_unbilled_label),
                         fontSize = 10.sp,
                         fontWeight = FontWeight.Bold,
                         color = if (isBilled) Color.Blue else Color(0xFFFFA500)

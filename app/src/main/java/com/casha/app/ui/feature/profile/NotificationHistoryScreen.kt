@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.profile
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,10 +38,11 @@ fun NotificationHistoryScreen(
 ) {
     val notifications by viewModel.notifications.collectAsStateWithLifecycle()
     val unreadCount by viewModel.unreadCount.collectAsStateWithLifecycle()
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onBackClick,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onBackClick,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = Color(0xFFF8F9FA)

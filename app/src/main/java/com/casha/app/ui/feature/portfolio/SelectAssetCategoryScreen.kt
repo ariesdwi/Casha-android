@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.portfolio
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -106,7 +107,8 @@ fun SelectAssetCategoryScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onNavigateBack,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = Color(0xFFF8F9FA)

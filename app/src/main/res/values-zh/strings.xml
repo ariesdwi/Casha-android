@@ -238,4 +238,122 @@
     <string name="liabilities_delete_message">您确定要删除该负债吗？</string>
     <string name="liabilities_section_overdue">已逾期</string>
     <string name="liabilities_section_paid_off">已还清</string>
-<string name="nav_report">报告</string><string name="nav_dashboard">首页</string><string name="nav_add">添加</string><string name="nav_transactions">交易</string><string name="nav_budget">预算</string></resources>
+<string name="nav_report">报告</string><string name="nav_dashboard">首页</string><string name="nav_add">添加</string><string name="nav_transactions">交易</string><string name="nav_budget">预算</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">跳过</string>
+    <string name="onboarding_cta_hook">了解更多</string>
+    <string name="onboarding_cta_chat_input">查看如何运作</string>
+    <string name="onboarding_cta_revelation">探索仪表板</string>
+    <string name="onboarding_cta_transaction_history">查看交易</string>
+    <string name="onboarding_cta_budget_tracker">查看预算</string>
+    <string name="onboarding_cta_portfolio">查看投资组合</string>
+    <string name="onboarding_cta_liabilities">追踪债务</string>
+    <string name="onboarding_cta_goal_tracker">设置目标</string>
+    <string name="onboarding_cta_global_power">全球化</string>
+    <string name="onboarding_cta_offline_sync">开始使用</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">您的资金，完全掌控。</string>
+    <string name="onboarding_hook_subtitle">所有支出均集中记录在案。</string>
+    <string name="onboarding_hook_bullet1">自动记录交易</string>
+    <string name="onboarding_hook_bullet2">查看您的资金流向</string>
+    <string name="onboarding_hook_bullet3">做出更明智的理财决策</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">记录支出\n疾如打字。</string>
+    <string name="onboarding_chat_subtitle">无长表单。直接告诉我。</string>
+    <string name="onboarding_chat_bullet1">自然输入，瞬间记录交易</string>
+    <string name="onboarding_chat_bullet2">扫描收据，自动填充数据</string>
+    <string name="onboarding_chat_bullet3">智能分类，无需手动输入</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">在线</string>
+    <string name="onboarding_chat_mock_timestamp">今天，09:41</string>
+    <string name="onboarding_chat_mock_user_msg">咖啡 25</string>
+    <string name="onboarding_chat_mock_ai_confirm">收到！已记录：</string>
+    <string name="onboarding_chat_mock_ai_result">咖啡 — 25.00</string>
+    <string name="onboarding_chat_mock_recorded">已记录</string>
+    <string name="onboarding_chat_mock_input_placeholder">输入交易或扫描收据…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">本月您的净现金流\n为 250 万。 👏</string>
+    <string name="onboarding_revelation_bullet1">流入 1500 万，流出 1250 万</string>
+    <string name="onboarding_revelation_bullet2">周末是您的支出高峰期</string>
+    <string name="onboarding_revelation_bullet3">监控此趋势以保持您的盈余</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">最近交易</string>
+    <string name="onboarding_history_title">今日所有交易\n均整齐记录。</string>
+    <string name="onboarding_history_subtitle">从早间咖啡到自由职业 — 绝无遗漏。</string>
+    <string name="onboarding_history_bullet1">星巴克、Grab 到收入均自动进入</string>
+    <string name="onboarding_history_bullet2">每笔交易均立即分类</string>
+    <string name="onboarding_history_bullet3">像聊天一样轻松搜索交易记录</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">预算 620 万\n已使用 430 万。</string>
+    <string name="onboarding_budget_subtitle">剩余 185 万 — 在月底前管理好它。</string>
+    <string name="onboarding_budget_bullet1">交通支出几近耗尽 — 仅剩 8%</string>
+    <string name="onboarding_budget_bullet2">餐饮警告：已达 82%</string>
+    <string name="onboarding_budget_bullet3">预算临界点自动通知</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">所有资产，\n统一仪表板。</string>
+    <string name="onboarding_portfolio_subtitle">无需一一检查。Casha 为您集中概括。</string>
+    <string name="onboarding_portfolio_bullet1">5 支股票，2 份黄金及储蓄 — 实时监控</string>
+    <string name="onboarding_portfolio_bullet2">回报率 +5.8%，账面收益 250 万</string>
+    <string name="onboarding_portfolio_bullet3">价格自动更新，无需手动刷新</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">房贷及信用卡\n全程监控。</string>
+    <string name="onboarding_liabilities_subtitle">每月 15 日及 25 日到期 — Casha 准时提醒。</string>
+    <string name="onboarding_liabilities_bullet1">房贷 4.8 亿 — 剩余 14 年</string>
+    <string name="onboarding_liabilities_bullet2">信用卡 2000 万额度已使用 520 万</string>
+    <string name="onboarding_liabilities_bullet3">每月总还款 220 万 — 自动追踪</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3 个目标，1 个已完成。\n保持一致。</string>
+    <string name="onboarding_goal_bullet1">总进度达 5 亿目标的 30%</string>
+    <string name="onboarding_goal_bullet2">梦想之家 2.5 亿已存 — 达成 25%</string>
+    <string name="onboarding_goal_bullet3">最近期限仅剩 30 天 — 假期基金</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">多货币支持\n助力全球公民。</string>
+    <string name="onboarding_global_bullet1">追踪 IDR, USD, EUR, JPY 等资产</string>
+    <string name="onboarding_global_bullet2">实时汇率，时刻精准</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">离线工作，\n处处同步。</string>
+    <string name="onboarding_sync_premium_title">高级功能</string>
+    <string name="onboarding_sync_feature1">AI 驱动的理财洞察</string>
+    <string name="onboarding_sync_feature2">智能收据扫描仪</string>
+    <string name="onboarding_sync_feature3">高级分析与报告</string>
+    <string name="onboarding_sync_feature4">优先支持</string>
+    <string name="onboarding_sync_start_button">开启您的旅程 🚀</string>
+    <string name="onboarding_sync_status_offline">离线模式</string>
+    <string name="onboarding_sync_status_syncing">同步中…</string>
+    <string name="onboarding_sync_status_done">全部已同步！</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">本月</string>
+    <string name="onboarding_mock_category_food">餐饮</string>
+    <string name="onboarding_mock_category_transport">交通</string>
+    <string name="onboarding_mock_category_income">收入</string>
+    <string name="onboarding_mock_trx_coffee">星巴克咖啡</string>
+    <string name="onboarding_mock_trx_ride">Grab 乘车</string>
+    <string name="onboarding_mock_trx_freelance">自由职业项目</string>
+    <string name="onboarding_mock_budget_total">总预算</string>
+    <string name="onboarding_mock_asset_saving">BCA 储蓄</string>
+    <string name="onboarding_mock_asset_stock">BBCA 股票</string>
+    <string name="onboarding_mock_liability_mortgage">KPR BTN</string>
+    <string name="onboarding_mock_liability_credit">BCA 白金卡</string>
+    <string name="onboarding_mock_goal_house">梦想之家</string>
+    <string name="onboarding_mock_goal_category_home">住宅</string>
+    <string name="onboarding_mock_currency">¥</string>
+    <string name="day_mon">周一</string>
+    <string name="day_tue">周二</string>
+    <string name="day_wed">周三</string>
+    <string name="day_thu">周四</string>
+    <string name="day_fri">周五</string>
+    <string name="day_sat">周六</string>
+    <string name="day_sun">周日</string>
+</resources>

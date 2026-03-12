@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.domain.usecase.auth.LoginUseCase
 import com.casha.app.domain.usecase.auth.GoogleLoginUseCase
+import com.casha.app.domain.usecase.notification.FcmRegistrationUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,7 +27,8 @@ data class LoginUiState(
 class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val googleLoginUseCase: GoogleLoginUseCase,
-    private val authManager: AuthManager
+    private val authManager: AuthManager,
+    private val fcmRegistrationUseCase: FcmRegistrationUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -52,6 +54,10 @@ class LoginViewModel @Inject constructor(
             try {
                 val result = loginUseCase(state.email.trim(), state.password)
                 authManager.saveAccessToken(result.token)
+                
+                // Safely trigger FCM token registration now that JWT is saved
+                fcmRegistrationUseCase()
+
                 if (result.currency != null) {
                     authManager.saveCurrency(result.currency)
                     _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }
@@ -75,6 +81,10 @@ class LoginViewModel @Inject constructor(
             try {
                 val result = googleLoginUseCase(idToken)
                 authManager.saveAccessToken(result.token)
+                
+                // Safely trigger FCM token registration now that JWT is saved
+                fcmRegistrationUseCase()
+
                 if (result.currency != null) {
                     authManager.saveCurrency(result.currency)
                     _uiState.update { it.copy(isLoading = false, isLoggedIn = true) }

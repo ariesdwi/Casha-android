@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.res.stringResource
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.LiabilityPayment
 import java.text.SimpleDateFormat
@@ -45,7 +47,7 @@ fun PaymentHistoryListView(
             Column(modifier = Modifier.fillMaxSize()) {
                 // Top App Bar
                 TopAppBar(
-                    title = { Text("Riwayat Pembayaran", fontWeight = FontWeight.SemiBold) },
+                    title = { Text(stringResource(R.string.liabilities_detail_history_title), fontWeight = FontWeight.SemiBold) },
                     navigationIcon = {
                         IconButton(onClick = onDismissRequest) {
                             Icon(Icons.Default.Close, contentDescription = "Close")
@@ -73,7 +75,7 @@ fun PaymentHistoryListView(
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
-                            text = "Belum ada riwayat pembayaran",
+                            text = stringResource(R.string.liabilities_detail_history_no_data),
                             fontSize = 18.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onBackground
@@ -142,7 +144,7 @@ private fun PaymentSummaryCard(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Ringkasan",
+                    text = stringResource(R.string.liabilities_detail_history_summary),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -158,7 +160,7 @@ private fun PaymentSummaryCard(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
-                        text = "Total Dibayar",
+                        text = stringResource(R.string.liabilities_detail_payment_total),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -175,7 +177,7 @@ private fun PaymentSummaryCard(
                     color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                 ) {
                     Text(
-                        text = "${payments.size} pembayaran",
+                        text = stringResource(R.string.liabilities_detail_history_count, payments.size),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
@@ -189,7 +191,7 @@ private fun PaymentSummaryCard(
             ) {
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = "Pokok",
+                        text = stringResource(R.string.liabilities_detail_history_principal),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -203,7 +205,7 @@ private fun PaymentSummaryCard(
 
                 Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                     Text(
-                        text = "Bunga",
+                        text = stringResource(R.string.liabilities_detail_history_interest),
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -282,7 +284,7 @@ private fun PaymentHistoryRow(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Pokok: ${CurrencyFormatter.format(pokok, userCurrency)}",
+                        text = stringResource(R.string.liabilities_detail_history_principal_value, CurrencyFormatter.format(pokok, userCurrency)),
                         fontSize = 10.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -300,7 +302,7 @@ private fun PaymentHistoryRow(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "Bunga: ${CurrencyFormatter.format(payment.interestPaid!!, userCurrency)}",
+                        text = stringResource(R.string.liabilities_detail_history_interest_value, CurrencyFormatter.format(payment.interestPaid!!, userCurrency)),
                         fontSize = 10.sp,
                         color = Color(0xFFFF9800)
                     )
@@ -324,7 +326,7 @@ private fun PaymentHistoryRow(
 
             payment.balanceAfterPayment?.let { balance ->
                 Text(
-                    text = "Sisa: ${CurrencyFormatter.format(balance, userCurrency)}",
+                    text = stringResource(R.string.liabilities_detail_history_remaining, CurrencyFormatter.format(balance, userCurrency)),
                     fontSize = 10.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

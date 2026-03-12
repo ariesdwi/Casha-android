@@ -11,6 +11,7 @@ sealed class NavRoutes(val route: String) {
     data object Register : NavRoutes("register")
     data object ForgotPassword : NavRoutes("forgot_password")
     data object SetupCurrency : NavRoutes("setup_currency")
+    data object Onboarding : NavRoutes("onboarding")
 
     // ── App Loading ──
     data object AppLoading : NavRoutes("app_loading")

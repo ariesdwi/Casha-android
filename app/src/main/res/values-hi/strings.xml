@@ -382,7 +382,6 @@
     <string name="report_percentage_of_total">कुल का %d%%</string>
     <string name="report_section_spending_by_category">श्रेणी अनुसार खर्च</string>
     <string name="report_title">रिपोर्ट</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">रद्द करें</string>
     <string name="profile_action_clear_all">सब साफ करें</string>
     <string name="profile_action_delete">हटाएं</string>
@@ -495,4 +494,164 @@
     <string name="portfolio_validation_amount_required">राशि आवश्यक है</string>
     <string name="portfolio_validation_category_required">श्रेणी आवश्यक है</string>
     <string name="portfolio_validation_name_required">एसेट का नाम आवश्यक है</string>
-<string name="nav_report">रिपोर्ट</string><string name="nav_dashboard">मुख्य</string><string name="nav_add">जोड़ें</string><string name="nav_transactions">लेनदेन</string><string name="nav_budget">बजट</string></resources>
+    <string name="nav_report">रिपोर्ट</string>
+    <string name="nav_dashboard">मुख्य</string>
+    <string name="nav_add">जोड़ें</string>
+    <string name="nav_transactions">लेनदेन</string>
+    <string name="nav_budget">बजट</string>
+    <string name="subscription_button_lifetime">आजीवन एक्सेस प्राप्त करें</string>
+    <string name="subscription_button_processing">प्रसंस्करण...</string>
+    <string name="subscription_button_retrying">पुनः प्रयास...</string>
+    <string name="subscription_button_select_plan">एक योजना चुनें</string>
+    <string name="subscription_button_start_trial">मुफ्त ट्रायल शुरू करें</string>
+    <string name="subscription_button_try_again">पुनः प्रयास करें</string>
+    <string name="subscription_error_load_failed">उत्पाद लोड करने में विफल: %s</string>
+    <string name="subscription_error_product_not_found">उत्पाद उपलब्ध नहीं है। कृपया बाद में पुनः प्रयास करें。</string>
+    <string name="subscription_error_receipt_unavailable">खरीदारी सत्यापित नहीं हो सकी। कृपया इंटरनेट कनेक्शन जाँचें।</string>
+    <string name="subscription_error_restore_failed">खरीदारी पुनर्स्थापित करने में विफल</string>
+    <string name="subscription_error_unknown">अज्ञात खरीदारी परिणाम</string>
+    <string name="subscription_error_verification_failed">खरीदारी सत्यापन विफल। कृपया सहायता से संपर्क करें।</string>
+    <string name="subscription_error_view_title">सदस्यता लोड नहीं हो सकी</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">अपने पोर्टफोलियो और देनदारियों का गहन विश्लेषण।</string>
+    <string name="subscription_feature_advanced_analytics_title">उन्नत विश्लेषण</string>
+    <string name="subscription_feature_ai_advisor_subtitle">आपके खर्चों के लिए व्यक्तिगत अंतर्दृष्टि।</string>
+    <string name="subscription_feature_ai_advisor_title">AI वित्तीय सलाहकार</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">बस एक फ़ोटो से तुरंत वर्गीकरण।</string>
+    <string name="subscription_feature_receipt_scanner_title">स्मार्ट रसीद स्कैनर</string>
+    <string name="subscription_feature_smart_alerts_subtitle">बजट सीमा फिर कभी न चूकें।</string>
+    <string name="subscription_feature_smart_alerts_title">स्मार्ट अलर्ट</string>
+    <string name="subscription_footer_cancel_anytime">App Store सेटिंग्स में कभी भी मासिक सदस्यता रद्द करें।</string>
+    <string name="subscription_link_privacy">गोपनीयता</string>
+    <string name="subscription_link_restore">खरीदारी पुनर्स्थापित करें</string>
+    <string name="subscription_link_terms">शर्तें</string>
+    <string name="subscription_overlay_securing_access">आपकी पहुँच सुरक्षित हो रही है...</string>
+    <string name="subscription_plan_best_value">सर्वोत्तम मूल्य</string>
+    <string name="subscription_plan_flexible">लचीला</string>
+    <string name="subscription_plan_lifetime_description">एकमुश्त भुगतान। हमेशा के लिए असीमित पहुँच। कोई आवर्ती शुल्क नहीं।</string>
+    <string name="subscription_plan_monthly_description">सभी सुविधाओं तक पूर्ण पहुँच। कभी भी रद्द करें। 3 दिन का मुफ्त ट्रायल।</string>
+    <string name="subscription_plan_savings">बचत</string>
+    <string name="subscription_status_pending">खरीदारी स्वीकृति की प्रतीक्षा में</string>
+    <string name="subscription_subtitle_join_users">10,000+ उपयोगकर्ताओं से जुड़ें जो
+अपने वित्तीय भविष्य में महारत हासिल कर रहे हैं。</string>
+    <string name="subscription_success_subtitle">वित्तीय स्वतंत्रता की आपकी यात्रा
+बहुत अधिक स्मार्ट हो गई है。</string>
+    <string name="subscription_success_welcome">Casha Premium में आपका स्वागत है!</string>
+    <string name="subscription_title_get_premium">Premium प्राप्त करें</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">छोड़ें</string>
+    <string name="onboarding_cta_hook">और जानें</string>
+    <string name="onboarding_cta_chat_input">देखें यह कैसे काम करता है</string>
+    <string name="onboarding_cta_revelation">डैशबोर्ड एक्सप्लोर करें</string>
+    <string name="onboarding_cta_transaction_history">लेनदेन देखें</string>
+    <string name="onboarding_cta_budget_tracker">बजट देखें</string>
+    <string name="onboarding_cta_portfolio">पोर्टफोलियो देखें</string>
+    <string name="onboarding_cta_liabilities">ऋण ट्रैक करें</string>
+    <string name="onboarding_cta_goal_tracker">लक्ष्य निर्धारित करें</string>
+    <string name="onboarding_cta_global_power">ग्लोबल जाएं</string>
+    <string name="onboarding_cta_offline_sync">शुरू करें</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">आपका पैसा, पूर्ण नियंत्रण में।</string>
+    <string name="onboarding_hook_subtitle">सभी खर्च एक ही स्थान पर व्यवस्थित रूप से रिकॉर्ड किए गए।</string>
+    <string name="onboarding_hook_bullet1">स्वचालित रूप से लेनदेन रिकॉर्ड करें</string>
+    <string name="onboarding_hook_bullet2">देखें कि आपका पैसा कहाँ जाता है</string>
+    <string name="onboarding_hook_bullet3">बेहतर वित्तीय निर्णय लें</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">खर्चों को टाइप करने की\nगति से रिकॉर्ड करें।</string>
+    <string name="onboarding_chat_subtitle">कोई लंबे फॉर्म नहीं। बस मुझे बताएं।</string>
+    <string name="onboarding_chat_bullet1">स्वाभाविक रूप से टाइप करें, लेनदेन तुरंत रिकॉर्ड हो जाते हैं</string>
+    <string name="onboarding_chat_bullet2">रसीद स्कैन करें, डेटा स्वचालित रूप से भर जाता है</string>
+    <string name="onboarding_chat_bullet3">मैनुअल इनपुट के बिना स्मार्ट श्रेणियां</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">ऑनलाइन</string>
+    <string name="onboarding_chat_mock_timestamp">आज, 09.41</string>
+    <string name="onboarding_chat_mock_user_msg">कॉफी 25rb</string>
+    <string name="onboarding_chat_mock_ai_confirm">समझ गया! रिकॉर्ड किया गया:</string>
+    <string name="onboarding_chat_mock_ai_result">कॉफी — Rp25.000</string>
+    <string name="onboarding_chat_mock_recorded">रिकॉर्ड किया गया</string>
+    <string name="onboarding_chat_mock_input_placeholder">लेनदेन टाइप करें या रसीद स्कैन करें…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">आपका शुद्ध नकद प्रवाह\nइस महीने Rp2,5 Juta है। 👏</string>
+    <string name="onboarding_revelation_bullet1">Rp15 Juta आवक में से, Rp12,5 Juta जावक</string>
+    <string name="onboarding_revelation_bullet2">वीकेंड आपके खर्च का पीक समय है</string>
+    <string name="onboarding_revelation_bullet3">अपने सरप्लस को बनाए रखने के लिए इस ट्रेंड की निगरानी करें</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">हाल के लेनदेन</string>
+    <string name="onboarding_history_title">आज के सभी लेनदेन\nव्यवस्थित रूप से रिकॉर्ड किए गए हैं।</string>
+    <string name="onboarding_history_subtitle">सुबह की कॉफी से लेकर फ्रीलांस तक — कुछ भी छूटता नहीं है।</string>
+    <string name="onboarding_history_bullet1">Starbucks, Grab, से लेकर आय तक स्वचालित रूप से दर्ज</string>
+    <string name="onboarding_history_bullet2">प्रत्येक लेनदेन को तुरंत वर्गीकृत किया जाता है</string>
+    <string name="onboarding_history_bullet3">लेनदेन इतिहास को चैट की तरह आसानी से खोजें</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">Rp6,2 Juta बजट में से\nRp4,3 Juta उपयोग किया गया।</string>
+    <string name="onboarding_budget_subtitle">Rp1,85 Juta शेष — महीने के अंत से पहले इसे प्रबंधित करें।</string>
+    <string name="onboarding_budget_bullet1">परिवहन लगभग खत्म — केवल 8% शेष</string>
+    <string name="onboarding_budget_bullet2">खाद्य और पेय चेतावनी 82% पर</string>
+    <string name="onboarding_budget_bullet3">क्रिटिकल बजट पर स्वचालित सूचनाएं</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">आपकी सभी संपत्तियां,\nएक डैशबोर्ड।</string>
+    <string name="onboarding_portfolio_subtitle">एक-एक करके चेक करने की जरूरत नहीं। Casha सब कुछ संक्षेप में प्रस्तुत करता है।</string>
+    <string name="onboarding_portfolio_bullet1">5 स्टॉक, 2 सोना और बचत — तुरंत निगरानी</string>
+    <string name="onboarding_portfolio_bullet2">रिटर्न +5.8%, अप्राप्त लाभ Rp2,5 Juta</string>
+    <string name="onboarding_portfolio_bullet3">कीमतें स्वचालित रूप से अपडेट होती हैं, कोई मैनुअल रिफ्रेश नहीं</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">बंधक और क्रेडिट कार्ड\nसभी की निगरानी।</string>
+    <string name="onboarding_liabilities_subtitle">15 और 25 तारीख को देय — Casha आपको समय पर याद दिलाता है।</string>
+    <string name="onboarding_liabilities_bullet1">बंधक Rp480 Juta — 14 वर्ष शेष</string>
+    <string name="onboarding_liabilities_bullet2">Rp20 Juta में से Rp5,2 Juta क्रेडिट कार्ड उपयोग किया गया</string>
+    <string name="onboarding_liabilities_bullet3">कुल किस्त Rp2,2 Juta प्रति माह — स्वचालित रूप से ट्रैक</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3 लक्ष्य, 1 पूर्ण।\nनिरंतर बने रहें।</string>
+    <string name="onboarding_goal_bullet1">Rp500 Juta लक्ष्य की कुल प्रगति 30%</string>
+    <string name="onboarding_goal_bullet2">सपनों का घर Rp250 Juta बचत — 25% प्राप्त</string>
+    <string name="onboarding_goal_bullet3">30 दिनों में निकटतम समय सीमा — हॉलिडे फंड</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">वैश्विक नागरिकों के लिए\nबहु-मुद्रा समर्थन।</string>
+    <string name="onboarding_global_bullet1">IDR, USD, EUR, JPY और अधिक में संपत्तियों को ट्रैक करें</string>
+    <string name="onboarding_global_bullet2">रीयल-टाइम विनिमय दरें, हमेशा सटीक</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">ऑफ़लाइन काम करता है,\nहर जगह सिंक होता है।</string>
+    <string name="onboarding_sync_premium_title">प्रीमियम विशेषताएं</string>
+    <string name="onboarding_sync_feature1">AI-संचालित वित्तीय अंतर्दृष्टि</string>
+    <string name="onboarding_sync_feature2">स्मार्ट रसीद स्कैनर</string>
+    <string name="onboarding_sync_feature3">उन्नत विश्लेषण और रिपोर्ट</string>
+    <string name="onboarding_sync_feature4">प्राथमिकता सहायता</string>
+    <string name="onboarding_sync_start_button">अपनी यात्रा शुरू करें 🚀</string>
+    <string name="onboarding_sync_status_offline">ऑफ़लाइन मोड</string>
+    <string name="onboarding_sync_status_syncing">सिंक हो रहा है…</string>
+    <string name="onboarding_sync_status_done">सब सिंक हो गया!</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">इस महीने</string>
+    <string name="onboarding_mock_category_food">खाद्य और पेय</string>
+    <string name="onboarding_mock_category_transport">परिवहन</string>
+    <string name="onboarding_mock_category_income">आय</string>
+    <string name="onboarding_mock_trx_coffee">स्टारबक्स कॉफी</string>
+    <string name="onboarding_mock_trx_ride">ग्रैब राइड</string>
+    <string name="onboarding_mock_trx_freelance">फ्रीलांस प्रोजेक्ट</string>
+    <string name="onboarding_mock_budget_total">कुल बजट</string>
+    <string name="onboarding_mock_asset_saving">BCA बचत</string>
+    <string name="onboarding_mock_asset_stock">BBCA स्टॉक</string>
+    <string name="onboarding_mock_liability_mortgage">KPR BTN</string>
+    <string name="onboarding_mock_liability_credit">BCA प्लेटिनम</string>
+    <string name="onboarding_mock_goal_house">सपनों का घर</string>
+    <string name="onboarding_mock_goal_category_home">घर</string>
+    <string name="onboarding_mock_currency">Rp</string>
+    <string name="day_mon">सोम</string>
+    <string name="day_tue">मंगल</string>
+    <string name="day_wed">बुध</string>
+    <string name="day_thu">गुरु</string>
+    <string name="day_fri">शुक्र</string>
+    <string name="day_sat">शनि</string>
+    <string name="day_sun">रवि</string>
+</resources>

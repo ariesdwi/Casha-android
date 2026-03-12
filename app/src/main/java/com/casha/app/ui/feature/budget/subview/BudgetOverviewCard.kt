@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.budget.subview
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +27,16 @@ import com.casha.app.ui.theme.*
 import androidx.compose.ui.res.stringResource
 import com.casha.app.R
 
+@Composable
+private fun getProgressColor(spentPercentage: Float): Color {
+    val isDark = isSystemInDarkTheme()
+    return when {
+        spentPercentage < 0.7f -> if (isDark) Color(0xFF81C784) else CashaSuccess
+        spentPercentage < 0.9f -> if (isDark) Color(0xFFFFB74D) else CashaWarning
+        else -> if (isDark) Color(0xFFE57373) else CashaDanger
+    }
+}
+
 /**
  * Premium budget overview card with a custom donut chart and detailed stats.
  */
@@ -40,11 +51,11 @@ fun BudgetOverviewCard(
     val spentPercentage = if (totalBudget > 0) (totalSpent / totalBudget).toFloat() else 0f
     val displayPercentage = (spentPercentage * 100).toInt()
     
-    val progressColor = when {
-        spentPercentage < 0.7f -> CashaSuccess
-        spentPercentage < 0.9f -> CashaWarning
-        else -> CashaDanger
-    }
+    val progressColor = getProgressColor(spentPercentage)
+    
+    val isDark = isSystemInDarkTheme()
+    val successColor = if (isDark) Color(0xFF81C784) else CashaSuccess
+    val dangerColor = if (isDark) Color(0xFFE57373) else CashaDanger
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -129,7 +140,7 @@ fun BudgetOverviewCard(
                 )
                 StatCard(
                     icon = Icons.Default.CheckCircle,
-                    iconColor = if (totalRemaining >= 0) CashaSuccess else CashaDanger,
+                    iconColor = if (totalRemaining >= 0) successColor else dangerColor,
                     amount = totalRemaining,
                     label = stringResource(R.string.budget_label_remaining).uppercase(),
                     modifier = Modifier.weight(1f)
@@ -163,7 +174,7 @@ fun BudgetOverviewCard(
                 Text(
                     text = "${stringResource(R.string.budget_label_remaining)}: ${CurrencyFormatter.format(totalRemaining)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (totalRemaining >= 0) CashaSuccess else CashaDanger
+                    color = if (totalRemaining >= 0) successColor else dangerColor
                 )
             }
         }

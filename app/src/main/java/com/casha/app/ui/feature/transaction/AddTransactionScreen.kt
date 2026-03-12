@@ -120,16 +120,16 @@ fun AddTransactionScreen(
     val screenTitle = if (isEditMode) "Edit Transaksi"
         else if (entryType == EntryType.EXPENSE) stringResource(R.string.add_transaction_title_expense) else stringResource(R.string.add_transaction_title_income)
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onNavigateBack,
+onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = MaterialTheme.colorScheme.background
     ) {
         Scaffold(
-            modifier = Modifier.fillMaxHeight(0.9f),
+            modifier = Modifier.fillMaxSize(),
             containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 Row(

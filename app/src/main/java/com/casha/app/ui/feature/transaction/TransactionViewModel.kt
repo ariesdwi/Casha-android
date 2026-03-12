@@ -225,7 +225,7 @@ class TransactionViewModel @Inject constructor(
                 val activeCategories = result.filter { it.isActive }
                 _uiState.update { it.copy(categories = activeCategories) }
             } catch (e: Exception) {
-                // Silently fail or log
+                android.util.Log.e("TransactionVM", "Failed to fetch categories: ${e.message}")
             }
         }
     }

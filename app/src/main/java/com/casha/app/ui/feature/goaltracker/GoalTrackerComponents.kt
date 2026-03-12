@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.goaltracker
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -305,7 +306,9 @@ fun GoalCategoryPickerBottomSheet(
     onDismiss: () -> Unit,
     onCategorySelected: (GoalCategory) -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismiss) {
+    ModalBottomSheet(
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss) {
         Column(modifier = Modifier.padding(bottom = 24.dp)) {
             Text(
                 stringResource(R.string.goal_details_select_category),

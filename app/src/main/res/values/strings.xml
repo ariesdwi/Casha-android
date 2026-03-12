@@ -2,30 +2,41 @@
 <resources>
     <string name="app_name">Casha</string>
     <string name="subscription_title_get_premium">Get Premium</string>
-    <string name="subscription_subtitle_join_users">Join thousands of users who are taking control of their finances with Casha Premium.</string>
+    <string name="subscription_subtitle_join_users">Join 10,000+ users mastering
+their financial future.</string>
     <string name="subscription_feature_ai_advisor_title">AI Financial Advisor</string>
-    <string name="subscription_feature_ai_advisor_subtitle">Get personalized insights and advice based on your spending habits.</string>
+    <string name="subscription_feature_ai_advisor_subtitle">Personalized insights for your spending.</string>
     <string name="subscription_feature_receipt_scanner_title">Smart Receipt Scanner</string>
-    <string name="subscription_feature_receipt_scanner_subtitle">Extract transaction details automatically from your receipts.</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">Instant categorization with just a photo.</string>
     <string name="subscription_feature_advanced_analytics_title">Advanced Analytics</string>
-    <string name="subscription_feature_advanced_analytics_subtitle">Deep dive into your financial data with beautiful charts.</string>
-    <string name="subscription_feature_smart_alerts_title">Smart Budget Alerts</string>
-    <string name="subscription_feature_smart_alerts_subtitle">Stay on track with intelligent notifications before you overspend.</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">Deep dive into your portfolio &amp; liabilities.</string>
+    <string name="subscription_feature_smart_alerts_title">Smart Alerts</string>
+    <string name="subscription_feature_smart_alerts_subtitle">Never miss a budget threshold again.</string>
     <string name="subscription_button_get_premium">Get Premium</string>
     <string name="subscription_button_start_trial">Start Free Trial</string>
-    <string name="subscription_button_lifetime">Lifetime Access</string>
+    <string name="subscription_button_lifetime">Get Lifetime Access</string>
     <string name="subscription_button_processing">Processing...</string>
     <string name="subscription_button_select_plan">Select a Plan</string>
     <string name="subscription_link_restore">Restore Purchases</string>
-    <string name="subscription_link_terms">Terms of Service</string>
-    <string name="subscription_link_privacy">Privacy Policy</string>
-    <string name="subscription_footer_cancel_anytime">Cancel anytime in your App Store settings. Managed by Google Play.</string>
-    <string name="subscription_overlay_securing_access">Securing your access…</string>
-    <string name="subscription_success_welcome">Welcome to Premium!</string>
-    <string name="subscription_success_subtitle">You now have unlimited access to all features. Enjoy your financial journey!</string>
+    <string name="subscription_link_terms">Terms</string>
+    <string name="subscription_link_privacy">Privacy</string>
+    <string name="subscription_footer_cancel_anytime">Cancel subscription anytime in Google Play settings.</string>
+    <string name="subscription_overlay_securing_access">Securing your access...</string>
+    <string name="subscription_success_welcome">Welcome to Casha Premium!</string>
+    <string name="subscription_success_subtitle">Your journey to financial freedom
+just got a whole lot smarter.</string>
     <string name="subscription_label_best_value">BEST VALUE</string>
     <string name="subscription_label_per_month">/ month</string>
     <string name="subscription_label_one_time">one-time</string>
+    <string name="subscription_social_proof">Used by 10,000+ users to achieve financial freedom</string>
+    <string name="subscription_testimonial_quote">"This app completely changed how I manage my money. The AI coach is like having a financial advisor in my pocket."</string>
+    <string name="subscription_testimonial_author">- Sarah M.</string>
+    <string name="subscription_plan_yearly_save">Save 40%</string>
+    <string name="subscription_plan_weekly_desc">Try it for a week</string>
+    <string name="subscription_label_per_week">/ week</string>
+    <string name="subscription_label_per_year">/ year</string>
+    <string name="subscription_plan_lifetime_desc">One-time payment</string>
+    <string name="subscription_plan_monthly_desc">Full access</string>
     <string name="auth_login_email">Email</string>
     <string name="auth_login_email_placeholder">Enter your email</string>
     <string name="auth_login_password">Password</string>
@@ -410,7 +421,6 @@
     <string name="report_percentage_of_total">%d%% of total</string>
     <string name="report_section_spending_by_category">Spending by Category</string>
     <string name="report_title">Report</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">Cancel</string>
     <string name="profile_action_clear_all">Clear All</string>
     <string name="profile_action_delete">Delete</string>
@@ -523,4 +533,337 @@
     <string name="portfolio_validation_amount_required">Amount is required</string>
     <string name="portfolio_validation_category_required">Category is required</string>
     <string name="portfolio_validation_name_required">Asset name is required</string>
-<string name="nav_report">Report</string><string name="nav_dashboard">Home</string><string name="nav_add">Add</string><string name="nav_transactions">Transactions</string><string name="nav_budget">Budget</string></resources>
+    <string name="nav_report">Report</string>
+    <string name="nav_dashboard">Home</string>
+    <string name="nav_add">Add</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_budget">Budget</string>
+    <string name="budget_banner_of">of %s</string>
+    <string name="category">Category</string>
+    <string name="subscription_button_retrying">Retrying...</string>
+    <string name="subscription_button_try_again">Try Again</string>
+    <string name="subscription_error_load_failed">Failed to load products: %s</string>
+    <string name="subscription_error_product_not_found">Product not available. Please try again later.</string>
+    <string name="subscription_error_receipt_unavailable">Unable to verify purchase. Please check your internet connection.</string>
+    <string name="subscription_error_restore_failed">Failed to restore purchases</string>
+    <string name="subscription_error_unknown">Unknown purchase result</string>
+    <string name="subscription_error_verification_failed">Purchase verification failed. Please contact support.</string>
+    <string name="subscription_error_view_title">Unable to load subscriptions</string>
+    <string name="subscription_plan_best_value">Best Value</string>
+    <string name="subscription_plan_flexible">Flexible</string>
+    <string name="subscription_plan_lifetime_description">One-time payment. Unlimited access forever. No recurring fees.</string>
+    <string name="subscription_plan_monthly_description">Full access to all features. Cancel anytime. 3-day free trial.</string>
+    <string name="subscription_plan_savings">SAVINGS</string>
+    <string name="subscription_status_pending">Purchase pending approval</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_cta_hook">Tell Me More</string>
+    <string name="onboarding_cta_chat_input">See How It Works</string>
+    <string name="onboarding_cta_revelation">Explore Dashboard</string>
+    <string name="onboarding_cta_transaction_history">See Transactions</string>
+    <string name="onboarding_cta_budget_tracker">View Budget</string>
+    <string name="onboarding_cta_portfolio">See Portfolio</string>
+    <string name="onboarding_cta_liabilities">Track Debts</string>
+    <string name="onboarding_cta_goal_tracker">Set Goals</string>
+    <string name="onboarding_cta_global_power">Go Global</string>
+    <string name="onboarding_cta_offline_sync">Get Started</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">Your money, in full control.</string>
+    <string name="onboarding_hook_subtitle">All expenses neatly recorded in one place.</string>
+    <string name="onboarding_hook_bullet1">Automatically record transactions</string>
+    <string name="onboarding_hook_bullet2">See where your money goes</string>
+    <string name="onboarding_hook_bullet3">Make smarter financial decisions</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">Record expenses\nas fast as typing.</string>
+    <string name="onboarding_chat_subtitle">No long forms. Just tell me.</string>
+    <string name="onboarding_chat_bullet1">Type naturally, transactions recorded instantly</string>
+    <string name="onboarding_chat_bullet2">Scan receipt, data filled automatically</string>
+    <string name="onboarding_chat_bullet3">Smart categories without manual input</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">Online</string>
+    <string name="onboarding_chat_mock_timestamp">Today, 09.41</string>
+    <string name="onboarding_chat_mock_user_msg">Coffee 25rb</string>
+    <string name="onboarding_chat_mock_ai_confirm">Got it! Recorded:</string>
+    <string name="onboarding_chat_mock_ai_result">Coffee — Rp25.000</string>
+    <string name="onboarding_chat_mock_recorded">Recorded</string>
+    <string name="onboarding_chat_mock_input_placeholder">Type transaction or scan receipt…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">Your net cashflow\nRp2,5 Juta this month. 👏</string>
+    <string name="onboarding_revelation_bullet1">From Rp15 Juta in, Rp12,5 Juta out</string>
+    <string name="onboarding_revelation_bullet2">Weekends are your peak spending times</string>
+    <string name="onboarding_revelation_bullet3">Monitor this trend to maintain your surplus</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">Recent Transactions</string>
+    <string name="onboarding_history_title">All of today\'s transactions\nneatly recorded.</string>
+    <string name="onboarding_history_subtitle">From morning coffee to freelance — nothing is missed.</string>
+    <string name="onboarding_history_bullet1">Starbucks, Grab, to income entered automatically</string>
+    <string name="onboarding_history_bullet2">Each transaction is immediately categorized</string>
+    <string name="onboarding_history_bullet3">Search transaction history as easily as chat</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">Rp7,9 Juta used\nof Rp10,4 Juta budget.</string>
+    <string name="onboarding_budget_subtitle">Rp2,5 Juta remaining — manage it before the month ends.</string>
+    <string name="onboarding_budget_bullet1">Transport almost gone — only 8% left</string>
+    <string name="onboarding_budget_bullet2">Food &amp; Drink warning at 82%</string>
+    <string name="onboarding_budget_bullet3">Automatic notifications at critical budget</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">All your assets,\none dashboard.</string>
+    <string name="onboarding_portfolio_subtitle">No need to check one by one. Casha summarizes it all.</string>
+    <string name="onboarding_portfolio_bullet1">5 stocks, 2 gold &amp; savings — monitored instantly</string>
+    <string name="onboarding_portfolio_bullet2">Return +5.8%, unrealized gain Rp2,5 Juta</string>
+    <string name="onboarding_portfolio_bullet3">Prices updated automatically, no manual refresh</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">Mortgage &amp; credit cards\nall monitored.</string>
+    <string name="onboarding_liabilities_subtitle">Due on dates 15 &amp; 25 — Casha reminds you on time.</string>
+    <string name="onboarding_liabilities_bullet1">Mortgage Rp480 Juta — 14 years remaining</string>
+    <string name="onboarding_liabilities_bullet2">Credit card Rp5,2 Juta used of Rp20 Juta</string>
+    <string name="onboarding_liabilities_bullet3">Total installments Rp2,2 Juta per month — tracked automatically</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3 goals, 1 completed.\nStay consistent.</string>
+    <string name="onboarding_goal_bullet1">Overall progress 30% of Rp500 Juta target</string>
+    <string name="onboarding_goal_bullet2">Dream home Rp250 Juta saved — 25% achieved</string>
+    <string name="onboarding_goal_bullet3">Nearest deadline in 30 days — Holiday Fund</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">Multi-currency support\nfor global citizens.</string>
+    <string name="onboarding_global_bullet1">Track assets in IDR, USD, EUR, JPY, and more</string>
+    <string name="onboarding_global_bullet2">Real-time exchange rates, always accurate</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">Works offline,\nsyncs everywhere.</string>
+    <string name="onboarding_sync_premium_title">Premium Features</string>
+    <string name="onboarding_sync_feature1">AI-powered financial insights</string>
+    <string name="onboarding_sync_feature2">Smart receipt scanner</string>
+    <string name="onboarding_sync_feature3">Advanced analytics &amp; reports</string>
+    <string name="onboarding_sync_feature4">Priority support</string>
+    <string name="onboarding_sync_start_button">Start Your Journey 🚀</string>
+    <string name="onboarding_sync_status_offline">Offline Mode</string>
+    <string name="onboarding_sync_status_syncing">Syncing…</string>
+    <string name="onboarding_sync_status_done">All Synced!</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">This Month</string>
+    <string name="onboarding_mock_category_food">Food &amp; Drink</string>
+    <string name="onboarding_mock_category_transport">Transport</string>
+    <string name="onboarding_mock_category_income">Income</string>
+    <string name="onboarding_mock_trx_coffee">Starbucks Coffee</string>
+    <string name="onboarding_mock_trx_ride">Grab Ride</string>
+    <string name="onboarding_mock_trx_freelance">Freelance Project</string>
+    <string name="onboarding_mock_budget_total">Total Budget</string>
+    <string name="onboarding_mock_asset_saving">BCA Savings</string>
+    <string name="onboarding_mock_asset_stock">BBCA Stocks</string>
+    <string name="onboarding_mock_liability_mortgage">KPR BTN</string>
+    <string name="onboarding_mock_liability_credit">BCA Platinum</string>
+    <string name="onboarding_mock_goal_house">Rumah Impian</string>
+    <string name="onboarding_mock_goal_category_home">Home</string>
+    <string name="onboarding_mock_currency">Rp</string>
+    <string name="day_mon">Mon</string>
+    <string name="day_tue">Tue</string>
+    <string name="day_wed">Wed</string>
+    <string name="day_thu">Thu</string>
+    <string name="day_fri">Fri</string>
+    <string name="day_sat">Sat</string>
+    <string name="day_sun">Sun</string>
+
+    <!-- Liabilities Form Views -->
+    <string name="liabilities_simulation_title">Payoff Simulation</string>
+    <string name="liabilities_simulation_subtitle">See automatic estimates for paying off your debt</string>
+    <string name="liabilities_simulation_strategy">Payment Strategy</string>
+    <string name="liabilities_simulation_additional_budget">Additional Monthly Budget</string>
+    <string name="liabilities_simulation_calculate">Calculate Simulation</string>
+    <string name="liabilities_simulation_no_data">No simulation data available for this budget</string>
+    <string name="liabilities_simulation_analysis_result">ANALYSIS RESULT</string>
+    <string name="liabilities_simulation_estimated_payoff">Estimated Payoff</string>
+    <string name="liabilities_simulation_time_saved">Time Saved</string>
+    <string name="liabilities_simulation_faster">Faster</string>
+    <string name="liabilities_simulation_interest_saved">Interest Saved</string>
+    <string name="liabilities_simulation_potential_savings">Total potential savings</string>
+    <string name="liabilities_simulation_payoff_order">Payoff Order</string>
+    <string name="liabilities_simulation_pay_per_month">Pay: %s/mo</string>
+    <string name="liabilities_simulation_paid_off">Paid Off</string>
+    
+    <string name="liabilities_payment_record_title">Record Payment</string>
+    <string name="liabilities_payment_record_remaining">Remaining: %s</string>
+    <string name="liabilities_payment_record_amount">Amount *</string>
+    <string name="liabilities_payment_record_installment">Installment</string>
+    <string name="liabilities_payment_record_full_payoff">Full Payoff</string>
+    <string name="liabilities_payment_record_date">Payment Date *</string>
+    <string name="liabilities_payment_record_type">Payment Type</string>
+    <string name="liabilities_payment_record_type_min">Minimum</string>
+    <string name="liabilities_payment_record_type_partial">Partial</string>
+    <string name="liabilities_payment_record_type_full">Full</string>
+    <string name="liabilities_payment_record_optional">OPTIONAL</string>
+    <string name="liabilities_payment_record_principal_portion">Principal Portion</string>
+    <string name="liabilities_payment_record_interest_portion">Interest Portion</string>
+    <string name="liabilities_payment_record_auto">auto</string>
+    <string name="liabilities_payment_record_leave_empty_auto">Leave empty for auto</string>
+    <string name="liabilities_payment_record_notes">Notes</string>
+    <string name="liabilities_payment_record_notes_placeholder">e.g., Transfer via ATM</string>
+    <string name="liabilities_payment_record_preview">Preview:</string>
+    <string name="liabilities_payment_record_principal">Principal: %s</string>
+    <string name="liabilities_payment_record_interest">Interest: %s</string>
+    <string name="liabilities_payment_record_balance_after">Balance after payment: %s</string>
+    <string name="liabilities_payment_record_submit">Pay</string>
+
+    <string name="liabilities_add_installment_title">Add Installment</string>
+    <string name="liabilities_add_installment_name">Installment Name *</string>
+    <string name="liabilities_add_installment_name_placeholder">e.g., iPhone 16 Pro</string>
+    <string name="liabilities_add_installment_total">Total Amount *</string>
+    <string name="liabilities_add_installment_per_month">Monthly Installment *</string>
+    <string name="liabilities_add_installment_tenor">Tenor (months) *</string>
+    <string name="liabilities_add_installment_current_month">Months Elapsed</string>
+    <string name="liabilities_add_installment_current_month_hint">Fill if installment started before using Casha</string>
+    <string name="liabilities_add_installment_start_date">Start Date</string>
+
+    <string name="liabilities_transaction_record_title">Record Transaction</string>
+    <string name="liabilities_transaction_record_name">Transaction Name *</string>
+    <string name="liabilities_transaction_record_name_placeholder">e.g., Target Shopping</string>
+    <string name="liabilities_transaction_record_amount">Amount *</string>
+    <string name="liabilities_transaction_record_category">Category *</string>
+    <string name="liabilities_transaction_record_select_category">Select Category</string>
+    <string name="liabilities_transaction_record_description">Description</string>
+    <string name="liabilities_transaction_record_description_placeholder">Add an optional note</string>
+    <string name="liabilities_transaction_record_card_info">Card Info:</string>
+    <string name="liabilities_transaction_record_remaining_limit">Remaining limit: %s</string>
+    <string name="liabilities_transaction_record_after_transaction">After transaction: %s</string>
+    <string name="liabilities_transaction_record_submit">Record</string>
+
+    <!-- Liability Balance Card -->
+    <string name="liabilities_card_current_bill">Current Bill</string>
+    <string name="liabilities_card_available">Available</string>
+    <string name="liabilities_card_usage_percent">%d%% used</string>
+    <string name="liabilities_card_limit">Limit %s</string>
+    <string name="liabilities_card_bill">Bill</string>
+    <string name="liabilities_card_active_installment">Active Installment</string>
+    <string name="liabilities_card_current_statement">Current Statement</string>
+    <string name="liabilities_card_due_date">Due Date:</string>
+    <string name="liabilities_card_statement_detail">Statement Detail</string>
+
+    <!-- Create Liability Screen -->
+    <string name="liabilities_create_title_credit_card">Add Credit Card</string>
+    <string name="liabilities_create_title_pay_later">Add Pay Later</string>
+    <string name="liabilities_create_title_mortgage">Add Mortgage</string>
+    <string name="liabilities_create_title_auto_loan">Add Auto Loan</string>
+    <string name="liabilities_create_title_student_loan">Add Student Loan</string>
+    <string name="liabilities_create_title_business_loan">Add Business Loan</string>
+    <string name="liabilities_create_title_personal_loan">Add Personal Loan</string>
+    <string name="liabilities_create_title_other">Add Liability</string>
+
+    <string name="liabilities_create_desc">Please complete the following details</string>
+
+    <string name="liabilities_create_name_cc">Card Name *</string>
+    <string name="liabilities_create_name_paylater">Service Name *</string>
+    <string name="liabilities_create_name_loan">Liability Name *</string>
+    <string name="liabilities_create_bank">Bank *</string>
+    <string name="liabilities_create_bank_placeholder">e.g., BCA, Mandiri</string>
+    <string name="liabilities_create_notes">Notes</string>
+
+    <string name="liabilities_create_ph_cc_name">e.g., BCA Platinum</string>
+    <string name="liabilities_create_ph_paylater_name">e.g., Shopee PayLater</string>
+    <string name="liabilities_create_ph_mortgage_name">e.g., House Mortgage</string>
+    <string name="liabilities_create_ph_auto_name">e.g., Car Loan Brio</string>
+    <string name="liabilities_create_ph_student_name">e.g., College Loan</string>
+    <string name="liabilities_create_ph_personal_name">e.g., Personal Loan</string>
+    <string name="liabilities_create_ph_business_name">e.g., Working Capital</string>
+    <string name="liabilities_create_ph_other_name">e.g., Other Liabilities</string>
+
+    <string name="liabilities_create_ph_cc_notes">e.g., Main card for shopping</string>
+    <string name="liabilities_create_ph_paylater_notes">e.g., E-commerce balance</string>
+    <string name="liabilities_create_ph_mortgage_notes">e.g., House Block A</string>
+    <string name="liabilities_create_ph_auto_notes">e.g., Brio car installment</string>
+    <string name="liabilities_create_ph_student_notes">e.g., 3rd semester fee</string>
+    <string name="liabilities_create_ph_personal_notes">e.g., Renovation fund</string>
+    <string name="liabilities_create_ph_business_notes">e.g., Working capital</string>
+    <string name="liabilities_create_ph_other_notes">e.g., Loan notes</string>
+
+    <!-- Select Liability Category -->
+    <string name="liabilities_category_title">Select Liability Type</string>
+    <string name="liabilities_category_desc">Choose the appropriate category to simplify recording and management.</string>
+    
+    <string name="liabilities_category_cc">Credit Card</string>
+    <string name="liabilities_category_cc_desc">BCA, Mandiri, BNI\u2026</string>
+    <string name="liabilities_category_personal">Loan</string>
+    <string name="liabilities_category_personal_desc">Cash loan &amp; KTA</string>
+    <string name="liabilities_category_mortgage">Mortgage</string>
+    <string name="liabilities_category_mortgage_desc">House, property installment</string>
+    <string name="liabilities_category_auto">Vehicle</string>
+    <string name="liabilities_category_auto_desc">Car, motorcycle loan</string>
+    <string name="liabilities_category_student">Education</string>
+    <string name="liabilities_category_student_desc">School, college fee</string>
+    <string name="liabilities_category_business">Business</string>
+    <string name="liabilities_category_business_desc">Working capital, KUR</string>
+    <string name="liabilities_category_paylater">Pay Later</string>
+    <string name="liabilities_category_paylater_desc">Shopee, GoPay, OVO</string>
+    <string name="liabilities_category_other">Other</string>
+    <string name="liabilities_category_other_desc">Loan to friends</string>
+
+    <!-- Liability Detail Subviews -->
+    <string name="liabilities_detail_unbilled_desc">%d transactions</string>
+    <string name="liabilities_detail_no_unbilled">No transactions yet</string>
+    <string name="liabilities_detail_billed_label">Billed</string>
+    <string name="liabilities_detail_unbilled_label">Unbilled</string>
+    <string name="liabilities_detail_min_payment">Minimum Payment</string>
+    <string name="liabilities_detail_pay_min">Pay Minimum</string>
+    <string name="liabilities_detail_pay_full">Pay Full</string>
+    <string name="liabilities_detail_statements_title">Billing Statements</string>
+    <string name="liabilities_detail_statements_count">%d statements</string>
+    <string name="liabilities_detail_no_statements">No statements available</string>
+    <string name="liabilities_detail_info_title">Liability Info</string>
+    <string name="liabilities_detail_info_statement_date">Statement Date</string>
+    <string name="liabilities_detail_info_statement_date_value">Date %s</string>
+    <string name="liabilities_detail_info_due_date">Due Date</string>
+    <string name="liabilities_detail_info_due_date_value">Date %s</string>
+    <string name="liabilities_detail_info_monthly_interest">Monthly Interest</string>
+    <string name="liabilities_detail_info_late_fee">Late Fee</string>
+    <string name="liabilities_detail_info_bank">Bank</string>
+    <string name="liabilities_detail_action_pay">Pay\nBill</string>
+    <string name="liabilities_detail_action_add_transaction">Record\nTrx.</string>
+    <string name="liabilities_detail_action_add_installment">Add\nInstallment</string>
+    <string name="liabilities_detail_active_installments">Active Installments</string>
+    <string name="liabilities_detail_no_active_installments">No active installments yet</string>
+    <string name="liabilities_detail_installment_month_count">%1$d of %2$d Mo</string>
+    <string name="liabilities_detail_loan_remaining">Remaining Loan</string>
+    <string name="liabilities_detail_loan_initial">Initial Loan:</string>
+    <string name="liabilities_detail_loan_paid">Paid:</string>
+    <string name="liabilities_detail_payment_summary">Payment Summary</string>
+    <string name="liabilities_detail_payment_total">Total Paid</string>
+    <string name="liabilities_detail_payment_principal">→ Principal</string>
+    <string name="liabilities_detail_payment_interest">→ Interest</string>
+    <string name="liabilities_detail_loan_info">Loan Info</string>
+    <string name="liabilities_detail_loan_start">Start</string>
+    <string name="liabilities_detail_loan_end">End</string>
+    <string name="liabilities_detail_loan_tenor">Tenor</string>
+    <string name="liabilities_detail_loan_tenor_value">%d months</string>
+    <string name="liabilities_detail_loan_remaining_tenor">Remaining Tenor</string>
+    <string name="liabilities_detail_loan_remaining_tenor_value">%d months</string>
+    <string name="liabilities_detail_loan_interest">Interest</string>
+    <string name="liabilities_detail_loan_monthly">Installment/mo</string>
+    <string name="liabilities_detail_loan_monthly_interest">Interest/mo</string>
+    <string name="liabilities_detail_loan_due_date">Pay Date</string>
+    <string name="liabilities_detail_loan_due_date_value">Date %d</string>
+    <string name="liabilities_detail_action_pay_installment">Pay Installment</string>
+    <string name="liabilities_detail_action_simulate">Payoff Simulation</string>
+    <string name="liabilities_simulation_strategy_avalanche">Highest Interest (Avalanche)</string>
+    <string name="liabilities_simulation_strategy_snowball">Lowest Balance (Snowball)</string>
+    <string name="liabilities_simulation_strategy_custom">Custom</string>
+    <string name="liabilities_detail_history_title">Payment History</string>
+    <string name="liabilities_detail_history_no_data">No payment history yet</string>
+    <string name="liabilities_detail_history_summary">Summary</string>
+    <string name="liabilities_detail_history_count">%d payments</string>
+    <string name="liabilities_detail_history_principal">Principal</string>
+    <string name="liabilities_detail_history_interest">Interest</string>
+    <string name="liabilities_detail_history_principal_value">Principal: %s</string>
+    <string name="liabilities_detail_history_interest_value">Interest: %s</string>
+    <string name="liabilities_detail_history_remaining">Remaining: %s</string>
+    <string name="liabilities_detail_history_view_all">View All</string>
+    <string name="liabilities_detail_history_view_more">View %d more payments</string>
+    <string name="liabilities_detail_history_no_payments">No payments yet</string>
+</resources>

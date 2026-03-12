@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.budget
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.layout.*
@@ -137,7 +138,8 @@ fun BudgetScreen(
     ) { innerPadding ->
         if (showPaywall) {
             ModalBottomSheet(
-                onDismissRequest = { showPaywall = false },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { showPaywall = false },
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                 dragHandle = null,
                 containerColor = Color.Transparent,

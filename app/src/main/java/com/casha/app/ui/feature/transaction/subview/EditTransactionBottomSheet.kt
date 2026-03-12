@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.transaction.subview
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -38,7 +39,7 @@ fun EditTransactionBottomSheet(
     onDismissRequest: () -> Unit,
     onSave: (TransactionRequest) -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     // Form States
     var name by remember { mutableStateOf(transaction.name) }
@@ -52,7 +53,7 @@ fun EditTransactionBottomSheet(
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surfaceVariant, // Light gray iOS style background
         dragHandle = null, // Custom header instead
-        modifier = Modifier.padding(top = 24.dp) // Leave a bit of space at top for iOS modal look
+        modifier = Modifier.fillMaxSize().padding(top = 24.dp) // Fullscreen but with a bit of space at top for iOS modal look
     ) {
         Column(
             modifier = Modifier

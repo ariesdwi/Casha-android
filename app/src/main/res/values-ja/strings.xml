@@ -382,7 +382,6 @@
     <string name="report_percentage_of_total">合計の%d%%</string>
     <string name="report_section_spending_by_category">カテゴリ別支出</string>
     <string name="report_title">レポート</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">キャンセル</string>
     <string name="profile_action_clear_all">すべてクリア</string>
     <string name="profile_action_delete">削除</string>
@@ -495,4 +494,164 @@
     <string name="portfolio_validation_amount_required">金額は必須です</string>
     <string name="portfolio_validation_category_required">カテゴリは必須です</string>
     <string name="portfolio_validation_name_required">資産名は必須です</string>
-<string name="nav_report">レポート</string><string name="nav_dashboard">ホーム</string><string name="nav_add">追加</string><string name="nav_transactions">取引</string><string name="nav_budget">予算</string></resources>
+    <string name="nav_report">レポート</string>
+    <string name="nav_dashboard">ホーム</string>
+    <string name="nav_add">追加</string>
+    <string name="nav_transactions">取引</string>
+    <string name="nav_budget">予算</string>
+    <string name="subscription_button_lifetime">永久アクセスを取得</string>
+    <string name="subscription_button_processing">処理中...</string>
+    <string name="subscription_button_retrying">リトライ中...</string>
+    <string name="subscription_button_select_plan">プランを選択</string>
+    <string name="subscription_button_start_trial">無料トライアルを開始</string>
+    <string name="subscription_button_try_again">再試行</string>
+    <string name="subscription_error_load_failed">製品の読み込みに失敗: %s</string>
+    <string name="subscription_error_product_not_found">製品が利用できません。後でもう一度お試しください。</string>
+    <string name="subscription_error_receipt_unavailable">購入を確認できません。インターネット接続を確認してください。</string>
+    <string name="subscription_error_restore_failed">購入の復元に失敗</string>
+    <string name="subscription_error_unknown">不明な購入結果</string>
+    <string name="subscription_error_verification_failed">購入の検証に失敗。サポートにお問い合わせください。</string>
+    <string name="subscription_error_view_title">サブスクリプションを読み込めません</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">ポートフォリオと負債を深く分析。</string>
+    <string name="subscription_feature_advanced_analytics_title">高度な分析</string>
+    <string name="subscription_feature_ai_advisor_subtitle">支出に合わせたインサイト。</string>
+    <string name="subscription_feature_ai_advisor_title">AI ファイナンシャルアドバイザー</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">写真1枚で即座にカテゴリ分類。</string>
+    <string name="subscription_feature_receipt_scanner_title">スマートレシートスキャナー</string>
+    <string name="subscription_feature_smart_alerts_subtitle">予算の制限を二度と見逃さない。</string>
+    <string name="subscription_feature_smart_alerts_title">スマートアラート</string>
+    <string name="subscription_footer_cancel_anytime">月額サブスクリプションはApp Store設定からいつでもキャンセル可能。</string>
+    <string name="subscription_link_privacy">プライバシー</string>
+    <string name="subscription_link_restore">購入を復元</string>
+    <string name="subscription_link_terms">利用規約</string>
+    <string name="subscription_overlay_securing_access">アクセスを確保中...</string>
+    <string name="subscription_plan_best_value">最もお得</string>
+    <string name="subscription_plan_flexible">フレキシブル</string>
+    <string name="subscription_plan_lifetime_description">一回払い。無制限アクセスが永久に。定期料金なし。</string>
+    <string name="subscription_plan_monthly_description">全機能へのフルアクセス。いつでもキャンセル可能。3日間無料トライアル。</string>
+    <string name="subscription_plan_savings">節約</string>
+    <string name="subscription_status_pending">購入は承認待ち</string>
+    <string name="subscription_subtitle_join_users">10,000人以上のユーザーと共に
+資産の未来をマスターしましょう。</string>
+    <string name="subscription_success_subtitle">ファイナンシャルフリーダムへの旅が
+もっとスマートになりました。</string>
+    <string name="subscription_success_welcome">Casha Premiumへようこそ！</string>
+    <string name="subscription_title_get_premium">Premiumを取得</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_cta_hook">詳しく見る</string>
+    <string name="onboarding_cta_chat_input">使い方を見る</string>
+    <string name="onboarding_cta_revelation">ダッシュボードを見る</string>
+    <string name="onboarding_cta_transaction_history">取引を表示</string>
+    <string name="onboarding_cta_budget_tracker">予算を表示</string>
+    <string name="onboarding_cta_portfolio">ポートフォリオを表示</string>
+    <string name="onboarding_cta_liabilities">負債を追跡</string>
+    <string name="onboarding_cta_goal_tracker">目標を設定</string>
+    <string name="onboarding_cta_global_power">グローバルに対応</string>
+    <string name="onboarding_cta_offline_sync">始める</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">お金を完全にコントロール。</string>
+    <string name="onboarding_hook_subtitle">すべての支出を1か所できれいに記録。</string>
+    <string name="onboarding_hook_bullet1">取引を自動的に記録</string>
+    <string name="onboarding_hook_bullet2">お金の使い道を可視化</string>
+    <string name="onboarding_hook_bullet3">より賢明な財務判断を</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">タイピングする速さで\n支出を記録。</string>
+    <string name="onboarding_chat_subtitle">長いフォームは不要。話しかけるだけ。</string>
+    <string name="onboarding_chat_bullet1">自然な入力で取引を即座に記録</string>
+    <string name="onboarding_chat_bullet2">レシートをスキャンして自動入力</string>
+    <string name="onboarding_chat_bullet3">手動入力なしでスマートにカテゴリ分け</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">オンライン</string>
+    <string name="onboarding_chat_mock_timestamp">今日, 09:41</string>
+    <string name="onboarding_chat_mock_user_msg">コーヒー 250円</string>
+    <string name="onboarding_chat_mock_ai_confirm">了解しました！記録しました：</string>
+    <string name="onboarding_chat_mock_ai_result">コーヒー — 250円</string>
+    <string name="onboarding_chat_mock_recorded">記録完了</string>
+    <string name="onboarding_chat_mock_input_placeholder">取引を入力またはレシートをスキャン…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">今月のネットキャッシュフローは\n250万円です。 👏</string>
+    <string name="onboarding_revelation_bullet1">収入1500万円、支出1250万円</string>
+    <string name="onboarding_revelation_bullet2">週末が支出のピークです</string>
+    <string name="onboarding_revelation_bullet3">トレンドを監視して黒字を維持しましょう</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">最近の取引</string>
+    <string name="onboarding_history_title">今日のすべての取引を\nきれいに記録。</string>
+    <string name="onboarding_history_subtitle">朝のコーヒーからフリーランスの収入まで、漏れなく記録。</string>
+    <string name="onboarding_history_bullet1">スターバックス、Grab、収入も自動入力</string>
+    <string name="onboarding_history_bullet2">各取引を即座にカテゴリ分け</string>
+    <string name="onboarding_history_bullet3">チャットのように簡単に取引履歴を検索</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">予算620万円のうち\n430万円を使用済み。</string>
+    <string name="onboarding_budget_subtitle">残り185万円 — 月末までに管理しましょう。</string>
+    <string name="onboarding_budget_bullet1">交通費がほぼ上限 — 残り8%</string>
+    <string name="onboarding_budget_bullet2">飲食費が82%で警告</string>
+    <string name="onboarding_budget_bullet3">予算が限界に達すると自動通知</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">すべての資産を、\n一つのダッシュボードで。</string>
+    <string name="onboarding_portfolio_subtitle">一つずつ確認する必要はありません。Cashaがすべてまとめます。</string>
+    <string name="onboarding_portfolio_bullet1">株5銘柄、金2つ、預金 — 即座に監視</string>
+    <string name="onboarding_portfolio_bullet2">リターン +5.8%、含み益 250万円</string>
+    <string name="onboarding_portfolio_bullet3">価格は自動更新、手動更新は不要</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">住宅ローンとカード、\nすべて監視。</string>
+    <string name="onboarding_liabilities_subtitle">15日と25日が期限 — Cashaがタイムリーに通知。</string>
+    <string name="onboarding_liabilities_bullet1">住宅ローン 4億8000万円 — 残り14年</string>
+    <string name="onboarding_liabilities_bullet2">カード利用 520万円（限度額2000万円）</string>
+    <string name="onboarding_liabilities_bullet3">月々の返済額 合計220万円 — 自動追跡</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3つの目標のうち1つ完了。\n継続しましょう。</string>
+    <string name="onboarding_goal_bullet1">全体の進捗：目標5億円の30%</string>
+    <string name="onboarding_goal_bullet2">マイホーム貯金 2億5000万円 — 25%達成</string>
+    <string name="onboarding_goal_bullet3">直近の期限まで30日 — 旅行資金</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">グローバル市民のための\nマルチ通貨対応。</string>
+    <string name="onboarding_global_bullet1">IDR、USD、EUR、JPYなどの資産を追跡</string>
+    <string name="onboarding_global_bullet2">リアルタイムの為替レートで常に正確</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">オフライン対応、\nどこでも同期。</string>
+    <string name="onboarding_sync_premium_title">プレミアム機能</string>
+    <string name="onboarding_sync_feature1">AIによる財務インサイト</string>
+    <string name="onboarding_sync_feature2">スマートレシートスキャナー</string>
+    <string name="onboarding_sync_feature3">高度な分析とレポート</string>
+    <string name="onboarding_sync_feature4">優先サポート</string>
+    <string name="onboarding_sync_start_button">ジャーニーを始める 🚀</string>
+    <string name="onboarding_sync_status_offline">オフラインモード</string>
+    <string name="onboarding_sync_status_syncing">同期中…</string>
+    <string name="onboarding_sync_status_done">同期完了！</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">今月</string>
+    <string name="onboarding_mock_category_food">飲食</string>
+    <string name="onboarding_mock_category_transport">交通費</string>
+    <string name="onboarding_mock_category_income">収入</string>
+    <string name="onboarding_mock_trx_coffee">スターバックス</string>
+    <string name="onboarding_mock_trx_ride">Grab Ride</string>
+    <string name="onboarding_mock_trx_freelance">外部案件</string>
+    <string name="onboarding_mock_budget_total">総予算</string>
+    <string name="onboarding_mock_asset_saving">BCA 預金</string>
+    <string name="onboarding_mock_asset_stock">BBCA 株</string>
+    <string name="onboarding_mock_liability_mortgage">住宅ローン</string>
+    <string name="onboarding_mock_liability_credit">BCA プラチナ</string>
+    <string name="onboarding_mock_goal_house">夢のマイホーム</string>
+    <string name="onboarding_mock_goal_category_home">住宅</string>
+    <string name="onboarding_mock_currency">円</string>
+    <string name="day_mon">月</string>
+    <string name="day_tue">火</string>
+    <string name="day_wed">水</string>
+    <string name="day_thu">木</string>
+    <string name="day_fri">金</string>
+    <string name="day_sat">土</string>
+    <string name="day_sun">日</string>
+</resources>

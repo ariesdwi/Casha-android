@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.transaction
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -82,7 +83,7 @@ fun TransactionScreen(
                 windowInsets = WindowInsets(0.dp),
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent, // Transparent to show gradient
+                    containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.background
                 )
             )
@@ -221,7 +222,8 @@ fun TransactionScreen(
                         )
 
                         ModalBottomSheet(
-                            onDismissRequest = { showDateRangePicker = false },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { showDateRangePicker = false },
                             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                             containerColor = MaterialTheme.colorScheme.surface
                         ) {

@@ -19,8 +19,10 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.casha.app.R
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.LiabilityCategory
 import com.casha.app.domain.model.LiabilityStatement
@@ -46,7 +48,7 @@ fun LiabilityBalanceCardView(
                 ambientColor = Color.Transparent
             ),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column(
@@ -71,15 +73,15 @@ fun LiabilityBalanceCardView(
                 // Left: Tagihan Berjalan
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Text(
-                        text = "Tagihan Berjalan",
+                        text = stringResource(R.string.liabilities_card_current_bill),
                         fontSize = 15.sp,
-                        color = Color(0xFF666666) // Casha Text Secondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = formatCurrencyWithSuperscript(currentBalance, userCurrency),
                         fontSize = 32.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF333333) // Casha Text Primary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
 
@@ -90,9 +92,9 @@ fun LiabilityBalanceCardView(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Tersedia",
+                            text = stringResource(R.string.liabilities_card_available),
                             fontSize = 15.sp,
-                            color = Color(0xFF666666)
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = formatCurrencyWithSuperscript(available, userCurrency),
@@ -147,26 +149,26 @@ fun LiabilityBalanceCardView(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                          Text(
-                             text = "${(usagePercent * 100).toInt()}% terpakai",
+                             text = stringResource(R.string.liabilities_card_usage_percent, (usagePercent * 100).toInt()),
                              fontSize = 12.sp,
                              fontWeight = FontWeight.Bold,
-                             color = if (usagePercent > 0.8f) Color(0xFFF44336) else Color(0xFF666666)
+                             color = if (usagePercent > 0.8f) Color(0xFFF44336) else MaterialTheme.colorScheme.onSurfaceVariant
                          )
                          Text(
-                             text = "Limit ${formatCurrencyCompact(limit, userCurrency)}",
+                             text = stringResource(R.string.liabilities_card_limit, formatCurrencyCompact(limit, userCurrency)),
                              fontSize = 12.sp,
-                             color = Color(0xFF666666)
+                             color = MaterialTheme.colorScheme.onSurfaceVariant
                          )
                     }
                     
-                    HorizontalDivider(color = Color(0xFFEEEEEE))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                     
                     // Breakdown rows
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         LimitDetailRow(
                             icon = Icons.Filled.CreditCard,
                             iconColor = Color(0xFF2196F3), // Blue
-                            label = "Tagihan",
+                            label = stringResource(R.string.liabilities_card_bill),
                             value = formatCurrencyCompact(currentBalance, userCurrency)
                         )
                         
@@ -174,7 +176,7 @@ fun LiabilityBalanceCardView(
                             LimitDetailRow(
                                 icon = Icons.Filled.AccessTimeFilled,
                                 iconColor = Color(0xFFFF9800), // Orange
-                                label = "Cicilan Aktif",
+                                label = stringResource(R.string.liabilities_card_active_installment),
                                 value = formatCurrencyCompact(installmentUsage, userCurrency)
                             )
                         }
@@ -182,7 +184,7 @@ fun LiabilityBalanceCardView(
                         LimitDetailRow(
                             icon = Icons.Filled.CheckCircle,
                             iconColor = Color(0xFF4CAF50), // Green
-                            label = "Tersedia",
+                            label = stringResource(R.string.liabilities_card_available),
                             value = formatCurrencyCompact(available, userCurrency)
                         )
                     }
@@ -199,29 +201,29 @@ fun LiabilityBalanceCardView(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             Text(
-                                text = "Tagihan Saat Ini",
+                                text = stringResource(R.string.liabilities_card_current_statement),
                                 fontSize = 15.sp,
-                                color = Color(0xFF666666)
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             
                             Text(
                                 text = formatCurrencyWithSuperscript(latestStatement.statementBalance, userCurrency),
                                 fontSize = 28.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFF333333)
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             
                             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                 Text(
-                                    text = "Jatuh Tempo:",
+                                    text = stringResource(R.string.liabilities_card_due_date),
                                     fontSize = 14.sp,
-                                    color = Color(0xFF666666)
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
                                     text = formatLiabilityDateStyle(latestStatement.dueDate),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.SemiBold,
-                                    color = Color(0xFF333333)
+                                    color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                         }
@@ -231,7 +233,7 @@ fun LiabilityBalanceCardView(
                             contentPadding = PaddingValues(0.dp)
                         ) {
                             Text(
-                                text = "Detail Tagihan",
+                                text = stringResource(R.string.liabilities_card_statement_detail),
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color(0xFF2196F3) // Blue
@@ -266,7 +268,7 @@ private fun LimitDetailRow(
         Text(
             text = label,
             fontSize = 14.sp,
-            color = Color(0xFF666666),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.weight(1f)
         )
         
@@ -274,7 +276,7 @@ private fun LimitDetailRow(
             text = value,
             fontSize = 14.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color(0xFF333333)
+            color = MaterialTheme.colorScheme.onSurface
         )
     }
 }

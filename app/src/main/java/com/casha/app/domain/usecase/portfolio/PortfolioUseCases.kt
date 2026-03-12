@@ -58,14 +58,6 @@ class DeleteAssetUseCase @Inject constructor(
     }
 }
 
-class GetAssetsUseCase @Inject constructor(
-    private val repository: PortfolioRepository
-) {
-    suspend fun execute(): List<Asset> {
-        return repository.getAssets()
-    }
-}
-
 class GetAssetTransactionsUseCase @Inject constructor(
     private val repository: PortfolioRepository
 ) {

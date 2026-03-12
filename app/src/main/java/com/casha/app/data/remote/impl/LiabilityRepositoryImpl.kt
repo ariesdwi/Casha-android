@@ -86,10 +86,12 @@ class LiabilityRepositoryImpl @Inject constructor(
         val body = mutableMapOf<String, Any>(
             "liabilityId" to liabilityId,
             "amount" to request.amount,
-            "paymentDate" to simpleDateFormatter.format(request.paymentDate)
+            "paymentDate" to request.paymentDate
         )
         
         request.paymentType?.let { body["paymentType"] = it.rawValue }
+        request.principalAmount?.let { body["principalAmount"] = it }
+        request.interestAmount?.let { body["interestAmount"] = it }
         request.notes?.let { body["notes"] = it }
         
         val result = safeApiCall { api.recordPayment(liabilityId, body) }
@@ -105,8 +107,8 @@ class LiabilityRepositoryImpl @Inject constructor(
         val body = mutableMapOf<String, Any>(
             "name" to request.name,
             "amount" to request.amount,
-            "categoryId" to request.categoryId,
-            "datetime" to dateFormatter.format(request.datetime)
+            "category" to request.category,
+            "datetime" to request.datetime
         )
         
         request.description?.let { body["description"] = it }

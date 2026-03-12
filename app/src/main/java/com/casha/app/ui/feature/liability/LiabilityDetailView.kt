@@ -52,46 +52,43 @@ fun LiabilityDetailView(
     var showingAddTransaction by remember { mutableStateOf(false) }
 
     Scaffold(
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8F9FA))
                 .padding(bottom = paddingValues.calculateBottomPadding())
                 .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            // Custom Header
+            // Toolbar — matching Portfolio style
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 24.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                IconButton(
-                    onClick = onBack,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .shadow(elevation = 2.dp, shape = androidx.compose.foundation.shape.CircleShape)
-                        .background(MaterialTheme.colorScheme.surface, androidx.compose.foundation.shape.CircleShape)
-                ) {
+                IconButton(onClick = onBack) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.size(20.dp)
+                        tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
 
-                Spacer(modifier = Modifier.width(16.dp))
-                
                 Text(
                     text = liability.name,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f).padding(horizontal = 8.dp)
                 )
+
+                // Placeholder so title stays centered
+                Spacer(modifier = Modifier.size(48.dp))
             }
 
             if (liability.category.isRevolving) {
@@ -219,8 +216,8 @@ fun LiabilityDetailView(
                 userCurrency = userCurrency,
                 categories = categories,
                 onDismissRequest = { showingAddTransaction = false },
-                onSubmit = { name, amount, categoryId, description ->
-                    onCreateTransaction(name, amount, categoryId, description)
+                onSubmit = { name, amount, category, description ->
+                    onCreateTransaction(name, amount, category, description)
                     showingAddTransaction = false
                 }
             )

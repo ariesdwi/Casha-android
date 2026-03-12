@@ -3,6 +3,7 @@ package com.casha.app.ui.feature.budget
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.network.NetworkMonitor
+import com.casha.app.core.network.SyncEventBus
 import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.CategoryCasha
 import com.casha.app.domain.model.*
@@ -40,6 +41,7 @@ class BudgetViewModel @Inject constructor(
     private val budgetSyncUseCase: BudgetSyncUseCase,
     private val categorySyncUseCase: CategorySyncUseCase,
     private val networkMonitor: NetworkMonitor,
+    private val syncEventBus: SyncEventBus,
     private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
 ) : ViewModel() {
 
@@ -48,6 +50,7 @@ class BudgetViewModel @Inject constructor(
 
     init {
         setupNetworkMonitoring()
+        setupSyncEventListener()
         loadInitialData()
     }
 
@@ -261,6 +264,16 @@ class BudgetViewModel @Inject constructor(
 
     fun clearError() {
         _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    // ── Sync Event Listener ──
+
+    private fun setupSyncEventListener() {
+        viewModelScope.launch {
+            syncEventBus.syncCompletedEvent.collect {
+                refreshBudgetData()
+            }
+        }
     }
 
     // ── Network Monitoring ──

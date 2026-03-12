@@ -29,7 +29,6 @@ data class PortfolioUiState(
 class PortfolioViewModel @Inject constructor(
     private val getPortfolioSummaryUseCase: GetPortfolioSummaryUseCase,
     private val createAssetUseCase: CreateAssetUseCase,
-    private val getAssetsUseCase: GetAssetsUseCase,
     private val updateAssetUseCase: UpdateAssetUseCase,
     private val deleteAssetUseCase: DeleteAssetUseCase,
     private val addAssetTransactionUseCase: AddAssetTransactionUseCase,
@@ -49,19 +48,6 @@ class PortfolioViewModel @Inject constructor(
             return (Date().time - lastFetch.time) < cacheValidityDuration
         }
 
-    // MARK: - Fetch Assets
-    fun fetchAssets() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-            try {
-                val assets = getAssetsUseCase.execute()
-                _uiState.update { it.copy(assets = assets, isLoading = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
-            }
-        }
-    }
-
     // MARK: - Fetch Portfolio Summary
     fun fetchPortfolioSummary(force: Boolean = false) {
         if (!force && isFresh && _uiState.value.portfolioSummary != null) {
@@ -73,7 +59,7 @@ class PortfolioViewModel @Inject constructor(
             try {
                 val summary = getPortfolioSummaryUseCase.execute()
                 lastFetchTime = Date()
-                _uiState.update { it.copy(portfolioSummary = summary, isLoading = false) }
+                _uiState.update { it.copy(portfolioSummary = summary, assets = summary.assets, isLoading = false) }
             } catch (e: Exception) {
                 _uiState.update { it.copy(error = e.localizedMessage, isLoading = false) }
             }
@@ -148,7 +134,6 @@ class PortfolioViewModel @Inject constructor(
             try {
                 addAssetTransactionUseCase.execute(assetId, request)
                 // Refresh asset, transactions, and portfolio summary for real-time update
-                fetchAssets()
                 fetchAssetTransactions(assetId)
                 fetchPortfolioSummary(force = true)
                 _uiState.update { it.copy(isLoading = false) }

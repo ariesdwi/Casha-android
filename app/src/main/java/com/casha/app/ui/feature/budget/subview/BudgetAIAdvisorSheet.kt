@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.budget.subview
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -57,10 +60,11 @@ fun BudgetAIAdvisorSheet(
     val fixedExpenses = remember { mutableStateMapOf<String, Double>() }
     var showCategoryMenu by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = MaterialTheme.colorScheme.background
@@ -248,6 +252,14 @@ private fun IncomeInputSection(
     onAnalyze: () -> Unit
 ) {
     var isFocused by remember { mutableStateOf(false) }
+    val isTyping = incomeText.isNotEmpty()
+
+    val buttonColor by animateColorAsState(
+        targetValue = if (isTyping && !isLoading) CashaSuccess else CashaSuccess.copy(alpha = 0.4f),
+        animationSpec = tween(durationMillis = 300),
+        label = "sendButtonColor"
+    )
+
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Text(stringResource(R.string.budget_advisor_income_title), fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
         
@@ -279,14 +291,21 @@ private fun IncomeInputSection(
             Button(
                 onClick = onAnalyze,
                 enabled = incomeValue > 0 && !isLoading,
-                colors = ButtonDefaults.buttonColors(containerColor = CashaSuccess),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = buttonColor,
+                    disabledContainerColor = CashaSuccess.copy(alpha = 0.4f)
+                ),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text(stringResource(R.string.budget_advisor_income_analyze))
+                Text(
+                    stringResource(R.string.budget_advisor_income_analyze),
+                    color = Color.White
+                )
             }
         }
     }
 }
+
 
 @Composable
 private fun FixedExpensesSection(

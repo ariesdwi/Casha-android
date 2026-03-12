@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.dashboard
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
@@ -195,7 +196,8 @@ fun CardBalanceSection(
             initialSelectedEndDateMillis = initialEnd
         )
         ModalBottomSheet(
-            onDismissRequest = { showDateRangePicker = false },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { showDateRangePicker = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             containerColor = MaterialTheme.colorScheme.surface
         ) {
@@ -298,10 +300,11 @@ fun PeriodPickerBottomSheet(
     onDismiss: () -> Unit,
     onCustomClick: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = MaterialTheme.colorScheme.surface

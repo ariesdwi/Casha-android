@@ -28,6 +28,7 @@ class AuthManager @Inject constructor(
         private val KEY_NAME = stringPreferencesKey("user_name")
         private val KEY_EMAIL = stringPreferencesKey("user_email")
         private val KEY_AVATAR = stringPreferencesKey("user_avatar")
+        private val KEY_PENDING_FCM_TOKEN = stringPreferencesKey("pending_fcm_token")
     }
 
     // ── Token ──
@@ -76,6 +77,24 @@ class AuthManager @Inject constructor(
     suspend fun saveUserId(userId: String) {
         context.dataStore.edit { prefs ->
             prefs[KEY_USER_ID] = userId
+        }
+    }
+
+    // ── FCM Token ──
+
+    val pendingFcmToken: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[KEY_PENDING_FCM_TOKEN]
+    }
+
+    suspend fun savePendingFcmToken(token: String) {
+        context.dataStore.edit { prefs ->
+            prefs[KEY_PENDING_FCM_TOKEN] = token
+        }
+    }
+
+    suspend fun clearPendingFcmToken() {
+        context.dataStore.edit { prefs ->
+            prefs.remove(KEY_PENDING_FCM_TOKEN)
         }
     }
 

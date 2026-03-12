@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -16,15 +17,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.R
 import com.casha.app.domain.model.LiabilityCategory
 
 data class LiabilityCategoryItem(
     val category: LiabilityCategory,
-    val displayName: String,
-    val description: String,
+    val displayNameRes: Int,
+    val descriptionRes: Int,
     val icon: ImageVector,
     val color: Color
 )
@@ -32,57 +35,57 @@ data class LiabilityCategoryItem(
 private val categoryItems = listOf(
     LiabilityCategoryItem(
         category = LiabilityCategory.CREDIT_CARD,
-        displayName = "Kartu Kredit",
-        description = "BCA, Mandiri, BNI...",
+        displayNameRes = R.string.liabilities_category_cc,
+        descriptionRes = R.string.liabilities_category_cc_desc,
         icon = Icons.Default.CreditCard,
         color = Color(0xFF6750A4)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.PERSONAL_LOAN,
-        displayName = "Pinjaman",
-        description = "Pinjaman tunai & KTA",
+        displayNameRes = R.string.liabilities_category_personal,
+        descriptionRes = R.string.liabilities_category_personal_desc,
         icon = Icons.Default.Person,
         color = Color(0xFF4CAF50)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.MORTGAGE,
-        displayName = "KPR",
-        description = "Cicilan rumah, ruko",
+        displayNameRes = R.string.liabilities_category_mortgage,
+        descriptionRes = R.string.liabilities_category_mortgage_desc,
         icon = Icons.Default.Home,
         color = Color(0xFF3F51B5)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.AUTO_LOAN,
-        displayName = "Kendaraan",
-        description = "Kredit mobil, motor",
+        displayNameRes = R.string.liabilities_category_auto,
+        descriptionRes = R.string.liabilities_category_auto_desc,
         icon = Icons.Default.DirectionsCar,
         color = Color(0xFFFF9800)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.STUDENT_LOAN,
-        displayName = "Pendidikan",
-        description = "Biaya sekolah, kuliah",
+        displayNameRes = R.string.liabilities_category_student,
+        descriptionRes = R.string.liabilities_category_student_desc,
         icon = Icons.Default.School,
         color = Color(0xFF009688)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.BUSINESS_LOAN,
-        displayName = "Usaha",
-        description = "Modal kerja, KUR",
+        displayNameRes = R.string.liabilities_category_business,
+        descriptionRes = R.string.liabilities_category_business_desc,
         icon = Icons.Default.BusinessCenter,
         color = Color(0xFF9C27B0)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.PAY_LATER,
-        displayName = "Pay Later",
-        description = "Shopee, GoPay, OVO",
+        displayNameRes = R.string.liabilities_category_paylater,
+        descriptionRes = R.string.liabilities_category_paylater_desc,
         icon = Icons.Default.ShoppingCart,
         color = Color(0xFFE91E63)
     ),
     LiabilityCategoryItem(
         category = LiabilityCategory.OTHER,
-        displayName = "Lainnya",
-        description = "Pinjaman ke teman",
+        displayNameRes = R.string.liabilities_category_other,
+        descriptionRes = R.string.liabilities_category_other_desc,
         icon = Icons.Default.Money,
         color = Color(0xFF9E9E9E)
     )
@@ -97,10 +100,11 @@ fun SelectLiabilityCategoryScreen(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onNavigateBack,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         Column(
             modifier = Modifier
@@ -115,14 +119,14 @@ fun SelectLiabilityCategoryScreen(
                     .padding(bottom = 20.dp)
             ) {
                 Text(
-                    text = "Pilih Jenis Hutang",
+                    text = stringResource(R.string.liabilities_category_title),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Spacer(modifier = Modifier.height(6.dp))
                 Text(
-                    text = "Pilih kategori yang sesuai untuk mempermudah pencatatan dan pengelolaan.",
+                    text = stringResource(R.string.liabilities_category_desc),
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     lineHeight = 20.sp
@@ -162,46 +166,61 @@ private fun CategoryGridItem(
             .height(130.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(14.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+        Row(
+            modifier = Modifier.fillMaxSize()
         ) {
-            // Icon
+            // Left colored accent bar
             Box(
                 modifier = Modifier
-                    .size(42.dp)
-                    .clip(CircleShape)
-                    .background(item.color.copy(alpha = 0.12f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = item.icon,
-                    contentDescription = null,
-                    tint = item.color,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+                    .width(4.dp)
+                    .fillMaxHeight()
+                    .background(
+                        item.color,
+                        RoundedCornerShape(topStart = 18.dp, bottomStart = 18.dp)
+                    )
+            )
 
-            // Text
-            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                Text(
-                    text = item.displayName,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1
-                )
-                Text(
-                    text = item.description,
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 2,
-                    lineHeight = 15.sp
-                )
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(14.dp),
+                verticalArrangement = Arrangement.SpaceBetween
+            ) {
+                // Icon circle
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(CircleShape)
+                        .background(item.color.copy(alpha = 0.12f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = item.icon,
+                        contentDescription = null,
+                        tint = item.color,
+                        modifier = Modifier.size(22.dp)
+                    )
+                }
+
+                // Text
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    Text(
+                        text = stringResource(item.displayNameRes),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1
+                    )
+                    Text(
+                        text = stringResource(item.descriptionRes),
+                        fontSize = 11.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        lineHeight = 15.sp
+                    )
+                }
             }
         }
     }

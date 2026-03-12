@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.budget.subview
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +28,7 @@ fun EditBudgetSheet(
     onSave: (NewBudgetRequest) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val sheetState = rememberModalBottomSheetState()
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var amountText by remember { mutableStateOf(budget.amount.toInt().toString()) }
     var amountValue by remember { mutableStateOf(budget.amount) }
     var isAmountFocused by remember { mutableStateOf(false) }
@@ -36,7 +37,8 @@ fun EditBudgetSheet(
     val isFormValid = amountValue > 0 && amountValue != budget.amount
 
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
         dragHandle = { BottomSheetDefaults.DragHandle() }

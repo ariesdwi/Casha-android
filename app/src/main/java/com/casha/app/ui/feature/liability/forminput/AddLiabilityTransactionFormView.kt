@@ -1,4 +1,5 @@
 package com.casha.app.ui.feature.liability.forminput
+import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.CategoryCasha
@@ -34,7 +37,7 @@ fun AddLiabilityTransactionFormView(
     userCurrency: String,
     categories: List<CategoryCasha>,
     onDismissRequest: () -> Unit,
-    onSubmit: (name: String, amount: Double, categoryId: String, description: String?) -> Unit
+    onSubmit: (name: String, amount: Double, category: String, description: String?) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
@@ -50,7 +53,8 @@ fun AddLiabilityTransactionFormView(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     ModalBottomSheet(
-        onDismissRequest = onDismissRequest,
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = onDismissRequest,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
         containerColor = Color(0xFFF8F9FA)
@@ -65,7 +69,7 @@ fun AddLiabilityTransactionFormView(
                 modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
             ) {
                 Text(
-                    text = "Catat Transaksi",
+                    text = stringResource(R.string.liabilities_transaction_record_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -88,16 +92,16 @@ fun AddLiabilityTransactionFormView(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Name
-                InputCard(title = "Nama Transaksi *") {
+                InputCard(title = stringResource(R.string.liabilities_transaction_record_name)) {
                     CashaFormTextField(
                         value = name,
                         onValueChange = { name = it },
-                        placeholder = "e.g., Belanja Tokopedia"
+                        placeholder = stringResource(R.string.liabilities_transaction_record_name_placeholder)
                     )
                 }
 
                 // Amount
-                InputCard(title = "Jumlah *") {
+                InputCard(title = stringResource(R.string.liabilities_transaction_record_amount)) {
                     OutlinedTextField(
                         value = if (amountFocused) amountText else if (amountText.isNotEmpty()) CurrencyFormatter.formatInput(amountText) else "",
                         onValueChange = { amountText = it.replace(",", ".") },
@@ -115,7 +119,7 @@ fun AddLiabilityTransactionFormView(
                 }
 
                 // Category
-                InputCard(title = "Kategori *") {
+                InputCard(title = stringResource(R.string.liabilities_transaction_record_category)) {
                     Box {
                         Surface(
                             onClick = { showCategoryDropdown = true },
@@ -129,7 +133,7 @@ fun AddLiabilityTransactionFormView(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = selectedCategory?.name ?: "Pilih Kategori",
+                                    text = selectedCategory?.name ?: stringResource(R.string.liabilities_transaction_record_select_category),
                                     fontSize = 15.sp,
                                     fontWeight = if (selectedCategory != null) FontWeight.SemiBold else FontWeight.Normal,
                                     color = if (selectedCategory != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
@@ -156,11 +160,11 @@ fun AddLiabilityTransactionFormView(
                 }
 
                 // Description
-                InputCard(title = "Deskripsi") {
+                InputCard(title = stringResource(R.string.liabilities_transaction_record_description)) {
                     CashaFormTextField(
                         value = description,
                         onValueChange = { description = it },
-                        placeholder = "Tambah catatan (Opsional)",
+                        placeholder = stringResource(R.string.liabilities_transaction_record_description_placeholder),
                         singleLine = false
                     )
                 }
@@ -177,12 +181,12 @@ fun AddLiabilityTransactionFormView(
                             modifier = Modifier.padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(4.dp)
                         ) {
-                            Text("Info Kartu:", fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text("Sisa limit: ${CurrencyFormatter.format(credit, userCurrency)}", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
+                            Text(stringResource(R.string.liabilities_transaction_record_card_info), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(stringResource(R.string.liabilities_transaction_record_remaining_limit, CurrencyFormatter.format(credit, userCurrency)), fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f))
                             if (amountValue > 0) {
                                 val newCredit = credit - amountValue
                                 Text(
-                                    "Setelah transaksi: ${CurrencyFormatter.format(maxOf(newCredit, 0.0), userCurrency)}",
+                                    stringResource(R.string.liabilities_transaction_record_after_transaction, CurrencyFormatter.format(maxOf(newCredit, 0.0), userCurrency)),
                                     fontSize = 14.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = if (newCredit < 0) Color(0xFFFF6B6B) else MaterialTheme.colorScheme.onSurface
@@ -199,7 +203,7 @@ fun AddLiabilityTransactionFormView(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(Color(0xFFF8F9FA))
+                    .background(MaterialTheme.colorScheme.background)
                     .padding(horizontal = 20.dp, vertical = 12.dp)
                     .navigationBarsPadding()
             ) {
@@ -216,8 +220,8 @@ fun AddLiabilityTransactionFormView(
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF009033),
-                        disabledContainerColor = Color(0xFF009033).copy(alpha = 0.4f)
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
                     ),
                     elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
                 ) {
@@ -226,7 +230,7 @@ fun AddLiabilityTransactionFormView(
                     } else {
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Default.ShoppingCart, contentDescription = null, modifier = Modifier.size(20.dp), tint = Color.White)
-                            Text("Catat", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                            Text(stringResource(R.string.liabilities_transaction_record_submit), fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
                         }
                     }
                 }

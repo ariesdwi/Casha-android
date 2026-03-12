@@ -382,7 +382,6 @@
     <string name="report_percentage_of_total">%d%% من الإجمالي</string>
     <string name="report_section_spending_by_category">الإنفاق حسب الفئة</string>
     <string name="report_title">التقرير</string>
-    <!-- Profile -->
     <string name="profile_action_cancel">إلغاء</string>
     <string name="profile_action_clear_all">مسح الكل</string>
     <string name="profile_action_delete">حذف</string>
@@ -495,4 +494,164 @@
     <string name="portfolio_validation_amount_required">المبلغ مطلوب</string>
     <string name="portfolio_validation_category_required">الفئة مطلوبة</string>
     <string name="portfolio_validation_name_required">اسم الأصل مطلوب</string>
-<string name="nav_report">التقرير</string><string name="nav_dashboard">الرئيسية</string><string name="nav_add">إضافة</string><string name="nav_transactions">المعاملات</string><string name="nav_budget">الميزانية</string></resources>
+    <string name="nav_report">التقرير</string>
+    <string name="nav_dashboard">الرئيسية</string>
+    <string name="nav_add">إضافة</string>
+    <string name="nav_transactions">المعاملات</string>
+    <string name="nav_budget">الميزانية</string>
+    <string name="subscription_button_lifetime">احصل على الوصول مدى الحياة</string>
+    <string name="subscription_button_processing">جاري المعالجة...</string>
+    <string name="subscription_button_retrying">إعادة المحاولة...</string>
+    <string name="subscription_button_select_plan">اختر خطة</string>
+    <string name="subscription_button_start_trial">ابدأ التجربة المجانية</string>
+    <string name="subscription_button_try_again">حاول مرة أخرى</string>
+    <string name="subscription_error_load_failed">فشل في تحميل المنتجات: %s</string>
+    <string name="subscription_error_product_not_found">المنتج غير متاح. يرجى المحاولة لاحقًا.</string>
+    <string name="subscription_error_receipt_unavailable">تعذر التحقق من الشراء. يرجى التحقق من اتصال الإنترنت.</string>
+    <string name="subscription_error_restore_failed">فشل في استعادة المشتريات</string>
+    <string name="subscription_error_unknown">نتيجة شراء غير معروفة</string>
+    <string name="subscription_error_verification_failed">فشل التحقق من الشراء. يرجى التواصل مع الدعم.</string>
+    <string name="subscription_error_view_title">تعذر تحميل الاشتراكات</string>
+    <string name="subscription_feature_advanced_analytics_subtitle">تعمق في محفظتك والتزاماتك.</string>
+    <string name="subscription_feature_advanced_analytics_title">تحليلات متقدمة</string>
+    <string name="subscription_feature_ai_advisor_subtitle">رؤى مخصصة لإنفاقك.</string>
+    <string name="subscription_feature_ai_advisor_title">مستشار مالي ذكي</string>
+    <string name="subscription_feature_receipt_scanner_subtitle">تصنيف فوري بمجرد صورة.</string>
+    <string name="subscription_feature_receipt_scanner_title">ماسح إيصالات ذكي</string>
+    <string name="subscription_feature_smart_alerts_subtitle">لا تفوت حد الميزانية مرة أخرى.</string>
+    <string name="subscription_feature_smart_alerts_title">تنبيهات ذكية</string>
+    <string name="subscription_footer_cancel_anytime">ألغِ الاشتراك الشهري في أي وقت من إعدادات App Store.</string>
+    <string name="subscription_link_privacy">الخصوصية</string>
+    <string name="subscription_link_restore">استعادة المشتريات</string>
+    <string name="subscription_link_terms">الشروط</string>
+    <string name="subscription_overlay_securing_access">تأمين وصولك...</string>
+    <string name="subscription_plan_best_value">أفضل قيمة</string>
+    <string name="subscription_plan_flexible">مرن</string>
+    <string name="subscription_plan_lifetime_description">دفعة واحدة. وصول غير محدود للأبد. بدون رسوم متكررة.</string>
+    <string name="subscription_plan_monthly_description">وصول كامل لجميع الميزات. ألغِ في أي وقت. تجربة مجانية 3 أيام.</string>
+    <string name="subscription_plan_savings">توفير</string>
+    <string name="subscription_status_pending">الشراء في انتظار الموافقة</string>
+    <string name="subscription_subtitle_join_users">انضم إلى أكثر من 10,000 مستخدم يتقنون
+مستقبلهم المالي.</string>
+    <string name="subscription_success_subtitle">رحلتك نحو الحرية المالية
+أصبحت أكثر ذكاءً.</string>
+    <string name="subscription_success_welcome">مرحبًا بك في Casha Premium!</string>
+    <string name="subscription_title_get_premium">احصل على Premium</string>
+
+    <!-- ── Onboarding ── -->
+    <string name="onboarding_skip">تخطي</string>
+    <string name="onboarding_cta_hook">أخبرني المزيد</string>
+    <string name="onboarding_cta_chat_input">انظر كيف يعمل</string>
+    <string name="onboarding_cta_revelation">استكشف لوحة التحكم</string>
+    <string name="onboarding_cta_transaction_history">انظر المعاملات</string>
+    <string name="onboarding_cta_budget_tracker">عرض الميزانية</string>
+    <string name="onboarding_cta_portfolio">انظر المحفظة</string>
+    <string name="onboarding_cta_liabilities">تتبع الديون</string>
+    <string name="onboarding_cta_goal_tracker">تحديد الأهداف</string>
+    <string name="onboarding_cta_global_power">انطلق عالمياً</string>
+    <string name="onboarding_cta_offline_sync">ابدأ الآن</string>
+
+    <!-- Hook Page -->
+    <string name="onboarding_hook_title">أموالك، تحت سيطرتك الكاملة.</string>
+    <string name="onboarding_hook_subtitle">جميع المصروفات مسجلة بدقة في مكان واحد.</string>
+    <string name="onboarding_hook_bullet1">تسجيل المعاملات تلقائياً</string>
+    <string name="onboarding_hook_bullet2">انظر أين تذهب أموالك</string>
+    <string name="onboarding_hook_bullet3">اتخذ قرارات مالية أكثر ذكاءً</string>
+
+    <!-- Chat Input Page -->
+    <string name="onboarding_chat_title">سجل المصروفات\nبسرعة الكتابة.</string>
+    <string name="onboarding_chat_subtitle">لا توجد نماذج طويلة. فقط أخبرني.</string>
+    <string name="onboarding_chat_bullet1">اكتب بشكل طبيعي، وسيتم تسجيل المعاملات على الفور</string>
+    <string name="onboarding_chat_bullet2">امسح الإيصال، وسيتم ملء البيانات تلقائياً</string>
+    <string name="onboarding_chat_bullet3">فئات ذكية دون إدخال يدوي</string>
+    <string name="onboarding_chat_mock_ai_name">Casha AI</string>
+    <string name="onboarding_chat_mock_online">متصل</string>
+    <string name="onboarding_chat_mock_timestamp">اليوم، 09.41</string>
+    <string name="onboarding_chat_mock_user_msg">قهوة 25</string>
+    <string name="onboarding_chat_mock_ai_confirm">فهمت! تم التسجيل:</string>
+    <string name="onboarding_chat_mock_ai_result">قهوة — 25.000 ر.س</string>
+    <string name="onboarding_chat_mock_recorded">تم التسجيل</string>
+    <string name="onboarding_chat_mock_input_placeholder">اكتب معاملة أو امسح الإيصال…</string>
+
+    <!-- Revelation Page -->
+    <string name="onboarding_revelation_title">صافي التدفق النقدي لديك\n2.5 مليون ر.س هذا الشهر. 👏</string>
+    <string name="onboarding_revelation_bullet1">من 15 مليون ر.س وارد، 12.5 مليون ر.س صادر</string>
+    <string name="onboarding_revelation_bullet2">عطلات نهاية الأسبوع هي أوقات ذروة إنفاقك</string>
+    <string name="onboarding_revelation_bullet3">راقب هذا الاتجاه للحفاظ على فائضك</string>
+
+    <!-- Transaction History Page -->
+    <string name="onboarding_history_recent_title">المعاملات الأخيرة</string>
+    <string name="onboarding_history_title">جميع معاملات اليوم\nمسجلة بدقة.</string>
+    <string name="onboarding_history_subtitle">من قهوة الصباح إلى العمل الحر — لا شيء يُفقد.</string>
+    <string name="onboarding_history_bullet1">ستاربكس، غراب، إلى الدخل المدخل تلقائياً</string>
+    <string name="onboarding_history_bullet2">يتم تصنيف كل معاملة على الفور</string>
+    <string name="onboarding_history_bullet3">ابحث في سجل المعاملات بسهولة الدردشة</string>
+
+    <!-- Budget Tracker Page -->
+    <string name="onboarding_budget_title">تم استخدام 4.3 مليون ر.س\nمن ميزانية 6.2 مليون ر.س.</string>
+    <string name="onboarding_budget_subtitle">المتبقي 1.85 مليون ر.س — قم بإدارتها قبل نهاية الشهر.</string>
+    <string name="onboarding_budget_bullet1">ميزانية المواصلات شارفت على الانتهاء — بقي 8% فقط</string>
+    <string name="onboarding_budget_bullet2">تحذير الطعام والشراب عند 82%</string>
+    <string name="onboarding_budget_bullet3">إشعارات تلقائية عند الميزانية الحرجة</string>
+
+    <!-- Portfolio Page -->
+    <string name="onboarding_portfolio_title">جميع أصولك،\nفي لوحة تحكم واحدة.</string>
+    <string name="onboarding_portfolio_subtitle">لا حاجة للتحقق منها واحدة تلو الأخرى. كاشا يلخص كل شيء.</string>
+    <string name="onboarding_portfolio_bullet1">5 أسهم، 2 ذهب ومدخرات — يتم مراقبتها على الفور</string>
+    <string name="onboarding_portfolio_bullet2">العائد +5.8%، الربح غير المحقق 2.5 مليون ر.س</string>
+    <string name="onboarding_portfolio_bullet3">الأسعار تُحدث تلقائياً، دون الحاجة للتحديث اليدوي</string>
+
+    <!-- Liabilities Page -->
+    <string name="onboarding_liabilities_title">الرهن العقاري وبطاقات الائتمان\nجميعها تحت المراقبة.</string>
+    <string name="onboarding_liabilities_subtitle">الاستحقاق في أيام 15 و 25 — كاشا يذكرك في الوقت المناسب.</string>
+    <string name="onboarding_liabilities_bullet1">الرهن العقاري 480 مليون ر.س — 14 سنة متبقية</string>
+    <string name="onboarding_liabilities_bullet2">استخدام بطاقة الائتمان 5.2 مليون ر.س من 20 مليون ر.س</string>
+    <string name="onboarding_liabilities_bullet3">إجمالي الأقساط 2.2 مليون ر.س شهرياً — يتم تتبعها تلقائياً</string>
+
+    <!-- Goal Tracker Page -->
+    <string name="onboarding_goal_title">3 أهداف، 1 اكتمل.\nحافظ على استمراريتك.</string>
+    <string name="onboarding_goal_bullet1">التقدم الإجمالي 30% من هدف 500 مليون ر.س</string>
+    <string name="onboarding_goal_bullet2">منزل الأحلام 250 مليون ر.س تم ادخارها — تم تحقيق 25%</string>
+    <string name="onboarding_goal_bullet3">أقرب موعد نهائي خلال 30 يوماً — صندوق العطلة</string>
+
+    <!-- Global Power Page -->
+    <string name="onboarding_global_title">دعم العملات المتعددة\nللمواطنين العالميين.</string>
+    <string name="onboarding_global_bullet1">تتبع الأصول بالروبية الإندونيسية، الدولار، اليورو، الين، والمزيد</string>
+    <string name="onboarding_global_bullet2">أسعار الصرف في الوقت الفعلي، دقيقة دائماً</string>
+
+    <!-- Offline Sync Page -->
+    <string name="onboarding_sync_title">يعمل دون اتصال،\nيتزامن في كل مكان.</string>
+    <string name="onboarding_sync_premium_title">ميزات Premium</string>
+    <string name="onboarding_sync_feature1">رؤى مالية مدعومة بالذكاء الاصطناعي</string>
+    <string name="onboarding_sync_feature2">ماسح إيصالات ذكي</string>
+    <string name="onboarding_sync_feature3">تحليلات وتقارير متقدمة</string>
+    <string name="onboarding_sync_feature4">دعم الأولوية</string>
+    <string name="onboarding_sync_start_button">ابدأ رحلتك 🚀</string>
+    <string name="onboarding_sync_status_offline">وضع عدم الاتصال</string>
+    <string name="onboarding_sync_status_syncing">جاري المزامنة…</string>
+    <string name="onboarding_sync_status_done">اكتملت المزامنة!</string>
+
+    <!-- Onboarding Mock Data -->
+    <string name="onboarding_mock_dashboard_period">هذا الشهر</string>
+    <string name="onboarding_mock_category_food">طعام وشراب</string>
+    <string name="onboarding_mock_category_transport">مواصلات</string>
+    <string name="onboarding_mock_category_income">دخل</string>
+    <string name="onboarding_mock_trx_coffee">قهوة ستاربكس</string>
+    <string name="onboarding_mock_trx_ride">رحلة غراب</string>
+    <string name="onboarding_mock_trx_freelance">مشروع عمل حر</string>
+    <string name="onboarding_mock_budget_total">إجمالي الميزانية</string>
+    <string name="onboarding_mock_asset_saving">مدخرات BCA</string>
+    <string name="onboarding_mock_asset_stock">أسهم BBCA</string>
+    <string name="onboarding_mock_liability_mortgage">KPR BTN</string>
+    <string name="onboarding_mock_liability_credit">BCA بلاتينوم</string>
+    <string name="onboarding_mock_goal_house">منزل الأحلام</string>
+    <string name="onboarding_mock_goal_category_home">منزل</string>
+    <string name="onboarding_mock_currency">ر.س</string>
+    <string name="day_mon">ن</string>
+    <string name="day_tue">ث</string>
+    <string name="day_wed">ر</string>
+    <string name="day_thu">خ</string>
+    <string name="day_fri">ج</string>
+    <string name="day_sat">س</string>
+    <string name="day_sun">ح</string>
+</resources>

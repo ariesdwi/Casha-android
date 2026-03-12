@@ -14,11 +14,6 @@ interface PortfolioRepository {
     suspend fun createAsset(request: CreateAssetRequest): Asset
 
     /**
-     * Get all assets for the current user
-     */
-    suspend fun getAssets(): List<Asset>
-
-    /**
      * Get portfolio summary with assets calculation
      */
     suspend fun getPortfolioSummary(): PortfolioSummary

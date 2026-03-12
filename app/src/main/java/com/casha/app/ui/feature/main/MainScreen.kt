@@ -3,6 +3,8 @@ package com.casha.app.ui.feature.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.ui.res.stringResource
 import com.casha.app.R
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,7 +58,6 @@ import com.casha.app.ui.feature.report.subview.TransactionListByCategoryView
 import com.casha.app.ui.feature.transaction.coordinator.AddMessageScreen
 import com.casha.app.ui.feature.portfolio.AssetsScreen
 import com.casha.app.ui.feature.portfolio.CreateAssetScreen
-import com.casha.app.ui.feature.portfolio.EditAssetScreen
 import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,29 +71,35 @@ fun MainScreen(
     val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    var activeNotification by remember { mutableStateOf<com.casha.app.domain.model.NotificationCasha?>(null) }
+
     LaunchedEffect(Unit) {
         viewModel.notificationEvents.collect { notification ->
-            val result = snackbarHostState.showSnackbar(
-                message = "${notification.title}: ${notification.body}",
-                actionLabel = "View",
-                duration = androidx.compose.material3.SnackbarDuration.Long
-            )
-            if (result == androidx.compose.material3.SnackbarResult.ActionPerformed) {
-                // Navigate based on type
-                val route = when (notification.type) {
-                    com.casha.app.domain.model.NotificationType.TRANSACTION_ADDED -> {
-                        val id = notification.data["transactionId"]
-                        val type = notification.data["cashflowType"] ?: "EXPENSE"
-                        if (id != null) NavRoutes.TransactionDetail.createRoute(id, type) else null
-                    }
-                    com.casha.app.domain.model.NotificationType.BUDGET_ALERT,
-                    com.casha.app.domain.model.NotificationType.BUDGET_CREATED -> NavRoutes.Budget.route
-                    com.casha.app.domain.model.NotificationType.MONTHLY_SUMMARY -> NavRoutes.Report.route
-                    else -> null
-                }
-                route?.let { navController.navigate(it) }
+            activeNotification = notification
+            // Auto dismiss after a delay
+            kotlinx.coroutines.delay(4000)
+            if (activeNotification == notification) {
+                activeNotification = null
             }
         }
+    }
+
+    // A separate effect to handle notification clicks if needed outside the display
+    fun handleNotificationClick(notification: com.casha.app.domain.model.NotificationCasha) {
+        // Navigate based on type
+        val route = when (notification.type) {
+            com.casha.app.domain.model.NotificationType.TRANSACTION_ADDED -> {
+                val id = notification.data["transactionId"]
+                val type = notification.data["cashflowType"] ?: "EXPENSE"
+                if (id != null) NavRoutes.TransactionDetail.createRoute(id, type) else null
+            }
+            com.casha.app.domain.model.NotificationType.BUDGET_ALERT,
+            com.casha.app.domain.model.NotificationType.BUDGET_CREATED -> NavRoutes.Budget.route
+            com.casha.app.domain.model.NotificationType.MONTHLY_SUMMARY -> NavRoutes.Report.route
+            else -> null
+        }
+        route?.let { navController.navigate(it) }
+        activeNotification = null
     }
 
     var selectedTab by remember { mutableIntStateOf(1) } // Default to Home
@@ -435,7 +442,7 @@ fun MainScreen(
                     } else {
                         // Fallback or loading if needed, though AssetsScreen should have loaded it
                         LaunchedEffect(assetId) {
-                            viewModel.fetchAssets()
+                            viewModel.fetchPortfolioSummary()
                         }
                     }
                 }
@@ -546,12 +553,12 @@ fun MainScreen(
                                 viewModel.simulatePayoff(strategy, additionalPayment)
                             },
                             onAddTransaction = {},
-                            onCreateTransaction = { name, amount, categoryId, description ->
+                            onCreateTransaction = { name, amount, category, description ->
                                 viewModel.createTransaction(
                                     liabilityId = liabilityId,
                                     name = name,
                                     amount = amount,
-                                    categoryId = categoryId,
+                                    category = category,
                                     description = description,
                                     onSuccess = {}
                                 )
@@ -630,7 +637,8 @@ fun MainScreen(
 
         if (showPaywallSheet) {
             ModalBottomSheet(
-                onDismissRequest = { showPaywallSheet = false },
+modifier = Modifier.fillMaxSize(),
+onDismissRequest = { showPaywallSheet = false },
                 sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
                 dragHandle = null,
                 containerColor = Color.Transparent,
@@ -638,6 +646,24 @@ fun MainScreen(
             ) {
                 com.casha.app.ui.feature.subscription.PaywallScreen(
                     onDismiss = { showPaywallSheet = false }
+                )
+            }
+        }
+        
+        // Render top floating notification banner if present
+        androidx.compose.animation.AnimatedVisibility(
+            visible = activeNotification != null,
+            enter = androidx.compose.animation.slideInVertically(initialOffsetY = { -it }) + androidx.compose.animation.fadeIn(),
+            exit = androidx.compose.animation.slideOutVertically(targetOffsetY = { -it }) + androidx.compose.animation.fadeOut(),
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+        ) {
+            activeNotification?.let { notif ->
+                com.casha.app.ui.component.BudgetAlertBanner(
+                    notification = notif,
+                    onTap = { handleNotificationClick(notif) },
+                    onDismiss = { activeNotification = null }
                 )
             }
         }
