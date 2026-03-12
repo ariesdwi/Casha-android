@@ -8,8 +8,7 @@
 
 # ── Configuration (customize these) ──
 APP_ID="1:842221844066:android:fdb101126b760f8918c33b"
-TESTERS="ariesdwiprasetiyo4@gmail.com"
-# GROUPS="testers"  # Uncomment to use groups instead of individual testers
+GROUPS="Casha Tester"  # Fill this with your group alias (e.g. "qa-team") AFTER creating it in Firebase Console
 
 # ── Build ──
 echo "🔨 Building debug APK..."
@@ -28,10 +27,18 @@ NOTES="Build #$(date '+%Y%m%d-%H%M') | $(git log -1 --pretty=%s 2>/dev/null || e
 
 echo "🚀 Uploading to Firebase App Distribution..."
 
-firebase appdistribution:distribute "$APK_PATH" \
-  --app "$APP_ID" \
-  --testers "$TESTERS" \
-  --release-notes "$NOTES"
+# Construct firebase command options
+DISTRIBUTE_CMD="firebase appdistribution:distribute \"$APK_PATH\" --app \"$APP_ID\" --release-notes \"$NOTES\""
+
+if [ -n "$TESTERS" ]; then
+  DISTRIBUTE_CMD="$DISTRIBUTE_CMD --testers \"$TESTERS\""
+fi
+
+if [ -n "$GROUPS" ]; then
+  DISTRIBUTE_CMD="$DISTRIBUTE_CMD --groups \"$GROUPS\""
+fi
+
+eval $DISTRIBUTE_CMD
 
 if [ $? -eq 0 ]; then
   echo ""

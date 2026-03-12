@@ -9,7 +9,8 @@
 
 # ── Configuration (customize these) ──
 APP_ID="1:842221844066:android:e465e9ff1a66a36c18c33b"
-TESTERS="ariesdwiprasetiyo4@gmail.com"
+# TESTERS="ariesdwiprasetiyo4@gmail.com"
+GROUPS="Casha Tester" 
 # GROUPS="testers"  # Uncomment to use groups instead of individual testers
 
 # ── Build ──
