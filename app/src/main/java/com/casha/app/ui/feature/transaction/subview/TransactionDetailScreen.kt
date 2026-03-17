@@ -14,6 +14,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -52,13 +54,26 @@ fun TransactionDetailScreen(
         uiState.rawTransactions.find { it.id == transactionId }
     }
 
+    // Cache the most recent valid transaction state so the UI doesn't blank out 
+    // instantly when it's deleted from the backing view model or list.
+    val activeTransaction = remember(transaction) { transaction } ?: remember { transaction }
+
     var showingDeleteAlert by remember { mutableStateOf(false) }
     var showingSyncAlert by remember { mutableStateOf(false) }
     var showingTenorSheet by remember { mutableStateOf(false) }
     var showingEditSheet by remember { mutableStateOf(false) }
+    var isDeleting by remember { mutableStateOf(false) }
+    var isEditing by remember { mutableStateOf(false) }
 
-    if (transaction == null) {
-        // Fallback or loading state
+    // Observe when deleting completes to gracefully pop navigation
+    LaunchedEffect(uiState.isLoading, isDeleting) {
+        if (isDeleting && !uiState.isLoading) {
+            onNavigateBack()
+        }
+    }
+
+    if (activeTransaction == null) {
+        // Fallback or full loading state
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             if (uiState.isLoading) {
                 CircularProgressIndicator()
@@ -106,7 +121,7 @@ fun TransactionDetailScreen(
                             leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) },
                             onClick = {
                                 menuExpanded = false
-                                if (transaction.isSynced) {
+                                if (activeTransaction.isSynced) {
                                     showingEditSheet = true
                                 } else {
                                     showingSyncAlert = true
@@ -118,7 +133,7 @@ fun TransactionDetailScreen(
                             leadingIcon = { Icon(Icons.Default.Delete, contentDescription = null, tint = MaterialTheme.colorScheme.error) },
                             onClick = {
                                 menuExpanded = false
-                                if (transaction.isSynced) {
+                                if (activeTransaction.isSynced) {
                                     showingDeleteAlert = true
                                 } else {
                                     showingSyncAlert = true
@@ -129,7 +144,7 @@ fun TransactionDetailScreen(
                 }
             )
         },
-        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
         Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
             Column(
@@ -139,35 +154,38 @@ fun TransactionDetailScreen(
                     .padding(horizontal = 20.dp, vertical = 24.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                HeaderSection(transaction, cashflowType)
-                AmountStatusSection(transaction, cashflowType)
-                CategorySection(transaction)
-                DetailsSection(transaction, onConvertInstallmentClick = { showingTenorSheet = true })
+                HeaderSection(activeTransaction, cashflowType)
+                AmountStatusSection(activeTransaction, cashflowType)
+                CategorySection(activeTransaction)
+                DetailsSection(activeTransaction, onConvertInstallmentClick = { showingTenorSheet = true })
                 Spacer(modifier = Modifier.height(120.dp))
             }
+        }
+    }
 
-            // Processing overlay
-            if (uiState.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black.copy(alpha = 0.3f)),
-                    contentAlignment = Alignment.Center
+    // Professional Processing Dialog Modal
+    if (uiState.isLoading && (isDeleting || isEditing)) {
+        Dialog(
+            onDismissRequest = { /* No cancel */ },
+            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(160.dp)
+                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp)),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(12.dp))
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        CircularProgressIndicator(modifier = Modifier.size(48.dp))
-                        Text(
-                            text = stringResource(R.string.transactions_detail_processing),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
+                    CircularProgressIndicator(modifier = Modifier.size(48.dp), color = MaterialTheme.colorScheme.primary)
+                    Text(
+                        text = if (isDeleting) "Deleting..." else "Saving...",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         }
@@ -182,12 +200,12 @@ fun TransactionDetailScreen(
                 TextButton(
                     onClick = {
                         showingDeleteAlert = false
+                        isDeleting = true
                         if (cashflowType == CashflowType.INCOME) {
-                            viewModel.deleteIncome(transaction.id)
+                            viewModel.deleteIncome(activeTransaction.id)
                         } else {
-                            viewModel.deleteTransaction(transaction.id)
+                            viewModel.deleteTransaction(activeTransaction.id)
                         }
-                        onNavigateBack() // Auto navigate back after initiating delete
                     }
                 ) {
                     Text(stringResource(R.string.transactions_detail_delete_confirm_button), color = MaterialTheme.colorScheme.error)
@@ -216,10 +234,11 @@ fun TransactionDetailScreen(
     
     if (showingEditSheet) {
         EditTransactionBottomSheet(
-            transaction = transaction,
+            transaction = activeTransaction,
             cashflowType = cashflowType,
             onDismissRequest = { showingEditSheet = false },
             onSave = { request ->
+                isEditing = true
                 if (cashflowType == CashflowType.INCOME) {
                     // Convert TransactionRequest to CreateIncomeRequest
                     val incomeRequest = com.casha.app.domain.model.CreateIncomeRequest(
@@ -229,13 +248,24 @@ fun TransactionDetailScreen(
                         type = try { com.casha.app.domain.model.IncomeType.valueOf(request.category.uppercase()) } catch(e: Exception) { com.casha.app.domain.model.IncomeType.OTHER },
                         note = request.note
                     )
-                    viewModel.updateIncome(transaction.id, incomeRequest)
+                    viewModel.updateIncome(activeTransaction.id, incomeRequest)
                 } else {
-                    viewModel.updateTransaction(transaction.id, request)
+                    viewModel.updateTransaction(activeTransaction.id, request)
                 }
                 showingEditSheet = false
+                
+                // Reset isEditing smoothly after successful save block finishes
+                // This simulates finishing to unlock the UI.
+                // It relies on LaunchedEffect or the viewModel terminating isloading properly.
+                // We'll manage resetting isEditing outside or leave it since it hides when !uiState.isLoading
             }
         )
+    }
+
+    LaunchedEffect(uiState.isLoading) {
+        if (!uiState.isLoading && isEditing) {
+            isEditing = false
+        }
     }
     
     // Convert Installment sheet would go here
@@ -245,7 +275,8 @@ fun TransactionDetailScreen(
 private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
     val tempEntry = with(CashflowUiUtils) { transaction.toCashflowEntry() }
     val icon = CashflowUiUtils.iconForEntry(tempEntry)
-    val color = CashflowUiUtils.colorForType(type)
+    val color = if (type == CashflowType.INCOME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+    val onColor = if (type == CashflowType.INCOME) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onError
     val typeName = if (type == CashflowType.INCOME) "INCOME" else "EXPENSE"
 
     Column(
@@ -275,6 +306,7 @@ private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
             text = transaction.name,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
@@ -283,7 +315,7 @@ private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
         Text(
             text = typeName,
             style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-            color = Color.White,
+            color = onColor,
             modifier = Modifier
                 .background(color, RoundedCornerShape(8.dp))
                 .padding(horizontal = 16.dp, vertical = 8.dp)
@@ -293,7 +325,7 @@ private fun HeaderSection(transaction: TransactionCasha, type: CashflowType) {
 
 @Composable
 private fun AmountStatusSection(transaction: TransactionCasha, type: CashflowType) {
-    val color = CashflowUiUtils.colorForType(type)
+    val color = if (type == CashflowType.INCOME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
     val titleText = if (type == CashflowType.INCOME) stringResource(R.string.transactions_detail_amount_received) else stringResource(R.string.transactions_detail_amount_spent)
 
     Column(
@@ -394,14 +426,14 @@ private fun DetailsSection(transaction: TransactionCasha, onConvertInstallmentCl
                 Text(
                     text = if (transaction.isSynced) stringResource(R.string.transactions_detail_status_synced) else stringResource(R.string.transactions_detail_status_pending),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = if (transaction.isSynced) CashaSuccess else Color(0xFFFF9800),
+                    color = if (transaction.isSynced) MaterialTheme.colorScheme.primary else Color(0xFFFF9800),
                     textAlign = TextAlign.End
                 )
                 if (transaction.isSynced) {
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = Color(0xFF4CAF50),
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(start = 4.dp).size(16.dp)
                     )
                 }

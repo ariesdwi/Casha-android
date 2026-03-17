@@ -43,7 +43,12 @@ fun EditTransactionBottomSheet(
 
     // Form States
     var name by remember { mutableStateOf(transaction.name) }
-    var amount by remember { mutableStateOf(transaction.amount.toString()) }
+    var amount by remember { 
+        mutableStateOf(
+            if (transaction.amount % 1.0 == 0.0) transaction.amount.toLong().toString()
+            else transaction.amount.toString()
+        ) 
+    }
     var category by remember { mutableStateOf(transaction.category) }
     var datetime by remember { mutableStateOf(transaction.datetime) }
     var isConfirmed by remember { mutableStateOf(transaction.isSynced) } // Using synced for the "confirmed" switch 
@@ -98,141 +103,109 @@ fun EditTransactionBottomSheet(
             }
 
             // Transaction Details Group
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = if (cashflowType == CashflowType.INCOME) "Income Details" else stringResource(R.string.transactions_edit_title),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
                 )
 
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                ) {
-                    Column {
-                        // Name Input
-                        TextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            placeholder = { Text(stringResource(R.string.transactions_edit_name_placeholder)) },
-                            textStyle = MaterialTheme.typography.bodyLarge
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
-                        
-                        var isAmountFocused by remember { mutableStateOf(false) }
-                        // Amount Input
-                        TextField(
-                            value = if (isAmountFocused) amount else if (amount.isNotEmpty()) CurrencyFormatter.formatInput(amount) else "",
-                            onValueChange = { amount = it },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                            modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
-                            colors = TextFieldDefaults.colors(
-                                focusedContainerColor = Color.Transparent,
-                                unfocusedContainerColor = Color.Transparent,
-                                focusedIndicatorColor = Color.Transparent,
-                                unfocusedIndicatorColor = Color.Transparent
-                            ),
-                            placeholder = { Text("0") },
-                            textStyle = MaterialTheme.typography.bodyLarge
-                        )
-                        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant, modifier = Modifier.padding(horizontal = 16.dp))
-                        
-                        // Category Picker
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { /* Open Category Picker */ }
-                                .padding(16.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(stringResource(R.string.transactions_detail_category), style = MaterialTheme.typography.bodyLarge)
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(
-                                    text = category.ifEmpty { "Shopping" },
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Icon(
-                                    imageVector = Icons.Default.UnfoldMore,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    modifier = Modifier.padding(start = 4.dp).size(20.dp)
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+                // Name Input
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Name") },
+                    placeholder = { Text(stringResource(R.string.transactions_edit_name_placeholder)) },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
 
-            // Date Group
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                var isAmountFocused by remember { mutableStateOf(false) }
+                // Amount Input
+                OutlinedTextField(
+                    value = if (isAmountFocused) amount else if (amount.isNotEmpty()) CurrencyFormatter.formatInput(amount) else "",
+                    onValueChange = { amount = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
+                    label = { Text("Amount") },
+                    placeholder = { Text("0") },
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // Category Picker (Simulated)
+                OutlinedTextField(
+                    value = category.ifEmpty { "Shopping" },
+                    onValueChange = { },
+                    modifier = Modifier.fillMaxWidth().clickable { /* Open Category Picker */ },
+                    enabled = false, // Use as a clickable button visually
+                    label = { Text(stringResource(R.string.transactions_detail_category)) },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.UnfoldMore,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                        disabledBorderColor = MaterialTheme.colorScheme.outline,
+                        disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                    ),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                // Date Group
                 Text(
                     text = stringResource(R.string.transactions_detail_date),
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(top = 8.dp)
                 )
 
-                Card(
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text(
-                            text = stringResource(R.string.transactions_detail_date),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(bottom = 12.dp)
-                        )
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            // Date Pill
-                            Box(
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                                    .clickable { /* Select Date */ }
-                                    .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    text = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(datetime),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                            // Time Pill
-                            Box(
-                                modifier = Modifier
-                                    .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(8.dp))
-                                    .clickable { /* Select Time */ }
-                                    .padding(horizontal = 12.dp, vertical = 6.dp)
-                            ) {
-                                Text(
-                                    text = SimpleDateFormat("HH.mm", Locale.getDefault()).format(datetime),
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-                            }
-                        }
-                    }
-                }
-            }
+                    // Date Input
+                    OutlinedTextField(
+                        value = SimpleDateFormat("dd MMM yyyy", Locale.getDefault()).format(datetime),
+                        onValueChange = { },
+                        modifier = Modifier.weight(1f).clickable { /* Select Date */ },
+                        enabled = false,
+                        label = { Text("Date") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledBorderColor = MaterialTheme.colorScheme.outline,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
 
-            // Confirmed Switch
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
+                    // Time Input
+                    OutlinedTextField(
+                        value = SimpleDateFormat("HH.mm", Locale.getDefault()).format(datetime),
+                        onValueChange = { },
+                        modifier = Modifier.weight(1f).clickable { /* Select Time */ },
+                        enabled = false,
+                        label = { Text("Time") },
+                        colors = OutlinedTextFieldDefaults.colors(
+                            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                            disabledBorderColor = MaterialTheme.colorScheme.outline,
+                            disabledLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                }
+
+                // Confirmed Switch
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(vertical = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -242,7 +215,7 @@ fun EditTransactionBottomSheet(
                         onCheckedChange = { isConfirmed = it },
                         colors = SwitchDefaults.colors(
                             checkedThumbColor = Color.White,
-                            checkedTrackColor = Color(0xFF34C759) // iOS Green
+                            checkedTrackColor = MaterialTheme.colorScheme.primary
                         )
                     )
                 }

@@ -208,7 +208,7 @@ fun AddMessageScreen(
                 color = MaterialTheme.colorScheme.background,
                 shadowElevation = 0.dp
             ) {
-                Column(modifier = Modifier.imePadding()) {
+                Column(modifier = Modifier.navigationBarsPadding().imePadding()) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -321,9 +321,6 @@ fun AddMessageScreen(
                             )
                         }
                     }
-                    
-                    // Extra padding for navigation bar area
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
         }
@@ -342,21 +339,31 @@ fun AddMessageScreen(
                     onCameraClick = { showSourceSelection = true }
                 )
             }
-            
+
             items(uiState.sentMessages) { msg ->
                 UserMessageView(message = msg)
             }
-            
+
             if (uiState.isSending) {
-                item {
-                    ProcessingMessageView()
-                }
+                item { ProcessingMessageView() }
             } else if (uiState.showConfirmation) {
                 item {
                     ConfirmationMessageView(
                         isSuccess = uiState.transactionSuccess,
                         message = uiState.aiResponseMessage,
                         intent = uiState.lastIntent
+                    )
+                }
+            }
+
+            // Non-blocking error banner shown inside the chat list (always last)
+            uiState.errorMessage?.let { errorMessage ->
+                item {
+                    ErrorBannerView(
+                        message = errorMessage,
+                        canRetry = uiState.lastFailedImageUri != null,
+                        onRetry = { viewModel.retryLastImage() },
+                        onDismiss = { viewModel.clearError() }
                     )
                 }
             }
@@ -393,6 +400,80 @@ fun AddMessageScreen(
                 },
                 confirmButton = {}
             )
+        }
+    }
+}
+
+@Composable
+fun ErrorBannerView(
+    message: String,
+    canRetry: Boolean,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    Surface(
+        color = MaterialTheme.colorScheme.errorContainer,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.Top
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.12f), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    Icons.Default.ErrorOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(18.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = "Oops!",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.85f)
+                )
+                if (canRetry) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextButton(
+                        onClick = onRetry,
+                        contentPadding = PaddingValues(0.dp),
+                        modifier = Modifier.height(28.dp)
+                    ) {
+                        Text(
+                            text = "Try again",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+            }
+            // Dismiss X
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    Icons.Default.Close,
+                    contentDescription = "Dismiss error",
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
@@ -584,14 +665,36 @@ fun ProcessingMessageView() {
 
 @Composable
 fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String) {
-    val color = if (isSuccess) Color(0xFF00C896) else Color(0xFFFF6B6B)
-    val icon = if (isSuccess) Icons.Default.CheckCircle else Icons.Default.Warning
+    val isUnknown = intent == ChatParseIntent.UNKNOWN.rawValue
+    
+    // Choose colors:
+    // Success -> Green
+    // Unknown -> Blue/Neutral
+    // Error -> Red
+    val color = when {
+        isSuccess -> Color(0xFF00C896)
+        isUnknown -> Color(0xFF3B82F6) // Info Blue
+        else -> Color(0xFFFF6B6B)
+    }
+    
+    val icon = when {
+        isSuccess -> Icons.Default.CheckCircle
+        isUnknown -> Icons.Default.Info
+        else -> Icons.Default.Warning
+    }
     
     val badgeColor = when (intent) {
         ChatParseIntent.EXPENSE.rawValue -> Color(0xFFFF6B6B)
         ChatParseIntent.INCOME.rawValue -> Color(0xFF00C896)
         ChatParseIntent.PAYMENT.rawValue -> Color(0xFF6C63FF)
+        ChatParseIntent.UNKNOWN.rawValue -> Color(0xFF3B82F6)
         else -> Color(0xFF888AAA)
+    }
+    
+    val titleText = when {
+        isSuccess -> "Transaction Logged"
+        isUnknown -> "Message Received"
+        else -> stringResource(R.string.add_transaction_chat_error_oops)
     }
     
     Surface(
@@ -616,13 +719,13 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (isSuccess) "Transaction Logged" else stringResource(R.string.add_transaction_chat_error_oops),
+                        text = titleText,
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     
-                    if (isSuccess && intent.isNotEmpty()) {
+                    if (intent.isNotEmpty() && !isUnknown) {
                         Surface(
                             color = badgeColor.copy(alpha = 0.1f),
                             shape = RoundedCornerShape(8.dp)

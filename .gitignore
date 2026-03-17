@@ -3,6 +3,8 @@
 *.aar
 *.ap_
 *.aab
+release.keystore
+
 
 # Files for the ART/Dalvik VM
 *.dex
@@ -49,6 +51,9 @@ app/google-services.json
 # Firebase service account
 firebase-sa.json
 
+# Google Play Store service account (JANGAN COMMIT!)
+play-store-credentials.json
+
 # External native build folder
 .cxx/
 .externalNativeBuild
@@ -58,3 +63,5 @@ firebase-sa.json
 *.swp
 *.swo
 *~
+
+casha-30ee7-e52de804def5.json

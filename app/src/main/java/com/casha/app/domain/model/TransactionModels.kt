@@ -43,7 +43,8 @@ data class UpdateTransactionRequest(
 enum class ChatParseIntent(val rawValue: String) {
     EXPENSE("EXPENSE"), 
     INCOME("INCOME"), 
-    PAYMENT("PAYMENT")
+    PAYMENT("PAYMENT"),
+    UNKNOWN("UNKNOWN")
 }
 
 data class ChatParseResult(

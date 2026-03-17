@@ -31,9 +31,10 @@ enum class PresentationState {
 
 data class CoordinatorUiState(
     val presentationState: PresentationState = PresentationState.IDLE,
-    val isPremium: Boolean = false, // Mocked for now
+    val isPremium: Boolean = false,
     val progressState: ProgressState = ProgressState(),
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val lastFailedImageUri: Uri? = null
 )
 
 @HiltViewModel
@@ -155,13 +156,34 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 progressJob.cancel()
-                _uiState.update { 
+                _uiState.update {
                     it.copy(
-                        progressState = ProgressState(), 
-                        errorMessage = e.localizedMessage ?: "Failed to upload image"
-                    ) 
+                        progressState = ProgressState(),
+                        errorMessage = friendlyError(e),
+                        lastFailedImageUri = imageUri
+                    )
                 }
             }
+        }
+    }
+
+    fun retryUpload() {
+        val uri = _uiState.value.lastFailedImageUri ?: return
+        uploadImage(uri)
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null, lastFailedImageUri = null) }
+    }
+
+    private fun friendlyError(e: Exception): String = when (e) {
+        is java.net.UnknownHostException, is java.io.IOException ->
+            "No internet connection. Please check your network and try again."
+        is java.net.SocketTimeoutException ->
+            "The server took too long to respond. Please try again."
+        else -> {
+            val msg = e.localizedMessage ?: ""
+            if (msg.length > 120) "Something went wrong processing your image. Please try again." else msg
         }
     }
 }

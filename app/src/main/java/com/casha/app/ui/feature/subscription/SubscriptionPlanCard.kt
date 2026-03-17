@@ -33,7 +33,7 @@ fun SubscriptionPlanCard(
     onClick: () -> Unit
 ) {
     val borderColor by animateColorAsState(
-        targetValue = if (isSelected) CashaPrimaryLight else Color.Black.copy(alpha = 0.05f),
+        targetValue = if (isSelected) CashaPrimaryLight else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
         label = "borderColor"
     )
     val borderWidth by animateDpAsState(
@@ -41,7 +41,7 @@ fun SubscriptionPlanCard(
         label = "borderWidth"
     )
     val containerColor by animateColorAsState(
-        targetValue = if (isSelected) CashaPrimaryLight.copy(alpha = 0.05f) else Color.White.copy(alpha = 0.5f),
+        targetValue = if (isSelected) CashaPrimaryLight.copy(alpha = 0.05f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
         label = "containerColor"
     )
 
@@ -63,7 +63,7 @@ fun SubscriptionPlanCard(
             Box(
                 modifier = Modifier
                     .size(20.dp)
-                    .border(2.dp, if (isSelected) CashaPrimaryLight else Color.Black.copy(alpha = 0.2f), androidx.compose.foundation.shape.CircleShape),
+                    .border(2.dp, if (isSelected) CashaPrimaryLight else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f), androidx.compose.foundation.shape.CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 if (isSelected) {

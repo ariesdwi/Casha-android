@@ -45,7 +45,7 @@ fun PaywallScreen(
     viewModel: SubscriptionManager = hiltViewModel()
 ) {
     val context = LocalContext.current
-    val activity = context as? Activity
+    val activity = context.findActivity()
     
     val products by viewModel.products.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
@@ -58,7 +58,7 @@ fun PaywallScreen(
     var purchaseSuccess by remember { mutableStateOf(false) }
     var appearAnimation by remember { mutableStateOf(false) }
 
-    val lifetimeProduct = products.find { it.productId == "premium.casha.lifetime" }
+    val lifetimeProduct = products.find { it.productId == "com.casha.premium.lifetime.new" }
     val yearlyProduct = products.find { it.productId == "casha.premium.yearly" }
     val monthlyProduct = products.find { it.productId == "premium.casha.monthly" }
     val weeklyProduct = products.find { it.productId == "com.casha.premium.weekly" }
@@ -161,7 +161,7 @@ fun PaywallScreen(
                 .align(Alignment.TopEnd)
                 .padding(16.dp)
                 .size(32.dp)
-                .background(Color.Black.copy(alpha = 0.05f), CircleShape)
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), CircleShape)
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
@@ -328,8 +328,8 @@ fun FeatureSection(visible: Boolean) {
             .fillMaxWidth()
             .graphicsLayer { alpha = opacity }
             .clip(RoundedCornerShape(24.dp))
-            .background(Color.White.copy(alpha = 0.5f))
-            .border(1.dp, Color.Black.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), RoundedCornerShape(24.dp))
             .padding(24.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
@@ -491,14 +491,14 @@ fun FooterLinks(
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 modifier = Modifier.clickable { onRestore() }
             )
-            Box(modifier = Modifier.width(1.dp).height(10.dp).background(Color.LightGray))
+            Box(modifier = Modifier.width(1.dp).height(10.dp).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)))
             Text(
                 text = stringResource(R.string.subscription_link_terms),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 modifier = Modifier.clickable { onTerms() }
             )
-            Box(modifier = Modifier.width(1.dp).height(10.dp).background(Color.LightGray))
+            Box(modifier = Modifier.width(1.dp).height(10.dp).background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)))
             Text(
                 text = stringResource(R.string.subscription_link_privacy),
                 style = MaterialTheme.typography.labelSmall,
@@ -523,18 +523,18 @@ fun PurchaseOverlay() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Black.copy(alpha = 0.3f)),
+            .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.6f)),
         contentAlignment = Alignment.Center
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
-            CircularProgressIndicator(color = Color.White, strokeWidth = 3.dp)
+            CircularProgressIndicator(color = CashaPrimaryLight, strokeWidth = 3.dp)
             Text(
                 text = stringResource(R.string.subscription_overlay_securing_access),
                 style = MaterialTheme.typography.titleMedium,
-                color = Color.White,
+                color = CashaPrimaryLight,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -669,8 +669,8 @@ fun TestimonialSection(visible: Boolean) {
         modifier = Modifier
             .fillMaxWidth()
             .graphicsLayer { alpha = opacity }
-            .background(Color.White.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
-            .border(1.dp, Color.Black.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+            .border(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
             .padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
@@ -702,4 +702,11 @@ fun TestimonialSection(visible: Boolean) {
     }
 }
 
-
+internal fun android.content.Context.findActivity(): Activity? {
+    var context = this
+    while (context is android.content.ContextWrapper) {
+        if (context is Activity) return context
+        context = context.baseContext
+    }
+    return null
+}

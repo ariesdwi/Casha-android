@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.subscription
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.*
@@ -52,10 +53,20 @@ class SubscriptionManager @Inject constructor(
 
     private var billingClient: BillingClient
 
+    companion object {
+        private const val TAG = "BillingVM"
+    }
+
     init {
+        Log.d(TAG, "Initializing BillingClient...")
         billingClient = BillingClient.newBuilder(context)
             .setListener(this)
-            .enablePendingPurchases()
+            .enablePendingPurchases(
+                PendingPurchasesParams.newBuilder()
+                    .enableOneTimeProducts()
+                    .enablePrepaidPlans()
+                    .build()
+            )
             .build()
 
         setupBillingClient()
@@ -66,16 +77,20 @@ class SubscriptionManager @Inject constructor(
     private fun setupBillingClient() {
         billingClient.startConnection(object : BillingClientStateListener {
             override fun onBillingSetupFinished(result: BillingResult) {
+                Log.d(TAG, "Billing setup finished. Response: ${result.responseCode}, Message: ${result.debugMessage}")
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
                     viewModelScope.launch {
                         loadProducts()
                         checkSubscriptionStatus()
                     }
+                } else {
+                    Log.e(TAG, "Billing setup FAILED: code=${result.responseCode}, msg=${result.debugMessage}")
+                    _errorMessage.value = "Billing setup failed: ${result.debugMessage}"
                 }
             }
 
             override fun onBillingServiceDisconnected() {
-                // Will retry on next app foreground; DataStore persists last known state
+                Log.w(TAG, "Billing service disconnected — will retry on next foreground")
             }
         })
     }
@@ -86,42 +101,55 @@ class SubscriptionManager @Inject constructor(
         _isLoading.value = true
         _errorMessage.value = null
 
+        Log.d(TAG, "Loading products...")
+
+        val subProductIds = listOf("casha.premium.yearly", "premium.casha.monthly", "com.casha.premium.weekly")
+        val inappProductIds = listOf("com.casha.premium.lifetime.new")
+
+        Log.d(TAG, "Querying SUBS: $subProductIds")
+        Log.d(TAG, "Querying INAPP: $inappProductIds")
+
         val subParams = QueryProductDetailsParams.newBuilder()
-            .setProductList(listOf(
+            .setProductList(subProductIds.map { id ->
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId("casha.premium.yearly")
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId("premium.casha.monthly")
-                    .setProductType(BillingClient.ProductType.SUBS)
-                    .build(),
-                QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId("com.casha.premium.weekly")
+                    .setProductId(id)
                     .setProductType(BillingClient.ProductType.SUBS)
                     .build()
-            ))
+            })
             .build()
 
         val inappParams = QueryProductDetailsParams.newBuilder()
-            .setProductList(listOf(
+            .setProductList(inappProductIds.map { id ->
                 QueryProductDetailsParams.Product.newBuilder()
-                    .setProductId("premium.casha.lifetime")
+                    .setProductId(id)
                     .setProductType(BillingClient.ProductType.INAPP)
                     .build()
-            ))
+            })
             .build()
 
         val allProducts = mutableListOf<ProductDetails>()
 
         billingClient.queryProductDetailsAsync(subParams) { result, list ->
+            Log.d(TAG, "SUBS query result: code=${result.responseCode}, msg=${result.debugMessage}, count=${list?.size ?: 0}")
             if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                list?.forEach { product ->
+                    Log.d(TAG, "  Found SUB: ${product.productId} — ${product.title}")
+                }
                 list?.let { allProducts.addAll(it) }
+            } else {
+                Log.e(TAG, "SUBS query FAILED: code=${result.responseCode}, msg=${result.debugMessage}")
             }
             billingClient.queryProductDetailsAsync(inappParams) { resultInapp, listInapp ->
+                Log.d(TAG, "INAPP query result: code=${resultInapp.responseCode}, msg=${resultInapp.debugMessage}, count=${listInapp?.size ?: 0}")
                 if (resultInapp.responseCode == BillingClient.BillingResponseCode.OK) {
+                    listInapp?.forEach { product ->
+                        Log.d(TAG, "  Found INAPP: ${product.productId} — ${product.title}")
+                    }
                     listInapp?.let { allProducts.addAll(it) }
+                } else {
+                    Log.e(TAG, "INAPP query FAILED: code=${resultInapp.responseCode}, msg=${resultInapp.debugMessage}")
                 }
+                Log.d(TAG, "Total products loaded: ${allProducts.size}")
                 _products.value = allProducts
                 _isLoading.value = false
             }
@@ -134,8 +162,29 @@ class SubscriptionManager @Inject constructor(
         _isPurchasing.value = true
         _errorMessage.value = null
 
+        Log.d(TAG, "Starting purchase flow for product: ${productDetails.productId}")
+
         val productDetailsParamsList = if (productDetails.productType == BillingClient.ProductType.SUBS) {
-            val offerToken = productDetails.subscriptionOfferDetails?.firstOrNull()?.offerToken ?: return
+            val offerDetails = productDetails.subscriptionOfferDetails
+            
+            // Log all available offers for debugging
+            offerDetails?.forEachIndexed { index, offer ->
+                val phases = offer.pricingPhases.pricingPhaseList.joinToString { it.formattedPrice }
+                Log.d(TAG, "Offer $index: Token=${offer.offerToken}, Phases=[$phases]")
+            }
+
+            // Find an offer with a valid token, prioritizing the one with the most pricing phases (e.g. Free Trial + Regular)
+            val selectedOffer = offerDetails?.maxByOrNull { it.pricingPhases.pricingPhaseList.size }
+            val offerToken = selectedOffer?.offerToken
+
+            if (offerToken == null) {
+                Log.e(TAG, "Cannot purchase SUB: No valid offerToken found for ${productDetails.productId}.")
+                _errorMessage.value = "Product unavailable: Missing offer details in Play Console."
+                _isPurchasing.value = false
+                return
+            }
+
+            Log.d(TAG, "Selected offer token: $offerToken")
             listOf(
                 BillingFlowParams.ProductDetailsParams.newBuilder()
                     .setProductDetails(productDetails)
@@ -150,12 +199,18 @@ class SubscriptionManager @Inject constructor(
             )
         }
 
-        billingClient.launchBillingFlow(
-            activity,
-            BillingFlowParams.newBuilder()
-                .setProductDetailsParamsList(productDetailsParamsList)
-                .build()
-        )
+        val billingFlowParams = BillingFlowParams.newBuilder()
+            .setProductDetailsParamsList(productDetailsParamsList)
+            .build()
+
+        val launchResult = billingClient.launchBillingFlow(activity, billingFlowParams)
+        if (launchResult.responseCode != BillingClient.BillingResponseCode.OK) {
+            Log.e(TAG, "Failed to launch billing flow. Code: ${launchResult.responseCode}, Msg: ${launchResult.debugMessage}")
+            _errorMessage.value = "Billing flow error: ${launchResult.debugMessage}"
+            _isPurchasing.value = false
+        } else {
+            Log.d(TAG, "Billing flow launched successfully. Waiting for user input...")
+        }
     }
 
     // ── PurchasesUpdatedListener ───────────────────────────────────────────────

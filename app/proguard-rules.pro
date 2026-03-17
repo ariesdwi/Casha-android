@@ -7,6 +7,15 @@
 -keepclasseswithmembers class * {
     @retrofit2.http.* <methods>;
 }
+-dontwarn retrofit2.**
+
+# OkHttp & Okio
+-keepattributes *Annotation*
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
 
 # Kotlinx Serialization
 -keepattributes *Annotation*, InnerClasses
@@ -24,6 +33,7 @@
 -keepclasseswithmembers class com.casha.app.** {
     kotlinx.serialization.KSerializer serializer(...);
 }
+-keep class com.jakewharton.retrofit2.converter.kotlinx.serialization.** { *; }
 
 # Room
 -keep class * extends androidx.room.RoomDatabase
@@ -42,4 +52,6 @@
 -keep class com.casha.app.data.remote.dto.** { *; }
 -keep class com.casha.app.data.remote.api.** { *; }
 -keep class com.casha.app.domain.model.** { *; }
+-keepclassmembers class com.casha.app.domain.model.** { *; }
+-keepclassmembers class com.casha.app.data.remote.dto.** { *; }
 -keep @kotlinx.serialization.Serializable class * { *; }

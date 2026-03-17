@@ -98,9 +98,10 @@ fun AddTransactionCoordinator(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     LaunchedEffect(isPresented) {
-        if (isPresented && uiState.presentationState == PresentationState.IDLE) {
+        if (isPresented) {
             viewModel.showActionSheet()
-        } else if (!isPresented) {
+        } else {
+            viewModel.clearError()
             viewModel.close()
         }
     }
@@ -137,17 +138,13 @@ fun AddTransactionCoordinator(
         }
     }
 
-    LaunchedEffect(uiState.errorMessage) {
-        uiState.errorMessage?.let { msg ->
-            android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_LONG).show()
-        }
-    }
-
     // New custom animated ProgressOverlay matching iOS
     ProgressOverlay(progressState = uiState.progressState)
     
-    if (uiState.presentationState == PresentationState.ACTION_SHEET && !uiState.progressState.isVisible) {
-        Dialog(onDismissRequest = { 
+    // Show action sheet — keep open even on error so user can still interact
+    if ((uiState.presentationState == PresentationState.ACTION_SHEET || uiState.errorMessage != null) && !uiState.progressState.isVisible) {
+        Dialog(onDismissRequest = {
+            viewModel.clearError()
             viewModel.close()
             onDismiss()
         }) {
@@ -170,43 +167,98 @@ fun AddTransactionCoordinator(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     Text(
                         text = stringResource(R.string.add_transaction_coordinator_message_premium),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center
                     )
-                    
+
+                    // ── Inline error banner (non-blocking) ──────────────────
+                    uiState.errorMessage?.let { errorMessage ->
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Surface(
+                            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.errorContainer,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.ErrorOutline,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(18.dp).padding(top = 2.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = errorMessage,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                    if (uiState.lastFailedImageUri != null) {
+                                        TextButton(
+                                            onClick = { viewModel.retryUpload() },
+                                            contentPadding = PaddingValues(0.dp),
+                                            modifier = Modifier.height(28.dp)
+                                        ) {
+                                            Text(
+                                                text = "Try Again",
+                                                style = MaterialTheme.typography.labelMedium,
+                                                color = MaterialTheme.colorScheme.error
+                                            )
+                                        }
+                                    }
+                                }
+                                IconButton(
+                                    onClick = { viewModel.clearError() },
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Dismiss",
+                                        tint = MaterialTheme.colorScheme.onErrorContainer,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    // ────────────────────────────────────────────────────────
+
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_manual),
                         onClick = { viewModel.onFeatureSelected(PresentationState.MANUAL_ENTRY) }
                     )
-                    
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_chat),
                         isPremiumFeature = true,
                         hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.CHAT) }
                     )
-                    
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_camera),
                         isPremiumFeature = true,
                         hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.CAMERA) }
                     )
-                    
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     CoordinatorOption(
                         title = stringResource(R.string.add_transaction_coordinator_button_photo_library),
                         isPremiumFeature = true,

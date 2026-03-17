@@ -18,6 +18,9 @@ import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import com.casha.app.core.utils.ImageUtils
+import java.io.IOException
+import java.net.SocketTimeoutException
+import java.net.UnknownHostException
 import java.util.Date
 import javax.inject.Inject
 
@@ -27,7 +30,10 @@ data class AddMessageUiState(
     val showConfirmation: Boolean = false,
     val transactionSuccess: Boolean = false,
     val aiResponseMessage: String = "",
-    val lastIntent: String = ""
+    val lastIntent: String = "",
+    // Non-blocking error — shown as a dismissible banner, NOT a blocking card
+    val errorMessage: String? = null,
+    val lastFailedImageUri: Uri? = null
 )
 
 @HiltViewModel
@@ -42,36 +48,36 @@ class AddMessageViewModel @Inject constructor(
 
     fun sendMessage(message: String) {
         viewModelScope.launch {
-            _uiState.update { 
+            _uiState.update {
                 it.copy(
                     sentMessages = it.sentMessages + message,
                     isSending = true,
-                    showConfirmation = false
-                ) 
+                    showConfirmation = false,
+                    errorMessage = null
+                )
             }
-            
+
             try {
                 val result = chatRepository.parseChat(message)
-                
-                syncEventBus.emitSyncCompleted()
-                
+                val isSuccess = result.intent != ChatParseIntent.UNKNOWN
+                if (isSuccess) {
+                    syncEventBus.emitSyncCompleted()
+                }
                 _uiState.update {
                     it.copy(
                         isSending = false,
                         showConfirmation = true,
-                        transactionSuccess = true,
+                        transactionSuccess = isSuccess,
                         aiResponseMessage = result.message,
                         lastIntent = result.intent.rawValue
                     )
                 }
-                
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isSending = false,
-                        showConfirmation = true,
-                        transactionSuccess = false,
-                        aiResponseMessage = e.localizedMessage ?: "Unknown error"
+                        showConfirmation = false,
+                        errorMessage = friendlyError(e)
                     )
                 }
             }
@@ -80,50 +86,83 @@ class AddMessageViewModel @Inject constructor(
 
     fun sendImage(imageUri: Uri) {
         viewModelScope.launch {
-            _uiState.update { 
+            _uiState.update {
                 it.copy(
                     isSending = true,
-                    showConfirmation = false
-                ) 
+                    showConfirmation = false,
+                    errorMessage = null,
+                    lastFailedImageUri = null
+                )
             }
-            
+
             try {
-                // Compress & Copy URI to a temporary optimized file
                 val tempFile = ImageUtils.compressImage(context, imageUri, "chat_upload.jpg")
-                
+
                 if (tempFile == null || !tempFile.exists()) {
-                    throw Exception("Failed to process image")
+                    _uiState.update {
+                        it.copy(
+                            isSending = false,
+                            errorMessage = "Couldn't read the image. Please try selecting it again.",
+                            lastFailedImageUri = imageUri
+                        )
+                    }
+                    return@launch
                 }
 
                 val result = chatRepository.parseImage(tempFile)
-                syncEventBus.emitSyncCompleted()
-                
-                // Clean up temp file
-                try { tempFile.delete() } catch (e: Exception) { /* ignore */ }
-                
+                val isSuccess = result.intent != ChatParseIntent.UNKNOWN
+                if (isSuccess) {
+                    syncEventBus.emitSyncCompleted()
+                }
+
+                try { tempFile.delete() } catch (_: Exception) { /* ignore cleanup errors */ }
+
                 _uiState.update {
                     it.copy(
                         isSending = false,
                         showConfirmation = true,
-                        transactionSuccess = true,
+                        transactionSuccess = isSuccess,
                         aiResponseMessage = result.message,
-                        lastIntent = result.intent.rawValue
+                        lastIntent = result.intent.rawValue,
+                        lastFailedImageUri = null
                     )
                 }
             } catch (e: Exception) {
                 _uiState.update {
                     it.copy(
                         isSending = false,
-                        showConfirmation = true,
-                        transactionSuccess = false,
-                        aiResponseMessage = e.localizedMessage ?: "Unknown error"
+                        showConfirmation = false,
+                        errorMessage = friendlyError(e),
+                        lastFailedImageUri = imageUri
                     )
                 }
             }
         }
     }
 
+    /** Retry the last failed image upload. */
+    fun retryLastImage() {
+        val uri = _uiState.value.lastFailedImageUri ?: return
+        sendImage(uri)
+    }
+
+    /** Dismiss the error banner without retrying. */
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null, lastFailedImageUri = null) }
+    }
+
     fun resetState() {
         _uiState.update { AddMessageUiState() }
+    }
+
+    private fun friendlyError(e: Exception): String = when (e) {
+        is UnknownHostException, is IOException ->
+            "No internet connection. Please check your network and try again."
+        is SocketTimeoutException ->
+            "The server took too long to respond. Please try again."
+        else -> {
+            val msg = e.localizedMessage ?: ""
+            if (msg.length > 120) "Something went wrong. Please try again." else msg
+        }
     }
 }

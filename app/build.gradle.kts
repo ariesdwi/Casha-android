@@ -18,7 +18,7 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2
+        versionCode = 16
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -29,9 +29,9 @@ android {
         create("release") {
             // Placeholder keys for the user to update
             keyAlias = "casha"
-            keyPassword = "password"
+            keyPassword = "01081997Abgmud@"
             storeFile = file("../release.keystore")
-            storePassword = "password"
+            storePassword = "01081997Abgmud@"
         }
     }
 
@@ -40,7 +40,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"https://be-casha-apps.vercel.app/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -77,8 +77,12 @@ android {
             } else {
                 signingConfigs.getByName("debug")
             }
+
         }
     }
+
+    // Disable ART profile embedding to fix INSTALL_BASELINE_PROFILE_FAILED on local devices
+    experimentalProperties["android.experimental.art-profile-r8-rewriting"] = false
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

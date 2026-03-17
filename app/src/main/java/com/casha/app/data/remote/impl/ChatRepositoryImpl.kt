@@ -123,6 +123,14 @@ class ChatRepositoryImpl @Inject constructor(
                     message = message
                 )
             }
+            "UNKNOWN" -> {
+                // For unknown intents, we just return the AI's message
+                // so the UI can display it without saving any transaction.
+                ChatParseResult(
+                    intent = ChatParseIntent.UNKNOWN,
+                    message = message
+                )
+            }
             else -> {
                 throw Exception("Unknown intent: $intentString")
             }
