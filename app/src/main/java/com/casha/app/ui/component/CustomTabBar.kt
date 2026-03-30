@@ -311,6 +311,8 @@ private fun RegularTabButton(
             color = textColor,
             fontSize = 10.sp,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
+            maxLines = 1,
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
             modifier = Modifier.graphicsLayer {
                 scaleX = if (isSelected) 1.05f else 1f
                 scaleY = if (isSelected) 1.05f else 1f

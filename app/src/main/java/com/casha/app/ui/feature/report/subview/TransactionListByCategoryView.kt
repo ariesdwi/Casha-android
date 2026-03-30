@@ -21,6 +21,7 @@ import com.casha.app.R
 fun TransactionListByCategoryView(
     category: String,
     onBackClick: () -> Unit,
+    onNavigateToDetail: (String, String) -> Unit = { _, _ -> },
     viewModel: ReportViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -64,7 +65,7 @@ fun TransactionListByCategoryView(
             TransactionList(
                 sections = sections,
                 isLoading = uiState.isLoading,
-                onClick = { _, _ -> /* TODO: Navigate to Detail */ }
+                onClick = { id, type -> onNavigateToDetail(id, type) }
             )
 
             if (uiState.isLoading) {

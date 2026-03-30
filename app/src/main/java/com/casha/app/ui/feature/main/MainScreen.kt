@@ -355,6 +355,7 @@ fun MainScreen(
                     TransactionListByCategoryView(
                         category = category,
                         onBackClick = { navController.popBackStack() },
+                        onNavigateToDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) },
                         viewModel = viewModel
                     )
                 }
