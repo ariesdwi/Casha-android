@@ -162,7 +162,7 @@ class AddMessageViewModel @Inject constructor(
             "The server took too long to respond. Please try again."
         else -> {
             val msg = e.localizedMessage ?: ""
-            if (msg.length > 120) "Something went wrong. Please try again." else msg
+            if (msg.length > 160) "Something went wrong. Please try again." else msg
         }
     }
 }

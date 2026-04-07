@@ -113,6 +113,8 @@ class ChatRepositoryImpl @Inject constructor(
                     isRecurring = incomeDto.isRecurring,
                     frequency = frequencyResolved,
                     note = incomeDto.note,
+                    isSynced = true,
+                    remoteId = incomeDto.id,
                     createdAt = try { incomeDto.createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
                     updatedAt = try { incomeDto.updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
                 )
