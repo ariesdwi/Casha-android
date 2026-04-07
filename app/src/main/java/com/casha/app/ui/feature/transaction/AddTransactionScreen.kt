@@ -148,7 +148,7 @@ onDismissRequest = onNavigateBack,
                     )
                     TextButton(
                         onClick = { save() },
-                        enabled = isFormValid
+                        enabled = isFormValid && !uiState.isLoading
                     ) {
                         Text(
                             stringResource(R.string.add_transaction_save),

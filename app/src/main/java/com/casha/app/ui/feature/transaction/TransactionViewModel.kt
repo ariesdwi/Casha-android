@@ -231,6 +231,7 @@ class TransactionViewModel @Inject constructor(
     }
 
     fun addTransaction(request: TransactionRequest) {
+        if (_uiState.value.isLoading) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
@@ -244,6 +245,7 @@ class TransactionViewModel @Inject constructor(
     }
 
     fun addIncome(request: CreateIncomeRequest) {
+        if (_uiState.value.isLoading) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {

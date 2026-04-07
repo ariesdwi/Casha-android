@@ -51,21 +51,6 @@ class IncomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveIncome(request: CreateIncomeRequest) {
-        val entity = IncomeEntity(
-            id = UUID.randomUUID().toString(),
-            name = request.name,
-            amount = request.amount,
-            datetime = request.datetime,
-            type = request.type,
-            source = request.source,
-            assetId = request.assetId,
-            isRecurring = request.isRecurring,
-            frequency = request.frequency,
-            note = request.note,
-            createdAt = Date(),
-            updatedAt = Date()
-        )
-
         val dto = CreateIncomeRequestDto(
             name = request.name,
             type = request.type.name,
@@ -78,10 +63,26 @@ class IncomeRepositoryImpl @Inject constructor(
             assetId = request.assetId
         )
 
-        safeApiCall { apiService.createIncome(dto) }.fold(
-            onSuccess = { incomeDao.insertIncome(entity) },
-            onFailure = { incomeDao.insertIncome(entity) } // Still fallback
+        val result = safeApiCall { apiService.createIncome(dto) }
+        
+        val entity = IncomeEntity(
+            id = result.getOrNull()?.data?.id ?: UUID.randomUUID().toString(),
+            name = request.name,
+            amount = request.amount,
+            datetime = request.datetime,
+            type = request.type,
+            source = request.source,
+            assetId = request.assetId,
+            isRecurring = request.isRecurring,
+            frequency = request.frequency,
+            note = request.note,
+            isSynced = result.isSuccess,
+            remoteId = result.getOrNull()?.data?.id,
+            createdAt = Date(),
+            updatedAt = Date()
         )
+
+        incomeDao.insertIncome(entity)
     }
 
     override suspend fun updateIncome(id: String, request: CreateIncomeRequest) {
@@ -108,6 +109,8 @@ class IncomeRepositoryImpl @Inject constructor(
             isRecurring = request.isRecurring,
             frequency = request.frequency,
             note = request.note,
+            isSynced = true,
+            remoteId = id,
             updatedAt = Date()
         )
         incomeDao.insertIncome(entity)
@@ -133,6 +136,8 @@ class IncomeRepositoryImpl @Inject constructor(
         isRecurring = isRecurring,
         frequency = try { frequency?.let { IncomeFrequency.valueOf(it.uppercase()) } } catch (e: Exception) { null },
         note = note,
+        isSynced = true,
+        remoteId = id,
         createdAt = try { createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
         updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
     )
@@ -154,6 +159,8 @@ class IncomeRepositoryImpl @Inject constructor(
         isRecurring = isRecurring,
         frequency = frequency,
         note = note,
+        isSynced = isSynced,
+        remoteId = remoteId,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

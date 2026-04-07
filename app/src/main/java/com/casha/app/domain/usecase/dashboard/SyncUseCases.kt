@@ -63,16 +63,18 @@ class CashflowSyncUseCase @Inject constructor(
             if (incomes.isNotEmpty()) {
                 val incomeEntities = incomes.map { entry ->
                     IncomeEntity(
-                        id = entry.id,
+                        id = entry.id, // Using server ID as primary key
                         name = entry.title,
                         amount = entry.amount,
                         datetime = entry.date,
-                        type = IncomeType.OTHER,
+                        type = try { entry.category.let { IncomeType.valueOf(it.uppercase()) } } catch (e: Exception) { IncomeType.OTHER },
                         source = null,
                         assetId = null,
                         isRecurring = false,
                         frequency = null,
                         note = null,
+                        isSynced = true,
+                        remoteId = entry.id,
                         createdAt = entry.date,
                         updatedAt = entry.date
                     )
