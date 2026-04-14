@@ -16,5 +16,8 @@ data class TransactionEntity(
     val remoteId: String? = null,
 
     val createdAt: Date = Date(),
-    val updatedAt: Date = Date()
+    val updatedAt: Date = Date(),
+
+    val groupId: String? = null,
+    val groupName: String? = null
 )

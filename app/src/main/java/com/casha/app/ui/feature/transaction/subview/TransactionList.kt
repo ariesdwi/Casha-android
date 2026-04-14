@@ -22,6 +22,7 @@ fun TransactionList(
     sections: List<CashflowDateSection>,
     isLoading: Boolean,
     onClick: (String, String) -> Unit = { _, _ -> },
+    onGroupClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     if (sections.isEmpty() && !isLoading) {
@@ -36,7 +37,8 @@ fun TransactionList(
                 item {
                     TransactionSectionCard(
                         section = section,
-                        onClick = onClick
+                        onClick = onClick,
+                        onGroupClick = onGroupClick
                     )
                 }
             }

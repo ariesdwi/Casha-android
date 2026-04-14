@@ -53,7 +53,8 @@ class TransactionViewModel @Inject constructor(
     private val getIncomesUseCase: GetIncomesUseCase,
     private val updateIncomeUseCase: UpdateIncomeUseCase,
     private val deleteIncomeUseCase: DeleteIncomeUseCase,
-    private val syncEventBus: SyncEventBus
+    private val syncEventBus: SyncEventBus,
+    private val cashflowRepository: com.casha.app.domain.repository.CashflowRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiState())
@@ -320,6 +321,32 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
+    fun deleteGroup(groupId: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                cashflowRepository.deleteGroup(groupId)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun renameGroup(groupId: String, newName: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                cashflowRepository.renameGroup(groupId, newName)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
     private fun groupTransactionsByDate(transactions: List<CashflowEntry>): List<CashflowDateSection> {
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         val displayDateFormatter = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
@@ -339,7 +366,8 @@ class TransactionViewModel @Inject constructor(
                     yesterdayStr -> "Yesterday"
                     else -> dayFormatter.format(parsed)
                 }
-                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+                val segments = CashflowUiUtils.buildDisplaySegments(entries)
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries, segments = segments)
             }
     }
 }

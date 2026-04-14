@@ -33,7 +33,12 @@ data class AddMessageUiState(
     val lastIntent: String = "",
     // Non-blocking error — shown as a dismissible banner, NOT a blocking card
     val errorMessage: String? = null,
-    val lastFailedImageUri: Uri? = null
+    val lastFailedImageUri: Uri? = null,
+    // Multi-expense summary fields
+    val multiExpenseCount: Int = 0,
+    val multiExpenseTotal: Double = 0.0,
+    val multiExpenseGroupName: String = "",
+    val multiExpenseCurrency: String = ""
 )
 
 @HiltViewModel
@@ -69,7 +74,11 @@ class AddMessageViewModel @Inject constructor(
                         showConfirmation = true,
                         transactionSuccess = isSuccess,
                         aiResponseMessage = result.message,
-                        lastIntent = result.intent.rawValue
+                        lastIntent = result.intent.rawValue,
+                        multiExpenseCount = result.summary?.count ?: 0,
+                        multiExpenseTotal = result.summary?.total ?: 0.0,
+                        multiExpenseGroupName = result.summary?.groupName ?: "",
+                        multiExpenseCurrency = result.summary?.currency ?: ""
                     )
                 }
             } catch (e: Exception) {

@@ -42,6 +42,7 @@ fun TransactionScreen(
     onNavigate: (String) -> Unit,
     onNavigateToEditTransaction: (String) -> Unit,
     onNavigateToTransactionDetail: (String, String) -> Unit,
+    onNavigateToGroupDetail: (String) -> Unit = {},
     viewModel: TransactionViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -55,17 +56,6 @@ fun TransactionScreen(
     )
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-
-    var showCoordinator by remember { mutableStateOf(false) }
-
-    com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinator(
-        isPresented = showCoordinator,
-        onDismiss = { showCoordinator = false },
-        onNavigate = { route ->
-            onNavigate(route)
-            showCoordinator = false
-        }
-    )
 
     Scaffold(
         modifier = Modifier
@@ -87,15 +77,6 @@ fun TransactionScreen(
                     scrolledContainerColor = MaterialTheme.colorScheme.background
                 )
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showCoordinator = true },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Transaction")
-            }
         },
         containerColor = Color.Transparent
     ) { innerPadding ->
@@ -325,14 +306,16 @@ onDismissRequest = { showDateRangePicker = false },
                             TransactionList(
                                 sections = emptyList(),
                                 isLoading = false,
-                                onClick = { _, _ -> }
+                                onClick = { _, _ -> },
+                                onGroupClick = onNavigateToGroupDetail
                             )
                         }
                     } else {
                         TransactionList(
                             sections = sectionsToDisplay,
                             isLoading = uiState.isLoading,
-                            onClick = { id, type -> onNavigateToTransactionDetail(id, type) }
+                            onClick = { id, type -> onNavigateToTransactionDetail(id, type) },
+                            onGroupClick = onNavigateToGroupDetail
                         )
                     }
                 }

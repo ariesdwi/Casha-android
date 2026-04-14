@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.CategoryCasha
 import com.casha.app.ui.feature.liability.LiabilityState
@@ -41,7 +42,6 @@ fun AddLiabilityTransactionFormView(
 ) {
     var name by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
-    var amountFocused by remember { mutableStateOf(false) }
     var selectedCategory by remember { mutableStateOf<CategoryCasha?>(null) }
     var showCategoryDropdown by remember { mutableStateOf(false) }
     var description by remember { mutableStateOf("") }
@@ -102,13 +102,11 @@ onDismissRequest = onDismissRequest,
 
                 // Amount
                 InputCard(title = stringResource(R.string.liabilities_transaction_record_amount)) {
-                    OutlinedTextField(
-                        value = if (amountFocused) amountText else if (amountText.isNotEmpty()) CurrencyFormatter.formatInput(amountText) else "",
-                        onValueChange = { amountText = it.replace(",", ".") },
+                    CurrencyInputField(
+                        value = amountText,
+                        onValueChange = { amountText = it },
                         placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { amountFocused = it.isFocused },
-                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = cashaBorderlessTextFieldColors(),
                         leadingIcon = {

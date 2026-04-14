@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
+import com.casha.app.domain.model.DisplaySegment
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.IncomeCasha
 import com.casha.app.ui.theme.*
@@ -72,8 +73,42 @@ object CashflowUiUtils {
                     yesterdayStr -> "Yesterday"
                     else -> dayFormatter.format(parsed)
                 }
-                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+                val segments = buildDisplaySegments(entries)
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries, segments = segments)
             }
+    }
+
+    /**
+     * Collapses entries with the same groupId into DisplaySegment.Grouped,
+     * and wraps individual (ungrouped) entries as DisplaySegment.Individual.
+     */
+    fun buildDisplaySegments(entries: List<CashflowEntry>): List<DisplaySegment> {
+        val segments = mutableListOf<DisplaySegment>()
+        val groupedById = mutableMapOf<String, MutableList<CashflowEntry>>()
+        val ungrouped = mutableListOf<CashflowEntry>()
+
+        for (entry in entries) {
+            val gId = entry.groupId
+            if (gId != null) {
+                groupedById.getOrPut(gId) { mutableListOf() }.add(entry)
+            } else {
+                ungrouped.add(entry)
+            }
+        }
+
+        // Build grouped segments
+        for ((groupId, items) in groupedById) {
+            val groupName = items.firstOrNull()?.groupName ?: "Multi Expense"
+            val total = items.sumOf { it.amount }
+            segments.add(DisplaySegment.Grouped(groupId = groupId, groupName = groupName, items = items, totalAmount = total))
+        }
+
+        // Build individual segments
+        for (entry in ungrouped) {
+            segments.add(DisplaySegment.Individual(entry))
+        }
+
+        return segments
     }
 
     fun TransactionCasha.toCashflowEntry(): CashflowEntry {
@@ -84,7 +119,9 @@ object CashflowUiUtils {
             category = this.category,
             type = CashflowType.EXPENSE,
             date = this.datetime,
-            icon = null
+            icon = null,
+            groupId = this.groupId,
+            groupName = this.groupName
         )
     }
 

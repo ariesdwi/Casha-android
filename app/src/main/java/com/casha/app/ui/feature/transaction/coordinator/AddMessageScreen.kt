@@ -348,11 +348,21 @@ fun AddMessageScreen(
                 item { ProcessingMessageView() }
             } else if (uiState.showConfirmation) {
                 item {
-                    ConfirmationMessageView(
-                        isSuccess = uiState.transactionSuccess,
-                        message = uiState.aiResponseMessage,
-                        intent = uiState.lastIntent
-                    )
+                    if (uiState.lastIntent == ChatParseIntent.MULTI_EXPENSE.rawValue) {
+                        MultiExpenseConfirmationView(
+                            message = uiState.aiResponseMessage,
+                            count = uiState.multiExpenseCount,
+                            total = uiState.multiExpenseTotal,
+                            groupName = uiState.multiExpenseGroupName,
+                            currency = uiState.multiExpenseCurrency
+                        )
+                    } else {
+                        ConfirmationMessageView(
+                            isSuccess = uiState.transactionSuccess,
+                            message = uiState.aiResponseMessage,
+                            intent = uiState.lastIntent
+                        )
+                    }
                 }
             }
 
@@ -687,6 +697,7 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
         ChatParseIntent.EXPENSE.rawValue -> Color(0xFFFF6B6B)
         ChatParseIntent.INCOME.rawValue -> Color(0xFF00C896)
         ChatParseIntent.PAYMENT.rawValue -> Color(0xFF6C63FF)
+        ChatParseIntent.MULTI_EXPENSE.rawValue -> Color(0xFF9C27B0)
         ChatParseIntent.UNKNOWN.rawValue -> Color(0xFF3B82F6)
         else -> Color(0xFF888AAA)
     }
@@ -748,6 +759,104 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun MultiExpenseConfirmationView(
+    message: String,
+    count: Int,
+    total: Double,
+    groupName: String,
+    currency: String
+) {
+    val purple = Color(0xFF9C27B0)
+
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(purple.copy(alpha = 0.1f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = purple,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Multi-Expense Logged",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Surface(
+                            color = purple.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "MULTI",
+                                color = purple,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (count > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = groupName.ifEmpty { "Multi Expense" },
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "$count items",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = com.casha.app.core.util.CurrencyFormatter.format(total, currency.ifEmpty { com.casha.app.core.util.CurrencyFormatter.defaultCurrency }),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = purple
+                    )
+                }
             }
         }
     }

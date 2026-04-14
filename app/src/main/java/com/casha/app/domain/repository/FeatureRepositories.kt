@@ -36,6 +36,8 @@ interface TransactionRepository {
 interface CashflowRepository {
     suspend fun getHistory(month: String?, year: String?, page: Int, pageSize: Int): CashflowHistoryResponse
     suspend fun getSummary(month: String?, year: String?): CashflowSummary
+    suspend fun deleteGroup(groupId: String)
+    suspend fun renameGroup(groupId: String, newName: String)
 }
 
 /**

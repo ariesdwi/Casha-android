@@ -25,6 +25,7 @@ import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.CashflowDateSection
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
+import com.casha.app.domain.model.DisplaySegment
 import com.casha.app.ui.feature.transaction.CashflowUiUtils
 import com.casha.app.ui.theme.*
 import java.text.SimpleDateFormat
@@ -34,6 +35,7 @@ import java.util.*
 fun TransactionSectionCard(
     section: CashflowDateSection,
     onClick: (String, String) -> Unit = { _, _ -> },
+    onGroupClick: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(true) }
@@ -41,6 +43,11 @@ fun TransactionSectionCard(
     val totalIncome = section.items.filter { it.type == CashflowType.INCOME }.sumOf { it.amount }
     val totalExpense = section.items.filter { it.type == CashflowType.EXPENSE }.sumOf { it.amount }
     val netBalance = totalIncome - totalExpense
+
+    // Use segments if available, otherwise fall back to individual items
+    val segments = section.segments.ifEmpty {
+        section.items.map { DisplaySegment.Individual(it) }
+    }
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -144,17 +151,27 @@ fun TransactionSectionCard(
             // Items List
             AnimatedVisibility(visible = expanded) {
                 Column {
-                    section.items.forEachIndexed { index, entry ->
+                    segments.forEachIndexed { index, segment ->
                         if (index > 0) {
                             HorizontalDivider(
                                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                                 modifier = Modifier.padding(horizontal = 16.dp)
                             )
                         }
-                        TransactionListItem(
-                            entry = entry,
-                            onClick = { onClick(entry.id, entry.type.name) }
-                        )
+                        when (segment) {
+                            is DisplaySegment.Individual -> {
+                                TransactionListItem(
+                                    entry = segment.entry,
+                                    onClick = { onClick(segment.entry.id, segment.entry.type.name) }
+                                )
+                            }
+                            is DisplaySegment.Grouped -> {
+                                GroupTransactionRow(
+                                    group = segment,
+                                    onClick = { onGroupClick(segment.groupId) }
+                                )
+                            }
+                        }
                     }
                 }
             }

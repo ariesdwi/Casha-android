@@ -176,8 +176,8 @@ onDismissRequest = onNavigateBack,
                                 value = amount,
                                 onValueChange = { amount = it },
                                 placeholder = "0",
-                                keyboardType = KeyboardType.Decimal,
-                                leadingText = currencySymbol
+                                leadingText = currencySymbol,
+                                isCurrency = true
                             )
                         }
                     } else {
@@ -196,8 +196,8 @@ onDismissRequest = onNavigateBack,
                                 value = pricePerUnit,
                                 onValueChange = { pricePerUnit = it },
                                 placeholder = "0",
-                                keyboardType = KeyboardType.Decimal,
-                                leadingText = currencySymbol
+                                leadingText = currencySymbol,
+                                isCurrency = true
                             )
                         }
 

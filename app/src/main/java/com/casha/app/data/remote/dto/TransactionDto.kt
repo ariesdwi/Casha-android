@@ -15,7 +15,9 @@ data class TransactionDto(
     val datetime: String = "",
     val note: String? = null,
     val createdAt: String? = null,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null
 )
 
 /**

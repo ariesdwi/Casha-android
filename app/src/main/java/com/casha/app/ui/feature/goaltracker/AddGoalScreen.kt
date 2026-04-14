@@ -29,6 +29,7 @@ import androidx.compose.ui.res.stringResource
 import com.casha.app.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.GoalCategory
 import java.util.*
 
@@ -166,26 +167,24 @@ fun AddGoalScreen(
 
             // Target Amount Input
             InputCard(title = stringResource(R.string.goal_input_target_amount)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = CurrencyFormatter.symbol(userCurrency),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = targetAmount,
-                        onValueChange = { targetAmount = it },
-                        placeholder = { Text("0") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
+                CurrencyInputField(
+                    value = targetAmount,
+                    onValueChange = { targetAmount = it },
+                    currencyCode = userCurrency,
+                    placeholder = { Text("0") },
+                    leadingIcon = {
+                        Text(
+                            text = CurrencyFormatter.symbol(userCurrency),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedBorderColor = Color.Transparent
                     )
-                }
+                )
             }
 
             // Timeline Section

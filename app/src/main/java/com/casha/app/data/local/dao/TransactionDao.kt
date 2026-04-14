@@ -15,6 +15,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getTransactionById(id: String): TransactionEntity?
 
+    @Query("SELECT * FROM transactions WHERE groupId = :groupId ORDER BY datetime DESC")
+    suspend fun getTransactionsByGroupId(groupId: String): List<TransactionEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity)
 

@@ -236,6 +236,7 @@ fun TransactionDetailScreen(
         EditTransactionBottomSheet(
             transaction = activeTransaction,
             cashflowType = cashflowType,
+            categories = uiState.categories,
             onDismissRequest = { showingEditSheet = false },
             onSave = { request ->
                 isEditing = true

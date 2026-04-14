@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.Liability
 import com.casha.app.domain.model.PaymentType
 import com.casha.app.ui.feature.liability.LiabilityState
@@ -48,11 +49,9 @@ fun RecordPaymentFormView(
     var interestAmountText by remember { mutableStateOf("") }
     var notesText by remember { mutableStateOf("") }
 
-    var paymentAmountFocused by remember { mutableStateOf(false) }
-
-    val paymentAmountValue = paymentAmountText.replace(",", ".").toDoubleOrNull() ?: 0.0
-    val principalAmountValue = principalAmountText.replace(",", ".").toDoubleOrNull()
-    val interestAmountValue = interestAmountText.replace(",", ".").toDoubleOrNull()
+    val paymentAmountValue = paymentAmountText.toDoubleOrNull() ?: 0.0
+    val principalAmountValue = principalAmountText.toDoubleOrNull()
+    val interestAmountValue = interestAmountText.toDoubleOrNull()
 
     val dateFormatter = remember { SimpleDateFormat("dd MMM yyyy", Locale("id", "ID")) }
     val currencySymbol = CurrencyFormatter.symbol(userCurrency)
@@ -107,13 +106,11 @@ onDismissRequest = onDismissRequest,
             ) {
                 // Amount
                 InputCard(title = stringResource(R.string.liabilities_payment_record_amount)) {
-                    OutlinedTextField(
-                        value = if (paymentAmountFocused) paymentAmountText else if (paymentAmountText.isNotEmpty()) CurrencyFormatter.formatInput(paymentAmountText) else "",
-                        onValueChange = { paymentAmountText = it.replace(",", ".") },
+                    CurrencyInputField(
+                        value = paymentAmountText,
+                        onValueChange = { paymentAmountText = it },
                         placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { paymentAmountFocused = it.isFocused },
-                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = cashaBorderlessTextFieldColors(),
                         leadingIcon = {
@@ -206,26 +203,22 @@ onDismissRequest = onDismissRequest,
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     InputCard(title = stringResource(R.string.liabilities_payment_record_principal_portion), modifier = Modifier.weight(1f)) {
-                        OutlinedTextField(
+                        CurrencyInputField(
                             value = principalAmountText,
-                            onValueChange = { principalAmountText = it.replace(",", ".") },
+                            onValueChange = { principalAmountText = it },
                             placeholder = { Text(stringResource(R.string.liabilities_payment_record_auto), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             colors = cashaBorderlessTextFieldColors(),
                             textStyle = LocalTextStyle.current.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)
                         )
                     }
                     InputCard(title = stringResource(R.string.liabilities_payment_record_interest_portion), modifier = Modifier.weight(1f)) {
-                        OutlinedTextField(
+                        CurrencyInputField(
                             value = interestAmountText,
-                            onValueChange = { interestAmountText = it.replace(",", ".") },
+                            onValueChange = { interestAmountText = it },
                             placeholder = { Text(stringResource(R.string.liabilities_payment_record_auto), color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
                             shape = RoundedCornerShape(12.dp),
                             colors = cashaBorderlessTextFieldColors(),
                             textStyle = LocalTextStyle.current.copy(fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = MaterialTheme.colorScheme.onSurface)

@@ -53,6 +53,7 @@ import com.casha.app.ui.feature.budget.BudgetScreen
 import com.casha.app.ui.feature.transaction.TransactionScreen
 import com.casha.app.ui.feature.transaction.AddTransactionScreen
 import com.casha.app.ui.feature.transaction.subview.TransactionDetailScreen
+import com.casha.app.ui.feature.transaction.subview.GroupDetailScreen
 import com.casha.app.ui.feature.report.ReportScreen
 import com.casha.app.ui.feature.report.subview.TransactionListByCategoryView
 import com.casha.app.ui.feature.transaction.coordinator.AddMessageScreen
@@ -306,7 +307,8 @@ fun MainScreen(
                             editTransactionId = id
                             showAddTransactionSheet = true
                         },
-                        onNavigateToTransactionDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) }
+                        onNavigateToTransactionDetail = { id, type -> navController.navigate(NavRoutes.TransactionDetail.createRoute(id, type)) },
+                        onNavigateToGroupDetail = { groupId -> navController.navigate(NavRoutes.GroupDetail.createRoute(groupId)) }
                     )
                 }
                 composable(
@@ -331,6 +333,18 @@ fun MainScreen(
                             editTransactionId = editId
                             showAddTransactionSheet = true
                         }
+                    )
+                }
+                composable(
+                    route = NavRoutes.GroupDetail.route,
+                    arguments = listOf(
+                        navArgument("groupId") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val gId = backStackEntry.arguments?.getString("groupId") ?: ""
+                    GroupDetailScreen(
+                        groupId = gId,
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 composable(NavRoutes.Budget.route) { 

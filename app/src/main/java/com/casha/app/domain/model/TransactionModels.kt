@@ -16,7 +16,9 @@ data class TransactionCasha(
     val remoteId: String? = null,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
-    val liabilityId: String? = null
+    val liabilityId: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null
 )
 
 /**
@@ -44,10 +46,21 @@ enum class ChatParseIntent(val rawValue: String) {
     EXPENSE("EXPENSE"), 
     INCOME("INCOME"), 
     PAYMENT("PAYMENT"),
+    MULTI_EXPENSE("MULTI_EXPENSE"),
     UNKNOWN("UNKNOWN")
 }
 
+data class MultiExpenseSummary(
+    val groupId: String,
+    val groupName: String,
+    val count: Int,
+    val total: Double,
+    val currency: String
+)
+
 data class ChatParseResult(
     val intent: ChatParseIntent,
-    val message: String
+    val message: String,
+    val expenses: List<TransactionCasha>? = null,
+    val summary: MultiExpenseSummary? = null
 )

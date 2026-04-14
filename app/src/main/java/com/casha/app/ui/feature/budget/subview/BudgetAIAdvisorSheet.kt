@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.*
 import com.casha.app.ui.feature.budget.BudgetViewModel
 import com.casha.app.ui.theme.*
@@ -273,13 +274,11 @@ private fun IncomeInputSection(
         ) {
             Text(CurrencyFormatter.symbol(), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.width(8.dp))
-            OutlinedTextField(
-                value = if (isFocused) incomeText else if (incomeText.isNotEmpty()) CurrencyFormatter.formatInput(incomeText) else "",
-                onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onIncomeChange(it) },
+            CurrencyInputField(
+                value = incomeText,
+                onValueChange = onIncomeChange,
                 placeholder = { Text(stringResource(R.string.budget_advisor_income_placeholder)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.weight(1f).onFocusChanged { isFocused = it.isFocused },
-                singleLine = true,
+                modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = Color.Transparent,
                     unfocusedBorderColor = Color.Transparent,
@@ -373,13 +372,11 @@ private fun FixedExpensesSection(
                     }
                 }
                 
-                OutlinedTextField(
-                    value = if (isAmountFocused) fixedAmountText else if (fixedAmountText.isNotEmpty()) CurrencyFormatter.formatInput(fixedAmountText) else "",
-                    onValueChange = { if (it.isEmpty() || it.all { char -> char.isDigit() }) onAmountChange(it) },
+                CurrencyInputField(
+                    value = fixedAmountText,
+                    onValueChange = onAmountChange,
                     placeholder = { Text(stringResource(R.string.budget_advisor_fixed_amount), fontSize = 12.sp) },
-                    modifier = Modifier.weight(1f).onFocusChanged { isAmountFocused = it.isFocused },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.weight(1f),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,
                         unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant,

@@ -21,8 +21,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyVisualTransformation
 
 // ── Section Header ──────────────────────────────────────────────
 @Composable
@@ -182,8 +185,13 @@ fun CashaFormTextField(
         fontSize = 16.sp,
         fontWeight = FontWeight.Medium,
         color = MaterialTheme.colorScheme.onSurface
-    )
+    ),
+    isCurrency: Boolean = false,
+    currencyCode: String = CurrencyFormatter.defaultCurrency,
 ) {
+    val effectiveKeyboardType = if (isCurrency) KeyboardType.Decimal else keyboardType
+    val visualTransformation = if (isCurrency) CurrencyVisualTransformation(currencyCode) else VisualTransformation.None
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
@@ -199,7 +207,22 @@ fun CashaFormTextField(
         }
         OutlinedTextField(
             value = value,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                if (isCurrency) {
+                    val filtered = newValue.filter { it.isDigit() || it == '.' }
+                    val dotIdx = filtered.indexOf('.')
+                    val cleaned = if (dotIdx >= 0) {
+                        val intPart = filtered.substring(0, dotIdx).filter { it.isDigit() }
+                        val decPart = filtered.substring(dotIdx + 1).filter { it.isDigit() }.take(2)
+                        "$intPart.$decPart"
+                    } else {
+                        filtered.filter { it.isDigit() }
+                    }
+                    onValueChange(cleaned)
+                } else {
+                    onValueChange(newValue)
+                }
+            },
             placeholder = {
                 Text(
                     placeholder,
@@ -208,10 +231,11 @@ fun CashaFormTextField(
                 )
             },
             textStyle = textStyle,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            keyboardOptions = KeyboardOptions(keyboardType = effectiveKeyboardType),
             singleLine = singleLine,
             shape = RoundedCornerShape(12.dp),
             colors = cashaBorderlessTextFieldColors(),
+            visualTransformation = visualTransformation,
             modifier = Modifier.fillMaxWidth()
         )
     }

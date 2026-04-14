@@ -13,8 +13,24 @@ data class CashflowEntry(
     val category: String,
     val type: CashflowType,
     val date: Date,
-    val icon: String? = null
+    val icon: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null
 )
+
+/**
+ * Represents how a transaction row should be displayed in the list.
+ * Individual items are shown as-is; grouped items are collapsed into a single row.
+ */
+sealed class DisplaySegment {
+    data class Individual(val entry: CashflowEntry) : DisplaySegment()
+    data class Grouped(
+        val groupId: String,
+        val groupName: String,
+        val items: List<CashflowEntry>,
+        val totalAmount: Double
+    ) : DisplaySegment()
+}
 
 enum class CashflowType {
     INCOME, EXPENSE
@@ -23,7 +39,8 @@ enum class CashflowType {
 data class CashflowDateSection(
     val day: String,
     val date: String,
-    val items: List<CashflowEntry>
+    val items: List<CashflowEntry>,
+    val segments: List<DisplaySegment> = emptyList()
 )
 
 /**

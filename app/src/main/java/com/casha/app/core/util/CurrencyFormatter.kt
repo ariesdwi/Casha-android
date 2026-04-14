@@ -1,5 +1,6 @@
 package com.casha.app.core.util
 
+import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
@@ -134,6 +135,16 @@ object CurrencyFormatter {
     fun symbol(currencyCode: String? = null): String {
         val code = (currencyCode ?: defaultCurrency).uppercase()
         return currencyConfigs[code]?.symbol ?: code
+    }
+
+    /**
+     * Returns the grouping separator character for the given [currencyCode].
+     * E.g. '.' for IDR (locale id_ID), ',' for USD (locale en_US).
+     */
+    fun groupingSeparator(currencyCode: String? = null): Char {
+        val code = (currencyCode ?: defaultCurrency).uppercase()
+        val locale = currencyConfigs[code]?.locale ?: Locale.US
+        return DecimalFormatSymbols.getInstance(locale).groupingSeparator
     }
 
     /**

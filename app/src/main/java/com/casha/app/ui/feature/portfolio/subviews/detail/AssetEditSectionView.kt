@@ -82,8 +82,8 @@ fun AssetEditSectionView(
                         value = editPricePerUnit,
                         onValueChange = onPricePerUnitChange,
                         placeholder = "0",
-                        keyboardType = KeyboardType.Decimal,
-                        leadingText = currencySymbol
+                        leadingText = currencySymbol,
+                        isCurrency = true
                     )
                 }
             } else {
@@ -92,8 +92,8 @@ fun AssetEditSectionView(
                         value = editAmount,
                         onValueChange = onAmountChange,
                         placeholder = "0",
-                        keyboardType = KeyboardType.Decimal,
-                        leadingText = currencySymbol
+                        leadingText = currencySymbol,
+                        isCurrency = true
                     )
                 }
             }

@@ -35,6 +35,17 @@ interface CashflowApiService {
         @Path("type") type: String,
         @Path("id") id: String
     ): BaseResponse<Unit>
+
+    @DELETE("cashflow/EXPENSE_GROUP/{groupId}")
+    suspend fun deleteExpenseGroup(
+        @Path("groupId") groupId: String
+    ): BaseResponse<Unit>
+
+    @PATCH("cashflow/EXPENSE_GROUP/{groupId}")
+    suspend fun renameExpenseGroup(
+        @Path("groupId") groupId: String,
+        @Body request: RenameGroupRequestDto
+    ): BaseResponse<Unit>
 }
 
 interface IncomeApiService {

@@ -314,7 +314,9 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = isSynced,
         remoteId = remoteId,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        groupId = groupId,
+        groupName = groupName
     )
 
     private fun TransactionCasha.toEntity() = TransactionEntity(
@@ -327,7 +329,9 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = isSynced,
         remoteId = remoteId,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        groupId = groupId,
+        groupName = groupName
     )
 
     private fun TransactionEntity.toUploadDto() = TransactionUploadDto(

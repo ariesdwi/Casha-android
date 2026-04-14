@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.ui.theme.*
 import com.casha.app.domain.model.CreateIncomeRequest
 import com.casha.app.domain.model.IncomeFrequency
@@ -52,7 +53,6 @@ fun AddTransactionScreen(
     var name                  by remember { mutableStateOf("") }
     var amountText            by remember { mutableStateOf("") }
     var amountValue           by remember { mutableStateOf(0.0) }
-    var isAmountFocused       by remember { mutableStateOf(false) }
     var selectedDate          by remember { mutableStateOf(Date()) }
     var errorMessage          by remember { mutableStateOf<String?>(null) }
     var selectedCategory      by remember { mutableStateOf("") }
@@ -80,7 +80,7 @@ fun AddTransactionScreen(
             if (tx != null) {
                 name = tx.name
                 amountValue = tx.amount
-                amountText = if (tx.amount % 1.0 == 0.0) tx.amount.toLong().toString() else tx.amount.toString()
+                amountText = if (tx.amount % 1.0 == 0.0) tx.amount.toLong().toString() else String.format("%.2f", tx.amount)
                 selectedCategory = tx.category
                 note = tx.note ?: ""
                 selectedDate = tx.datetime
@@ -90,7 +90,7 @@ fun AddTransactionScreen(
                 if (inc != null) {
                     name = inc.name
                     amountValue = inc.amount
-                    amountText = if (inc.amount % 1.0 == 0.0) inc.amount.toLong().toString() else inc.amount.toString()
+                    amountText = if (inc.amount % 1.0 == 0.0) inc.amount.toLong().toString() else String.format("%.2f", inc.amount)
                     selectedIncomeType = inc.type
                     source = inc.source ?: ""
                     isRecurring = inc.isRecurring
@@ -176,19 +176,15 @@ onDismissRequest = onNavigateBack,
 
                 // ── Amount ───────────────────────────────────────
                 InputCard(title = "Jumlah *") {
-                    OutlinedTextField(
-                        value = if (isAmountFocused) amountText else if (amountText.isNotEmpty()) CurrencyFormatter.formatInput(amountText) else "",
+                    CurrencyInputField(
+                        value = amountText,
                         onValueChange = {
-                            if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) {
-                                amountText = it
-                                amountValue = it.toDoubleOrNull() ?: 0.0
-                                errorMessage = null
-                            }
+                            amountText = it
+                            amountValue = it.toDoubleOrNull() ?: 0.0
+                            errorMessage = null
                         },
                         placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
-                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = cashaBorderlessTextFieldColors(),
                         leadingIcon = {
@@ -501,6 +497,7 @@ private fun InputCard(
             )
             .clip(RoundedCornerShape(16.dp))
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+            .border(BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)), RoundedCornerShape(16.dp))
             .padding(horizontal = 20.dp, vertical = 16.dp),
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {

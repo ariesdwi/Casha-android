@@ -53,7 +53,9 @@ class CashflowSyncUseCase @Inject constructor(
                         isSynced = true,
                         remoteId = entry.id,
                         createdAt = entry.date,
-                        updatedAt = entry.date
+                        updatedAt = entry.date,
+                        groupId = entry.groupId,
+                        groupName = entry.groupName
                     )
                 }
                 transactionDao.insertTransactions(transactionEntities)
@@ -104,7 +106,9 @@ class CashflowSyncUseCase @Inject constructor(
                     amount = entity.amount,
                     category = entity.category,
                     type = CashflowType.EXPENSE,
-                    date = entity.datetime
+                    date = entity.datetime,
+                    groupId = entity.groupId,
+                    groupName = entity.groupName
                 )
             }
 

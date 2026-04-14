@@ -17,7 +17,14 @@ data class CashflowDto(
     val direction: String? = null,
     val note: String? = null,
     val createdAt: String? = null,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null
+)
+
+@Serializable
+data class RenameGroupRequestDto(
+    val groupName: String
 )
 
 @Serializable

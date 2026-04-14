@@ -46,7 +46,9 @@ class CashflowRepositoryImpl @Inject constructor(
         category = category.ifEmpty { if (type.lowercase() == "income") incomeType ?: "Income" else "" },
         type = if (type.lowercase() == "income") CashflowType.INCOME else CashflowType.EXPENSE,
         date = try { dateFormat.parse(datetime) ?: Date() } catch (e: Exception) { Date() },
-        icon = null // Icons could be derived from category later
+        icon = null,
+        groupId = groupId,
+        groupName = groupName
     )
 
     private fun CashflowSummaryDto.toDomain() = CashflowSummary(
@@ -59,4 +61,16 @@ class CashflowRepositoryImpl @Inject constructor(
         expenseBreakdown = expense?.breakdown ?: emptyMap(),
         liabilityBreakdown = liabilityPayment?.breakdown ?: emptyMap()
     )
+
+    override suspend fun deleteGroup(groupId: String) {
+        val result = safeApiCall { apiService.deleteExpenseGroup(groupId) }
+        result.onFailure { throw it }
+    }
+
+    override suspend fun renameGroup(groupId: String, newName: String) {
+        val result = safeApiCall {
+            apiService.renameExpenseGroup(groupId, RenameGroupRequestDto(groupName = newName))
+        }
+        result.onFailure { throw it }
+    }
 }
