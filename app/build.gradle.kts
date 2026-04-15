@@ -40,7 +40,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"http://10.168.88.205:3000/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"https://cashabe.vercel.app/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
