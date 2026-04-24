@@ -213,7 +213,9 @@ fun GroupDetailScreen(
                     onClick = {
                         showingDeleteGroupAlert = false
                         isProcessing = true
-                        viewModel.deleteGroup(groupId)
+                        viewModel.deleteGroup(groupId) {
+                            onNavigateBack()
+                        }
                     }
                 ) {
                     Text("Delete", color = MaterialTheme.colorScheme.error)

@@ -377,6 +377,8 @@
     <string name="profile_section_subscription">Langganan</string>
     <string name="profile_status_free">Gratis</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">Pengguna Gratis</string>
+    <string name="profile_status_premium_label">Pengguna Premium</string>
     <string name="profile_subscription_active">AKTIF</string>
     <string name="profile_subscription_inactive">TIDAK AKTIF</string>
     <string name="profile_subscription_status">Status Premium</string>

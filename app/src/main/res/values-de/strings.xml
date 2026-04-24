@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">Mit KI chatten</string>
     <string name="add_transaction_coordinator_button_manual">Manuelle Eingabe</string>
     <string name="add_transaction_coordinator_button_photo_library">Fotomediathek</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">Auf Premium upgraden, um alle Funktionen freizuschalten ✨</string>
     <string name="add_transaction_coordinator_message_premium">Wählen Sie, wie Sie eine Transaktion hinzufügen möchten</string>
     <string name="add_transaction_coordinator_title">Transaktion hinzufügen</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">Abonnement</string>
     <string name="profile_status_free">Kostenlos</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">Kostenloser Nutzer</string>
+    <string name="profile_status_premium_label">Premium-Nutzer</string>
     <string name="profile_subscription_active">AKTIV</string>
     <string name="profile_subscription_inactive">INAKTIV</string>
     <string name="profile_subscription_status">Premium-Status</string>

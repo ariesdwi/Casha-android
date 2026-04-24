@@ -109,6 +109,7 @@ just got a whole lot smarter.</string>
     <string name="add_transaction_coordinator_button_chat">Chat with AI</string>
     <string name="add_transaction_coordinator_button_manual">Manual Entry</string>
     <string name="add_transaction_coordinator_button_photo_library">Photo Library</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
     <string name="add_transaction_coordinator_message_free">Upgrade to Premium to unlock all features ✨</string>
     <string name="add_transaction_coordinator_message_premium">Choose how you\'d like to add a transaction</string>
     <string name="add_transaction_coordinator_title">Add Transaction</string>
@@ -479,6 +480,8 @@ just got a whole lot smarter.</string>
     <string name="profile_section_subscription">Subscription</string>
     <string name="profile_status_free">Free</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">Free User</string>
+    <string name="profile_status_premium_label">Premium User</string>
     <string name="profile_subscription_active">ACTIVE</string>
     <string name="profile_subscription_inactive">INACTIVE</string>
     <string name="profile_subscription_status">Premium Status</string>

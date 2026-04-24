@@ -42,7 +42,8 @@ data class UpdateTransactionDto(
     val name: String = "",
     val amount: Double = 0.0,
     val category: String? = null,
-    val datetime: String = ""
+    val datetime: String = "",
+    val note: String? = null
 )
 
 /**

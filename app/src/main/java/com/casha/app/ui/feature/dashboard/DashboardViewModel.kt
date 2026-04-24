@@ -70,7 +70,19 @@ class DashboardViewModel @Inject constructor(
     init {
         setupNetworkMonitoring()
         setupSyncEventListener()
+        observeProfileChanges()
         loadInitialData()
+    }
+
+    private fun observeProfileChanges() {
+        viewModelScope.launch {
+            authManager.userName.collect { name ->
+                if (!name.isNullOrBlank()) {
+                    val firstName = name.trim().split("\\s+".toRegex()).firstOrNull() ?: "User"
+                    _uiState.update { it.copy(nickname = firstName) }
+                }
+            }
+        }
     }
 
     private fun setupSyncEventListener() {
@@ -86,6 +98,7 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val profile = getProfileUseCase()
+                authManager.saveProfileInfo(profile.name, profile.email, profile.avatar)
                 val firstName = profile.name.trim().split("\\s+".toRegex()).firstOrNull() ?: "User"
                 _uiState.update { it.copy(nickname = firstName) }
             } catch (e: Exception) {
@@ -172,7 +185,10 @@ class DashboardViewModel @Inject constructor(
                     }
                     
                     val summaryTask = async {
-                        if (_uiState.value.isOnline) {
+                        // Only use remote API for periods it can filter (month/year params)
+                        // For THIS_WEEK, LAST_THREE_MONTHS, ALL_TIME, FUTURE: always calculate locally
+                        val canUseRemote = monthStr != null || yearStr != null
+                        if (_uiState.value.isOnline && canUseRemote) {
                             try {
                                 getCashflowSummaryUseCase.execute(monthStr, yearStr)
                             } catch (_: Exception) {

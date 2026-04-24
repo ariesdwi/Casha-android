@@ -183,9 +183,8 @@ fun MainScreen(
                         onTabSelected = { tag ->
                             selectedTab = tag
                             navController.navigate(tagToRoute(tag)) {
-                                popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                 launchSingleTop = true
-                                restoreState = true
                             }
                         },
                         onTabDoubleTapped = { tag ->
@@ -196,9 +195,8 @@ fun MainScreen(
                                 // Double tapped a different tab -> treat like single tap
                                 selectedTab = tag
                                 navController.navigate(tagToRoute(tag)) {
-                                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                                    popUpTo(navController.graph.startDestinationId) { inclusive = false }
                                     launchSingleTop = true
-                                    restoreState = true
                                 }
                             }
                         },

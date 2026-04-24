@@ -31,7 +31,8 @@ data class ReportUiState(
 class ReportViewModel @Inject constructor(
     private val getCategorySpendingUseCase: GetCategorySpendingUseCase,
     private val getTransactionByCategoryUseCase: GetTransactionByCategoryUseCase,
-    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager,
+    private val syncEventBus: com.casha.app.core.network.SyncEventBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ReportUiState())
@@ -41,6 +42,11 @@ class ReportViewModel @Inject constructor(
         viewModelScope.launch {
             subscriptionManager.isPremium.collect { isPremium ->
                 _uiState.update { it.copy(isPremium = isPremium) }
+            }
+        }
+        viewModelScope.launch {
+            syncEventBus.syncCompletedEvent.collect {
+                refreshAllData()
             }
         }
         refreshAllData()

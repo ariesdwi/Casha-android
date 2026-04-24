@@ -151,7 +151,7 @@ def set_track_and_commit(status):
         track='$TRACK',
         body=track_body
     ).execute()
-    service.edits().commit(packageName='$PACKAGE_NAME', editId=edit_id).execute()
+    service.edits().commit(packageName='$PACKAGE_NAME', editId=edit_id, changesNotSentForReview=True).execute()
 
 try:
     set_track_and_commit('completed')

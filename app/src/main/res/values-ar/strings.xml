@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">دردشة مع الذكاء الاصطناعي</string>
     <string name="add_transaction_coordinator_button_manual">إدخال يدوي</string>
     <string name="add_transaction_coordinator_button_photo_library">مكتبة الصور</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">ترقية إلى بريميوم لفتح جميع الميزات ✨</string>
     <string name="add_transaction_coordinator_message_premium">اختر كيف تريد إضافة معاملة</string>
     <string name="add_transaction_coordinator_title">إضافة معاملة</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">الاشتراك</string>
     <string name="profile_status_free">مجاني</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">مستخدم مجاني</string>
+    <string name="profile_status_premium_label">مستخدم Premium</string>
     <string name="profile_subscription_active">نشط</string>
     <string name="profile_subscription_inactive">غير نشط</string>
     <string name="profile_subscription_status">حالة Premium</string>

@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">Chatear con IA</string>
     <string name="add_transaction_coordinator_button_manual">Entrada manual</string>
     <string name="add_transaction_coordinator_button_photo_library">Biblioteca de fotos</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">Actualiza a Premium para desbloquear todas las funciones ✨</string>
     <string name="add_transaction_coordinator_message_premium">Elige cómo quieres agregar una transacción</string>
     <string name="add_transaction_coordinator_title">Agregar transacción</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">Suscripción</string>
     <string name="profile_status_free">Gratuito</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">Usuario Gratuito</string>
+    <string name="profile_status_premium_label">Usuario Premium</string>
     <string name="profile_subscription_active">ACTIVO</string>
     <string name="profile_subscription_inactive">INACTIVO</string>
     <string name="profile_subscription_status">Estado Premium</string>

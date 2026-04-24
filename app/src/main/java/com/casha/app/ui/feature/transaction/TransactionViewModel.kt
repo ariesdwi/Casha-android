@@ -276,7 +276,9 @@ class TransactionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val existing = _uiState.value.rawTransactions.find { it.id == id }
+                // Find by id or remoteId to handle locally-added transactions
+                // whose Room id is a local UUID but the cashflow list uses the server remoteId
+                val existing = _uiState.value.rawTransactions.find { it.id == id || it.remoteId == id }
                 if (existing != null) {
                     val updated = existing.copy(
                         name = request.name,
@@ -295,39 +297,42 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransaction(id: String) {
+    fun deleteTransaction(id: String, onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteTransactionUseCase(id)
                 syncEventBus.emitSyncCompleted()
                 syncData()
+                onSuccess?.invoke()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
     }
 
-    fun deleteIncome(id: String) {
+    fun deleteIncome(id: String, onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteIncomeUseCase(id)
                 syncEventBus.emitSyncCompleted()
                 syncData()
+                onSuccess?.invoke()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
     }
 
-    fun deleteGroup(groupId: String) {
+    fun deleteGroup(groupId: String, onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 cashflowRepository.deleteGroup(groupId)
                 syncEventBus.emitSyncCompleted()
                 syncData()
+                onSuccess?.invoke()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }

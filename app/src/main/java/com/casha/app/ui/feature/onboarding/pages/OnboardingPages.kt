@@ -518,7 +518,8 @@ fun BudgetTrackerPage() {
                 BudgetCardItem(
                     budget = budget,
                     onDelete = {},
-                    onEdit = {}
+                    onEdit = {},
+                    isSwipeEnabled = false
                 )
             }
         }

@@ -43,10 +43,6 @@ fun TransactionList(
                 }
             }
 
-            // Bottom spacer for FAB
-            item {
-                Spacer(modifier = Modifier.height(80.dp))
-            }
         }
     }
 }

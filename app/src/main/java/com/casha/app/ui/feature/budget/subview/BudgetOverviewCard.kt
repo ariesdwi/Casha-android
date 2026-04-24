@@ -169,12 +169,19 @@ fun BudgetOverviewCard(
                 Text(
                     text = "${stringResource(R.string.budget_label_spent)}: ${CurrencyFormatter.format(totalSpent)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = "${stringResource(R.string.budget_label_remaining)}: ${CurrencyFormatter.format(totalRemaining)}",
                     style = MaterialTheme.typography.labelSmall,
-                    color = if (totalRemaining >= 0) successColor else dangerColor
+                    color = if (totalRemaining >= 0) successColor else dangerColor,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
             }
         }
@@ -195,7 +202,7 @@ private fun StatCard(
         shape = RoundedCornerShape(12.dp)
     ) {
         Column(
-            modifier = Modifier.padding(8.dp),
+            modifier = Modifier.padding(horizontal = 6.dp, vertical = 8.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
@@ -213,15 +220,17 @@ private fun StatCard(
                 )
             }
             Text(
-                text = CurrencyFormatter.format(amount),
+                text = if (amount >= 1_000_000) CurrencyFormatter.formatCompact(amount) else CurrencyFormatter.format(amount),
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp),
                 fontWeight = FontWeight.Bold,
-                maxLines = 1
+                maxLines = 1,
+                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
             )
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall.copy(fontSize = 8.sp),
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1
             )
         }
     }

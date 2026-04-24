@@ -450,7 +450,7 @@ fun GoalProgressSection(goal: Goal) {
                 InfoChip(
                     icon = Icons.Default.Info, // Placeholder icon
                     label = stringResource(R.string.goal_label_still_needed),
-                    value = CurrencyFormatter.format(remaining, goal.currency),
+                    value = if (remaining >= 1_000_000) CurrencyFormatter.formatCompact(remaining, goal.currency) else CurrencyFormatter.format(remaining, goal.currency),
                     color = MaterialTheme.colorScheme.error, // cashaDanger (substituting for Accent/Warning red)
                     modifier = Modifier.weight(1f)
                 )
@@ -459,7 +459,7 @@ fun GoalProgressSection(goal: Goal) {
                     InfoChip(
                         icon = Icons.Default.DateRange,
                         label = stringResource(R.string.goal_label_per_month),
-                        value = CurrencyFormatter.format(goal.progress.monthlySavingsNeeded, goal.currency),
+                        value = if (goal.progress.monthlySavingsNeeded >= 1_000_000) CurrencyFormatter.formatCompact(goal.progress.monthlySavingsNeeded, goal.currency) else CurrencyFormatter.format(goal.progress.monthlySavingsNeeded, goal.currency),
                         color = goalColor,
                         modifier = Modifier.weight(1f)
                     )
@@ -499,7 +499,14 @@ fun InfoChip(
 
             Column {
                 Text(text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = value, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                Text(
+                    text = value,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
             }
         }
     }

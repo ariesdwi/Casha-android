@@ -265,6 +265,7 @@ class TransactionRepositoryImpl @Inject constructor(
                     amount = request.amount,
                     category = request.category ?: local.category,
                     datetime = dateFormat.parse(request.datetime) ?: local.datetime,
+                    note = request.note,
                     isSynced = true
                 )
                 transactionDao.insertTransaction(updatedEntity)

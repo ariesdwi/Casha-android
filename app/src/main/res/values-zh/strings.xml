@@ -37,6 +37,8 @@
     <string name="add_transaction_coordinator_button_chat">与 AI 对话</string>
     <string name="add_transaction_coordinator_button_manual">手动输入</string>
     <string name="add_transaction_coordinator_button_photo_library">相册</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">升级到高级版以解锁所有功能 ✨</string>
     <string name="add_transaction_coordinator_message_premium">选择添加交易的方式</string>
     <string name="add_transaction_coordinator_title">添加交易</string>

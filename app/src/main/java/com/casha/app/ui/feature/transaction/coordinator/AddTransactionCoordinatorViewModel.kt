@@ -26,6 +26,7 @@ enum class PresentationState {
     CHAT,
     CAMERA,
     PHOTO_LIBRARY,
+    VOICE_NOTE,
     UPGRADE_PROMPT
 }
 
@@ -68,7 +69,8 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
         val requiresPremium = state in listOf(
             PresentationState.CHAT,
             PresentationState.CAMERA,
-            PresentationState.PHOTO_LIBRARY
+            PresentationState.PHOTO_LIBRARY,
+            PresentationState.VOICE_NOTE
         )
 
         if (requiresPremium && !_uiState.value.isPremium) {
@@ -126,12 +128,27 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
                 }
 
                 val result = chatRepository.parseImage(tempFile)
-                syncEventBus.emitSyncCompleted()
                 
                 // Clean up temp file
                 try { tempFile.delete() } catch (e: Exception) { /* ignore */ }
                 
                 progressJob.cancel()
+
+                // If the AI could not parse a valid transaction, treat it as an error
+                if (result.intent == com.casha.app.domain.model.ChatParseIntent.UNKNOWN) {
+                    val aiMessage = result.message?.takeIf { it.isNotBlank() }
+                        ?: "Could not identify a transaction in this image. Please try a clearer receipt photo."
+                    _uiState.update {
+                        it.copy(
+                            progressState = ProgressState(),
+                            errorMessage = aiMessage,
+                            lastFailedImageUri = imageUri
+                        )
+                    }
+                    return@launch
+                }
+
+                syncEventBus.emitSyncCompleted()
                 
                 // Show success state
                 _uiState.update { state -> 

@@ -46,12 +46,14 @@ fun TransactionDetailScreen(
     val uiState by viewModel.uiState.collectAsState()
     
     // Find the specific transaction based on type
+    // Also check remoteId to handle locally-added transactions whose Room id is a local UUID
+    // but whose cashflow history id matches the server-assigned remoteId.
     val transaction = if (cashflowType == CashflowType.INCOME) {
-        uiState.rawIncomes.find { it.id == transactionId }?.let { 
+        uiState.rawIncomes.find { it.id == transactionId || it.remoteId == transactionId }?.let { 
             with(CashflowUiUtils) { it.toTransaction() }
         }
     } else {
-        uiState.rawTransactions.find { it.id == transactionId }
+        uiState.rawTransactions.find { it.id == transactionId || it.remoteId == transactionId }
     }
 
     // Cache the most recent valid transaction state so the UI doesn't blank out 
@@ -65,12 +67,7 @@ fun TransactionDetailScreen(
     var isDeleting by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
 
-    // Observe when deleting completes to gracefully pop navigation
-    LaunchedEffect(uiState.isLoading, isDeleting) {
-        if (isDeleting && !uiState.isLoading) {
-            onNavigateBack()
-        }
-    }
+
 
     if (activeTransaction == null) {
         // Fallback or full loading state
@@ -202,9 +199,13 @@ fun TransactionDetailScreen(
                         showingDeleteAlert = false
                         isDeleting = true
                         if (cashflowType == CashflowType.INCOME) {
-                            viewModel.deleteIncome(activeTransaction.id)
+                            viewModel.deleteIncome(activeTransaction.id) {
+                                onNavigateBack()
+                            }
                         } else {
-                            viewModel.deleteTransaction(activeTransaction.id)
+                            viewModel.deleteTransaction(activeTransaction.id) {
+                                onNavigateBack()
+                            }
                         }
                     }
                 ) {

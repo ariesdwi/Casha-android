@@ -54,6 +54,39 @@ class ProfileViewModel @Inject constructor(
             }
             .launchIn(viewModelScope)
 
+        // Observe local cached profile changes
+        viewModelScope.launch {
+            combine(
+                authManager.userName,
+                authManager.userEmail,
+                authManager.userAvatar,
+                authManager.selectedCurrency
+            ) { name, email, avatar, currency ->
+                if (name != null) {
+                    val currentProfile = _uiState.value.profile
+                    _uiState.update { state ->
+                        state.copy(
+                            profile = currentProfile?.copy(
+                                name = name,
+                                email = email ?: "",
+                                avatar = avatar,
+                                currency = currency ?: "USD"
+                            ) ?: UserCasha(
+                                id = "",
+                                email = email ?: "",
+                                name = name,
+                                avatar = avatar,
+                                phone = null,
+                                currency = currency ?: "USD",
+                                createdAt = Date(),
+                                updatedAt = Date()
+                            )
+                        )
+                    }
+                }
+            }.collect()
+        }
+
         // Initial load
         viewModelScope.launch {
             loadCachedProfile()

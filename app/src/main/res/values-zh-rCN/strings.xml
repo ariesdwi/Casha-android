@@ -355,6 +355,8 @@
     <string name="profile_section_subscription">订阅</string>
     <string name="profile_status_free">免费</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">免费用户</string>
+    <string name="profile_status_premium_label">Premium用户</string>
     <string name="profile_subscription_active">活跃</string>
     <string name="profile_subscription_inactive">不活跃</string>
     <string name="profile_subscription_status">Premium 状态</string>

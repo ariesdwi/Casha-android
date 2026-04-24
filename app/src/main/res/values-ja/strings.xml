@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">AIとチャット</string>
     <string name="add_transaction_coordinator_button_manual">手動入力</string>
     <string name="add_transaction_coordinator_button_photo_library">フォトライブラリ</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">プレミアムにアップグレードしてすべての機能を解除 ✨</string>
     <string name="add_transaction_coordinator_message_premium">取引の追加方法を選んでください</string>
     <string name="add_transaction_coordinator_title">取引を追加</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">サブスクリプション</string>
     <string name="profile_status_free">無料</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">無料ユーザー</string>
+    <string name="profile_status_premium_label">Premiumユーザー</string>
     <string name="profile_subscription_active">有効</string>
     <string name="profile_subscription_inactive">無効</string>
     <string name="profile_subscription_status">Premiumステータス</string>

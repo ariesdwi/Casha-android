@@ -27,6 +27,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.io.File
 import androidx.core.content.FileProvider
+import com.casha.app.ui.feature.transaction.voice.VoiceTransactionSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -125,6 +126,9 @@ fun AddTransactionCoordinator(
             PresentationState.PHOTO_LIBRARY -> {
                 imagePickerLauncher.launch("image/*")
                 // Don't close/dismiss yet, wait for picker result
+            }
+            PresentationState.VOICE_NOTE -> {
+                // Handled by VoiceTransactionSheet rendered below
             }
             PresentationState.UPGRADE_PROMPT -> {
                 onNavigate(NavRoutes.Subscription.route)
@@ -265,9 +269,47 @@ fun AddTransactionCoordinator(
                         hasPremiumAccess = uiState.isPremium,
                         onClick = { viewModel.onFeatureSelected(PresentationState.PHOTO_LIBRARY) }
                     )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    CoordinatorOption(
+                        title = stringResource(R.string.add_transaction_coordinator_button_voice),
+                        isPremiumFeature = true,
+                        hasPremiumAccess = uiState.isPremium,
+                        onClick = { viewModel.onFeatureSelected(PresentationState.VOICE_NOTE) }
+                    )
                 }
             }
         }
+    }
+
+    // ── Voice Note bottom-sheet ──────────────────────────────────────────────
+    if (uiState.presentationState == PresentationState.VOICE_NOTE) {
+        VoiceTransactionSheet(
+            onDismiss = {
+                viewModel.close()
+                onDismiss()
+            },
+            onSuccess = { result ->
+                // Do not show a success toast when the AI could not parse a valid transaction
+                if (result.intent == com.casha.app.domain.model.ChatParseIntent.UNKNOWN) {
+                    val aiMessage = result.message?.takeIf { it.isNotBlank() }
+                        ?: "Could not identify a transaction. Please try again with a clearer description."
+                    android.widget.Toast.makeText(context, aiMessage, android.widget.Toast.LENGTH_LONG).show()
+                } else {
+                    val toastLabel = when (result.intent) {
+                        com.casha.app.domain.model.ChatParseIntent.INCOME -> "Income Added ✓"
+                        com.casha.app.domain.model.ChatParseIntent.PAYMENT -> "Payment Recorded ✓"
+                        com.casha.app.domain.model.ChatParseIntent.MULTI_EXPENSE -> "Expenses Added ✓"
+                        else -> "Expense Added ✓"
+                    }
+                    android.widget.Toast.makeText(context, toastLabel, android.widget.Toast.LENGTH_SHORT).show()
+                    viewModel.refreshData()
+                }
+                viewModel.close()
+                onDismiss()
+            }
+        )
     }
 }
 

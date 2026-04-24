@@ -337,7 +337,7 @@ fun ProfileHeader(profile: UserCasha, isPremium: Boolean, onNavigateToSubscripti
                     tint = CashaBlue
                 )
                 Text(
-                    text = if (isPremium) stringResource(R.string.profile_status_premium) + " User" else stringResource(R.string.profile_status_free) + " User",
+                    text = if (isPremium) stringResource(R.string.profile_status_premium_label) else stringResource(R.string.profile_status_free_label),
                     style = MaterialTheme.typography.labelSmall,
                     color = CashaBlue,
                     fontWeight = FontWeight.Bold

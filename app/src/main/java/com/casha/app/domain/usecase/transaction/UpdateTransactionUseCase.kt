@@ -13,12 +13,15 @@ class UpdateTransactionUseCase @Inject constructor(
     private val repository: TransactionRepository
 ) {
     suspend operator fun invoke(transaction: TransactionCasha) {
-        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
+            timeZone = java.util.TimeZone.getTimeZone("UTC")
+        }
         val dto = UpdateTransactionDto(
             name = transaction.name,
             category = transaction.category,
             amount = transaction.amount,
-            datetime = dateFormat.format(transaction.datetime)
+            datetime = dateFormat.format(transaction.datetime),
+            note = transaction.note
         )
         repository.updateTransaction(transaction.id, dto)
     }
