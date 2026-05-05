@@ -11,6 +11,8 @@ import com.casha.app.domain.usecase.auth.GetProfileUseCase
 import com.casha.app.domain.usecase.dashboard.*
 import com.casha.app.domain.usecase.goal.GetGoalsUseCase
 import com.casha.app.domain.usecase.goal.GetGoalSummaryUseCase
+import com.casha.app.domain.usecase.wallet.GetWalletsUseCase
+import com.casha.app.domain.usecase.wallet.GetWalletSummaryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -38,7 +40,10 @@ data class DashboardUiState(
     val goals: List<Goal> = emptyList(),
     val goalSummary: GoalSummary? = null,
     val selectedChartTab: ChartTab = ChartTab.WEEK,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val wallets: List<Wallet> = emptyList(),
+    val walletSummary: WalletSummary? = null,
+    val defaultWalletId: String? = null
 )
 
 @HiltViewModel
@@ -51,6 +56,8 @@ class DashboardViewModel @Inject constructor(
     private val getCashflowSummaryUseCase: GetCashflowSummaryUseCase,
     private val getGoalsUseCase: GetGoalsUseCase,
     private val getGoalSummaryUseCase: GetGoalSummaryUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
+    private val getWalletSummaryUseCase: GetWalletSummaryUseCase,
     private val cashflowSyncUseCase: CashflowSyncUseCase,
     private val transactionSyncUseCase: TransactionSyncUseCase,
     private val getProfileUseCase: GetProfileUseCase,
@@ -71,7 +78,16 @@ class DashboardViewModel @Inject constructor(
         setupNetworkMonitoring()
         setupSyncEventListener()
         observeProfileChanges()
+        observeDefaultWallet()
         loadInitialData()
+    }
+
+    private fun observeDefaultWallet() {
+        viewModelScope.launch {
+            authManager.defaultWalletId.collect { walletId ->
+                _uiState.update { it.copy(defaultWalletId = walletId) }
+            }
+        }
     }
 
     private fun observeProfileChanges() {
@@ -201,6 +217,8 @@ class DashboardViewModel @Inject constructor(
                     
                     val goalsTask = async { getGoalsUseCase.execute() }
                     val goalSummaryTask = async { getGoalSummaryUseCase.execute() }
+                    val walletsTask = async { try { getWalletsUseCase.execute() } catch (_: Exception) { emptyList() } }
+                    val walletSummaryTask = async { try { getWalletSummaryUseCase.execute() } catch (_: Exception) { null } }
 
                     _uiState.update { it.copy(
                         totalSpending = spendingTask.await(),
@@ -210,6 +228,8 @@ class DashboardViewModel @Inject constructor(
                         cashflowSummary = summaryTask.await(),
                         goals = goalsTask.await(),
                         goalSummary = goalSummaryTask.await(),
+                        wallets = walletsTask.await(),
+                        walletSummary = walletSummaryTask.await(),
                         isSyncing = false
                     ) }
                 }

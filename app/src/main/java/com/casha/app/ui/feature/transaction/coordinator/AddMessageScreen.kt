@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -79,13 +80,18 @@ fun AddMessageScreen(
     }
 
     // ── Camera Launcher ──
-    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             cameraImageUri?.let { viewModel.sendImage(it) }
+        } else {
+            // Camera was cancelled or failed to write — show non-blocking error
+            if (cameraImageUri != null) {
+                android.widget.Toast.makeText(context, "Photo capture failed. Please try again.", android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -93,12 +99,23 @@ fun AddMessageScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            val tempFile = File(context.cacheDir, "chat_camera_${System.currentTimeMillis()}.jpg")
+            val tempFile = File(context.cacheDir, "chat_camera_${System.currentTimeMillis()}.jpg").also { it.createNewFile() }
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
                 tempFile
             )
+            // Explicitly grant write permission to all camera apps (some ignore FLAG_GRANT_WRITE_URI_PERMISSION in the intent)
+            val cameraIntent = android.content.Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            context.packageManager
+                .queryIntentActivities(cameraIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+                .forEach { resolveInfo ->
+                    context.grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        uri,
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                }
             cameraImageUri = uri
             cameraLauncher.launch(uri)
         } else {

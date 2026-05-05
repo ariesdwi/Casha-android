@@ -332,7 +332,8 @@ class TransactionRepositoryImpl @Inject constructor(
         createdAt = createdAt,
         updatedAt = updatedAt,
         groupId = groupId,
-        groupName = groupName
+        groupName = groupName,
+        assetId = assetId
     )
 
     private fun TransactionEntity.toUploadDto() = TransactionUploadDto(
@@ -341,7 +342,8 @@ class TransactionRepositoryImpl @Inject constructor(
         category = category,
         amount = amount,
         datetime = dateFormat.format(datetime),
-        note = note
+        note = note,
+        assetId = assetId
     )
 
     private fun TransactionDto.toEntity() = TransactionEntity(
@@ -354,6 +356,7 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = true,
         remoteId = id,
         createdAt = try { createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
-        updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
+        updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
+        assetId = assetId
     )
 }

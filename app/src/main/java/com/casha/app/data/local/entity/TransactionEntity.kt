@@ -19,5 +19,6 @@ data class TransactionEntity(
     val updatedAt: Date = Date(),
 
     val groupId: String? = null,
-    val groupName: String? = null
+    val groupName: String? = null,
+    val assetId: String? = null
 )

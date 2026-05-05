@@ -74,6 +74,16 @@ fun MainScreen(
 
     var activeNotification by remember { mutableStateOf<com.casha.app.domain.model.NotificationCasha?>(null) }
 
+    // Collect global app-level snackbar events (e.g. email sync success/error)
+    LaunchedEffect(Unit) {
+        com.casha.app.core.util.AppEvents.snackbar.collect { message ->
+            snackbarHostState.showSnackbar(
+                message = message,
+                duration = androidx.compose.material3.SnackbarDuration.Short
+            )
+        }
+    }
+
     LaunchedEffect(Unit) {
         viewModel.notificationEvents.collect { notification ->
             activeNotification = notification
@@ -389,6 +399,7 @@ fun MainScreen(
                             else showPaywallSheet = true
                         },
                         onNavigateToCategories = { navController.navigate(NavRoutes.Categories.route) },
+                        onNavigateToWallets = { navController.navigate(NavRoutes.WalletList.route) },
                         onNavigateToSubscription = {
                             if (isPremium) {
                                 coroutineScope.launch {
@@ -619,6 +630,46 @@ fun MainScreen(
                 composable(NavRoutes.Categories.route) {
                     com.casha.app.ui.feature.profile.CategoryListScreen(
                         onBackClick = { navController.popBackStack() }
+                    )
+                }
+
+                // ── Wallets ──
+                composable(NavRoutes.WalletList.route) {
+                    com.casha.app.ui.feature.wallet.WalletListScreen(
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToAddWallet = { navController.navigate(NavRoutes.AddWallet.route) },
+                        onNavigateToEditWallet = { walletId, source ->
+                            navController.navigate(NavRoutes.EditWallet.createRoute(walletId, source))
+                        },
+                        onNavigateToTransfer = { navController.navigate(NavRoutes.TransferWallet.route) }
+                    )
+                }
+
+                composable(NavRoutes.AddWallet.route) {
+                    com.casha.app.ui.feature.wallet.AddWalletScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(
+                    route = NavRoutes.EditWallet.route,
+                    arguments = listOf(
+                        navArgument("walletId") { type = NavType.StringType },
+                        navArgument("source") { type = NavType.StringType }
+                    )
+                ) { backStackEntry ->
+                    val walletId = backStackEntry.arguments?.getString("walletId") ?: return@composable
+                    val source = backStackEntry.arguments?.getString("source") ?: "ASSET"
+                    com.casha.app.ui.feature.wallet.EditWalletScreen(
+                        walletId = walletId,
+                        source = source,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+
+                composable(NavRoutes.TransferWallet.route) {
+                    com.casha.app.ui.feature.wallet.TransferWalletScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 

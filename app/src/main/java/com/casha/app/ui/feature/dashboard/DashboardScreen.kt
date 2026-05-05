@@ -143,14 +143,19 @@ fun DashboardScreen(
                 
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        CardBalanceSection(
-                            summary = uiState.cashflowSummary,
+                        WalletCardDeck(
+                            wallets = uiState.wallets,
+                            summary = uiState.walletSummary,
+                            cashflowSummary = uiState.cashflowSummary,
+                            defaultWalletId = uiState.defaultWalletId,
+                            isLoading = uiState.isSyncing,
                             selectedPeriod = uiState.selectedPeriod,
-                            onPeriodChange = { viewModel.changePeriod(it) }
+                            onPeriodChange = { viewModel.changePeriod(it) },
+                            onManageWallets = { navController.navigate(NavRoutes.WalletList.route) }
                         )
                     }
                 }
-                
+
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         ReportSection(

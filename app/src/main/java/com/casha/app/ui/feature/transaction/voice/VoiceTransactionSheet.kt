@@ -67,12 +67,9 @@ fun VoiceTransactionSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val haptic = LocalHapticFeedback.current
 
-    // ── Auto-send when STOPPED ──────────────────────────────────────────────
+    // ── Only haptic feedback on phase changes, no auto-send ───────────────
     LaunchedEffect(uiState.phase) {
-        if (uiState.phase == VoicePhase.STOPPED) {
-            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-            viewModel.sendTranscriptToAI()
-        } else if (uiState.phase == VoicePhase.ERROR) {
+        if (uiState.phase == VoicePhase.STOPPED || uiState.phase == VoicePhase.ERROR) {
             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
         }
     }
@@ -142,7 +139,14 @@ fun VoiceTransactionSheet(
                     },
                     onCancel = { viewModel.reset() }
                 )
-                VoicePhase.STOPPED,
+                VoicePhase.STOPPED            -> StoppedView(
+                    transcript = uiState.transcript,
+                    onSend = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        viewModel.sendTranscriptToAI()
+                    },
+                    onReRecord = { viewModel.reset() }
+                )
                 VoicePhase.SENDING            -> SendingView(transcript = uiState.transcript)
                 VoicePhase.ERROR              -> ErrorView(
                     message = uiState.errorMessage ?: "Something went wrong.",
@@ -532,6 +536,64 @@ private fun RecordingView(
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+    }
+}
+
+@Composable
+private fun StoppedView(
+    transcript: String,
+    onSend: () -> Unit,
+    onReRecord: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = "Ready to send?",
+            style = MaterialTheme.typography.titleSmall,
+            fontWeight = FontWeight.SemiBold
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = transcript.ifEmpty { "(no speech detected)" },
+                modifier = Modifier.padding(14.dp),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontStyle = if (transcript.isEmpty()) FontStyle.Italic else FontStyle.Normal
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Button(
+            onClick = onSend,
+            enabled = transcript.isNotEmpty(),
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Text("Send")
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = onReRecord,
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.Mic,
+                contentDescription = null,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Re-record")
         }
     }
 }

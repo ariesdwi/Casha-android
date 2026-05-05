@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -59,7 +60,7 @@ fun AddTransactionCoordinator(
     }
 
     // ── Camera Launcher ──
-    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -76,13 +77,24 @@ fun AddTransactionCoordinator(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // Create temp file and launch camera
-            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+            // Pre-create the file so all camera apps can write to it
+            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg").also { it.createNewFile() }
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
                 tempFile
             )
+            // Explicitly grant write permission to all camera apps (some ignore FLAG_GRANT_WRITE_URI_PERMISSION in the intent)
+            val cameraIntent = android.content.Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            context.packageManager
+                .queryIntentActivities(cameraIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+                .forEach { resolveInfo ->
+                    context.grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        uri,
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                }
             cameraImageUri = uri
             cameraLauncher.launch(uri)
         } else {

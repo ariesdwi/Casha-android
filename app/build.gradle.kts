@@ -18,11 +18,12 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 29
-        versionName = "1.0.5"
+        versionCode = 35
+        versionName = "1.0.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com\"")
+        buildConfigField("String", "GOOGLE_EMAIL_SYNC_WEB_CLIENT_ID", "\"842221844066-9o5k20forh7t4bl8vp2v8sjj2l7tifnj.apps.googleusercontent.com\"")
     }
 
     signingConfigs {
@@ -40,7 +41,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"https://cashabe.vercel.app/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"https://be-casha-apps-production.up.railway.app/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -155,6 +156,9 @@ dependencies {
 
     // Play Billing
     implementation(libs.play.billing)
+
+    // Play Services Auth (legacy GoogleSignIn — needed for requestServerAuthCode + Gmail OAuth scope)
+    implementation(libs.play.services.auth)
 
     // Image Loading
     implementation(libs.coil.compose)

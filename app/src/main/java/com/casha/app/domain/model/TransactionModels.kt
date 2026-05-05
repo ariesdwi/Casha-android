@@ -18,7 +18,8 @@ data class TransactionCasha(
     val updatedAt: Date = Date(),
     val liabilityId: String? = null,
     val groupId: String? = null,
-    val groupName: String? = null
+    val groupName: String? = null,
+    val assetId: String? = null
 )
 
 /**
@@ -29,7 +30,8 @@ data class TransactionRequest(
     val category: String,
     val amount: Double,
     val datetime: Date,
-    val note: String? = null
+    val note: String? = null,
+    val assetId: String? = null
 )
 
 /**

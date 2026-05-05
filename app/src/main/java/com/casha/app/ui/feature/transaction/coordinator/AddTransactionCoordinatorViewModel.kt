@@ -190,7 +190,7 @@ class AddTransactionCoordinatorViewModel @Inject constructor(
     }
 
     fun clearError() {
-        _uiState.update { it.copy(errorMessage = null, lastFailedImageUri = null) }
+        _uiState.update { it.copy(errorMessage = null, lastFailedImageUri = null, presentationState = PresentationState.ACTION_SHEET) }
     }
 
     private fun friendlyError(e: Exception): String = when (e) {

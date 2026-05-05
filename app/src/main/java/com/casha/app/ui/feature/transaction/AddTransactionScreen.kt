@@ -42,9 +42,11 @@ enum class EntryType { EXPENSE, INCOME }
 fun AddTransactionScreen(
     transactionId: String? = null,
     onNavigateBack: () -> Unit,
-    viewModel: TransactionViewModel = hiltViewModel()
+    viewModel: TransactionViewModel = hiltViewModel(),
+    walletViewModel: com.casha.app.ui.feature.wallet.WalletViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val walletUiState by walletViewModel.uiState.collectAsState()
     val isEditMode = transactionId != null
     val userCurrency = CurrencyFormatter.defaultCurrency
     val currencySymbol = CurrencyFormatter.symbol(userCurrency)
@@ -66,6 +68,8 @@ fun AddTransactionScreen(
     var note                  by remember { mutableStateOf("") }
     var showDatePicker        by remember { mutableStateOf(false) }
     var showTimePicker        by remember { mutableStateOf(false) }
+    var selectedWalletId      by remember { mutableStateOf<String?>(null) }
+    var showWalletDropdown    by remember { mutableStateOf(false) }
 
     val isFormValid = remember(amountValue, name, entryType, selectedCategory) {
         val base = amountValue > 0 && name.isNotEmpty()
@@ -108,7 +112,7 @@ fun AddTransactionScreen(
         if (name.isEmpty())   { errorMessage = "Masukkan nama transaksi"; return }
         if (entryType == EntryType.EXPENSE) {
             if (selectedCategory.isEmpty()) { errorMessage = "Pilih kategori"; return }
-            val req = TransactionRequest(name = name, category = selectedCategory, amount = amountValue, datetime = selectedDate, note = note.takeIf { it.isNotEmpty() })
+            val req = TransactionRequest(name = name, category = selectedCategory, amount = amountValue, datetime = selectedDate, note = note.takeIf { it.isNotEmpty() }, assetId = selectedWalletId)
             if (isEditMode && transactionId != null) viewModel.updateTransaction(transactionId, req) else viewModel.addTransaction(req)
         } else {
             val req = CreateIncomeRequest(name = name.trim(), amount = amountValue, datetime = selectedDate, type = selectedIncomeType, source = source.takeIf { it.isNotEmpty() }, isRecurring = isRecurring, frequency = if (isRecurring) selectedFrequency else null, note = note.takeIf { it.isNotEmpty() })
@@ -385,6 +389,49 @@ onDismissRequest = onNavigateBack,
                                         }
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // ── Wallet Picker ─────────────────────────────────────
+                InputCard(title = "Wallet") {
+                    Box {
+                        Surface(
+                            onClick = { showWalletDropdown = true },
+                            shape = RoundedCornerShape(10.dp),
+                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = walletUiState.wallets.find { it.id == selectedWalletId }?.name ?: "Select wallet (optional)",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = if (selectedWalletId != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Icon(Icons.Default.ArrowDropDown, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                        }
+                        DropdownMenu(
+                            expanded = showWalletDropdown,
+                            onDismissRequest = { showWalletDropdown = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("None") },
+                                onClick = { selectedWalletId = null; showWalletDropdown = false }
+                            )
+                            walletUiState.wallets.forEach { wallet ->
+                                DropdownMenuItem(
+                                    text = { Text(wallet.name) },
+                                    onClick = {
+                                        selectedWalletId = wallet.id
+                                        showWalletDropdown = false
+                                    }
+                                )
                             }
                         }
                     }

@@ -106,6 +106,8 @@ echo ""
 # ── Upload via Google Play Developer API ──
 python3 - <<PYTHON
 import sys
+import httplib2
+import google_auth_httplib2
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
@@ -119,7 +121,9 @@ except Exception as e:
     print(f"❌ Gagal membaca credentials: {e}")
     sys.exit(1)
 
-service = build('androidpublisher', 'v3', credentials=credentials)
+# Use a 10-minute timeout — httplib2 is the correct transport for googleapiclient
+http = google_auth_httplib2.AuthorizedHttp(credentials, http=httplib2.Http(timeout=600))
+service = build('androidpublisher', 'v3', http=http, cache_discovery=False)
 
 # Create a new edit
 edit = service.edits().insert(body={}, packageName='$PACKAGE_NAME').execute()
@@ -151,7 +155,7 @@ def set_track_and_commit(status):
         track='$TRACK',
         body=track_body
     ).execute()
-    service.edits().commit(packageName='$PACKAGE_NAME', editId=edit_id, changesNotSentForReview=True).execute()
+    service.edits().commit(packageName='$PACKAGE_NAME', editId=edit_id).execute()
 
 try:
     set_track_and_commit('completed')

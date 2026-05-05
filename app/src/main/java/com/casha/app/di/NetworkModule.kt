@@ -5,6 +5,7 @@ import com.casha.app.core.network.AuthInterceptor
 import com.casha.app.core.network.ErrorInterceptor
 import com.casha.app.data.remote.api.AuthApiService
 import com.casha.app.data.remote.api.CashflowApiService
+import com.casha.app.data.remote.api.EmailSyncApiService
 import com.casha.app.data.remote.api.GoalApiService
 import com.casha.app.data.remote.api.IncomeApiService
 import com.casha.app.data.remote.api.TransactionApiService
@@ -142,6 +143,18 @@ object NetworkModule {
     @Singleton
     fun provideNotificationApiService(retrofit: Retrofit): com.casha.app.data.remote.api.NotificationApiService {
         return retrofit.create(com.casha.app.data.remote.api.NotificationApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEmailSyncApiService(retrofit: Retrofit): EmailSyncApiService {
+        return retrofit.create(EmailSyncApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWalletApiService(retrofit: Retrofit): com.casha.app.data.remote.api.WalletApiService {
+        return retrofit.create(com.casha.app.data.remote.api.WalletApiService::class.java)
     }
 }
 

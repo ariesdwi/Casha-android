@@ -12,7 +12,7 @@ import com.casha.app.data.local.entity.*
         IncomeEntity::class,
         NotificationEntity::class
     ],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

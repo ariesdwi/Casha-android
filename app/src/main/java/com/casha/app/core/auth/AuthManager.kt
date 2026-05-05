@@ -29,6 +29,7 @@ class AuthManager @Inject constructor(
         private val KEY_EMAIL = stringPreferencesKey("user_email")
         private val KEY_AVATAR = stringPreferencesKey("user_avatar")
         private val KEY_PENDING_FCM_TOKEN = stringPreferencesKey("pending_fcm_token")
+        private val KEY_DEFAULT_WALLET_ID = stringPreferencesKey("default_wallet_id")
     }
 
     // ── Token ──
@@ -95,6 +96,19 @@ class AuthManager @Inject constructor(
     suspend fun clearPendingFcmToken() {
         context.dataStore.edit { prefs ->
             prefs.remove(KEY_PENDING_FCM_TOKEN)
+        }
+    }
+
+    // ── Default Wallet ──
+
+    val defaultWalletId: Flow<String?> = context.dataStore.data.map { prefs ->
+        prefs[KEY_DEFAULT_WALLET_ID]
+    }
+
+    suspend fun setDefaultWalletId(walletId: String?) {
+        context.dataStore.edit { prefs ->
+            if (walletId != null) prefs[KEY_DEFAULT_WALLET_ID] = walletId
+            else prefs.remove(KEY_DEFAULT_WALLET_ID)
         }
     }
 

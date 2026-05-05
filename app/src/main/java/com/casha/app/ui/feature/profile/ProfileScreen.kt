@@ -1,5 +1,13 @@
 package com.casha.app.ui.feature.profile
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -25,6 +34,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.domain.model.UserCasha
 import com.casha.app.ui.theme.CashaBlue
 import com.casha.app.ui.theme.CashaDanger
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -39,12 +52,37 @@ fun ProfileScreen(
     onNavigateToGoalTracker: () -> Unit,
     onNavigateToCategories: () -> Unit,
     onNavigateToSubscription: () -> Unit,
+    onNavigateToWallets: () -> Unit,
     onLogout: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    emailSyncViewModel: EmailSyncViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val emailSyncUiState by emailSyncViewModel.uiState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    
+    val context = LocalContext.current
+
+    val webClientId = com.casha.app.BuildConfig.GOOGLE_EMAIL_SYNC_WEB_CLIENT_ID
+
+    // Launcher for Gmail OAuth sign-in
+    val emailOAuthLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+            try {
+                val account = task.getResult(ApiException::class.java)
+                val serverAuthCode = account.serverAuthCode
+                if (serverAuthCode != null) {
+                    emailSyncViewModel.connectEmail(serverAuthCode)
+                }
+            } catch (e: ApiException) {
+                // Sign-in cancelled or failed — ignore
+            }
+        }
+    }
+
+    var showDisconnectConfirmation by remember { mutableStateOf(false) }
     var showDeleteConfirmation by remember { mutableStateOf(false) }
     var showLanguagePicker by remember { mutableStateOf(false) }
 
@@ -165,6 +203,13 @@ fun ProfileScreen(
                 }
                 item {
                     ProfileMenuItem(
+                        icon = Icons.Default.AccountBalanceWallet,
+                        title = "Wallets",
+                        onClick = onNavigateToWallets
+                    )
+                }
+                item {
+                    ProfileMenuItem(
                         icon = Icons.Default.Work,
                         title = stringResource(R.string.profile_menu_portfolio),
                         isLocked = !uiState.isPremium,
@@ -194,6 +239,30 @@ fun ProfileScreen(
                     onClick = onNavigateToCategories
                 )
                 }
+
+                // ── Automation Section ── (hidden: feature postponed)
+                /*
+                item {
+                    ProfileSectionHeader("Automation")
+                }
+                item {
+                    EmailSyncCard(
+                        uiState = emailSyncUiState,
+                        onConnect = {
+                            val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                                .requestServerAuthCode(webClientId, true)
+                                .requestEmail()
+                                .requestScopes(Scope("https://www.googleapis.com/auth/gmail.readonly"))
+                                .build()
+                            val signInClient = GoogleSignIn.getClient(context, gso)
+                            signInClient.signOut().addOnCompleteListener {
+                                emailOAuthLauncher.launch(signInClient.signInIntent)
+                            }
+                        },
+                        onDisconnect = { showDisconnectConfirmation = true }
+                    )
+                }
+                */
 
                 item {
                     ProfileSectionHeader("Subscription & Safety")
@@ -249,6 +318,43 @@ fun ProfileScreen(
 
     if (showLanguagePicker) {
         LanguagePickerDialog(onDismiss = { showLanguagePicker = false })
+    }
+
+    if (showDisconnectConfirmation) {
+        AlertDialog(
+            onDismissRequest = { showDisconnectConfirmation = false },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.LinkOff,
+                    contentDescription = null,
+                    tint = CashaDanger
+                )
+            },
+            title = { Text("Putuskan Gmail?", fontWeight = FontWeight.SemiBold) },
+            text = {
+                Text(
+                    "Setelah diputus, transaksi dari email bank tidak akan lagi diimpor secara otomatis.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        showDisconnectConfirmation = false
+                        emailSyncViewModel.disconnect()
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = CashaDanger)
+                ) {
+                    Text("Putuskan", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDisconnectConfirmation = false }) {
+                    Text(stringResource(R.string.profile_action_cancel))
+                }
+            }
+        )
     }
 
     if (showDeleteConfirmation) {
@@ -443,6 +549,172 @@ fun ProfileMenuItem(
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.size(20.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun EmailSyncCard(
+    uiState: EmailSyncUiState,
+    onConnect: () -> Unit,
+    onDisconnect: () -> Unit
+) {
+    val syncStatus = uiState.status
+    val isConnected = syncStatus?.connected == true
+
+    val cardState = when {
+        uiState.isLoading -> "loading"
+        isConnected -> "connected"
+        else -> "disconnected"
+    }
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        color = when {
+            isConnected -> Color(0xFF4CAF50).copy(alpha = 0.06f)
+            else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+        },
+        border = if (isConnected) BorderStroke(1.dp, Color(0xFF4CAF50).copy(alpha = 0.3f)) else null,
+        onClick = { if (!uiState.isLoading && !isConnected) onConnect() }
+    ) {
+        AnimatedContent(
+            targetState = cardState,
+            transitionSpec = { fadeIn() togetherWith fadeOut() },
+            label = "email_sync_card"
+        ) { state ->
+            when (state) {
+                "loading" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(22.dp),
+                            strokeWidth = 2.5.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Text(
+                            text = if (isConnected) "Memutus koneksi..." else "Menghubungkan Gmail...",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                "connected" -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .background(Color(0xFF4CAF50).copy(alpha = 0.15f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.MarkEmailRead,
+                                contentDescription = null,
+                                tint = Color(0xFF4CAF50),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Spacer(Modifier.width(14.dp))
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                Text(
+                                    text = "Gmail Terhubung",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(7.dp)
+                                        .background(Color(0xFF4CAF50), CircleShape)
+                                )
+                            }
+                            Text(
+                                text = syncStatus?.emailAddress ?: "",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = "Auto-sync aktif",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = Color(0xFF4CAF50).copy(alpha = 0.8f)
+                            )
+                        }
+                        IconButton(
+                            onClick = onDisconnect,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.LinkOff,
+                                contentDescription = "Putuskan",
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.45f),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
+                else -> {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp, vertical = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f), CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Email,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                        Spacer(Modifier.width(14.dp))
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            verticalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = "Hubungkan Gmail",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                            Text(
+                                text = "Auto-import transaksi dari email bank",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Default.ChevronRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
             }
         }
     }
