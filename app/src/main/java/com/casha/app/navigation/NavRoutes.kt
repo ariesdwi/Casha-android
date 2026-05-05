@@ -87,7 +87,6 @@ sealed class NavRoutes(val route: String) {
 
     // ── Wallets ──
     data object WalletList : NavRoutes("wallet_list")
-    data object AddWallet : NavRoutes("add_wallet")
     data object EditWallet : NavRoutes("edit_wallet/{walletId}/{source}") {
         fun createRoute(walletId: String, source: String) = "edit_wallet/$walletId/$source"
     }

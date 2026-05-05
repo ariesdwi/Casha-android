@@ -637,17 +637,10 @@ fun MainScreen(
                 composable(NavRoutes.WalletList.route) {
                     com.casha.app.ui.feature.wallet.WalletListScreen(
                         onNavigateBack = { navController.popBackStack() },
-                        onNavigateToAddWallet = { navController.navigate(NavRoutes.AddWallet.route) },
                         onNavigateToEditWallet = { walletId, source ->
                             navController.navigate(NavRoutes.EditWallet.createRoute(walletId, source))
                         },
                         onNavigateToTransfer = { navController.navigate(NavRoutes.TransferWallet.route) }
-                    )
-                }
-
-                composable(NavRoutes.AddWallet.route) {
-                    com.casha.app.ui.feature.wallet.AddWalletScreen(
-                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
 

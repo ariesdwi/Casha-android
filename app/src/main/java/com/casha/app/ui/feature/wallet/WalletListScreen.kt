@@ -45,12 +45,13 @@ import kotlin.math.roundToInt
 fun WalletListScreen(
     viewModel: WalletViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToAddWallet: () -> Unit,
     onNavigateToEditWallet: (String, String) -> Unit,
     onNavigateToTransfer: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     var showDeleteDialog by remember { mutableStateOf<Wallet?>(null) }
+    var showTypePicker by remember { mutableStateOf(false) }
+    var selectedWalletTab by remember { mutableStateOf<WalletTab?>(null) }
 
     LaunchedEffect(Unit) {
         viewModel.loadAll()
@@ -120,7 +121,7 @@ fun WalletListScreen(
                             tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
-                    IconButton(onClick = onNavigateToAddWallet) {
+                    IconButton(onClick = { showTypePicker = true }) {
                         Icon(
                             Icons.Default.AddCircle,
                             contentDescription = "Add Wallet",
@@ -208,7 +209,7 @@ fun WalletListScreen(
                                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                                             )
                                             Spacer(Modifier.height(8.dp))
-                                            TextButton(onClick = onNavigateToAddWallet) {
+                                            TextButton(onClick = { showTypePicker = true }) {
                                                 Text("Add your first wallet")
                                             }
                                         }
@@ -244,6 +245,26 @@ fun WalletListScreen(
                     Text("Cancel")
                 }
             }
+        )
+    }
+
+    // ── Step 1: Type Picker Sheet ─────────────────────────────────────────────
+    if (showTypePicker) {
+        SelectWalletTypeSheet(
+            onDismiss = { showTypePicker = false },
+            onTypeSelected = { tab ->
+                showTypePicker = false
+                selectedWalletTab = tab
+            }
+        )
+    }
+
+    // ── Step 2: Add Wallet Form Sheet ─────────────────────────────────────────
+    selectedWalletTab?.let { tab ->
+        AddWalletSheet(
+            initialTab = tab,
+            viewModel = viewModel,
+            onDismiss = { selectedWalletTab = null }
         )
     }
 }

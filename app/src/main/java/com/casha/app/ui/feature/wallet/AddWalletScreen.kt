@@ -1,14 +1,16 @@
 package com.casha.app.ui.feature.wallet
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,16 +30,198 @@ import com.casha.app.domain.model.AddLiquidWalletRequest
 import com.casha.app.domain.model.WalletType
 import com.casha.app.ui.component.CurrencyInputField
 
-private enum class WalletTab { LIQUID, CREDIT_CARD }
+enum class WalletTab { LIQUID, CREDIT_CARD }
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 1 — Type Picker Sheet
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+data class WalletTypeItem(
+    val tab: WalletTab,
+    val title: String,
+    val description: String,
+    val icon: ImageVector,
+    val color: Color
+)
+
+private val walletTypeItems = listOf(
+    WalletTypeItem(
+        tab = WalletTab.LIQUID,
+        title = "Cash / Bank Account",
+        description = "Savings, checking, e-wallet, cash",
+        icon = Icons.Default.AccountBalance,
+        color = Color(0xFF2196F3)
+    ),
+    WalletTypeItem(
+        tab = WalletTab.CREDIT_CARD,
+        title = "Credit Card",
+        description = "Credit card with limit & billing cycle",
+        icon = Icons.Default.CreditCard,
+        color = Color(0xFF9C27B0)
+    )
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddWalletScreen(
+fun SelectWalletTypeSheet(
+    onDismiss: () -> Unit,
+    onTypeSelected: (WalletTab) -> Unit
+) {
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.55f)
+        ) {
+            // Header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 16.dp)
+            ) {
+                Text(
+                    "Add Wallet",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    "Choose the type of wallet to add",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
+                )
+            }
+
+            HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+            Spacer(Modifier.height(16.dp))
+
+            // Type grid
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(bottom = 32.dp)
+            ) {
+                items(walletTypeItems) { item ->
+                    WalletTypeCard(item = item, onClick = { onTypeSelected(item.tab) })
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WalletTypeCard(item: WalletTypeItem, onClick: () -> Unit) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(140.dp),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(14.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(42.dp)
+                    .clip(CircleShape)
+                    .background(item.color.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = item.icon,
+                    contentDescription = null,
+                    tint = item.color,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                Text(
+                    item.title,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1
+                )
+                Text(
+                    item.description,
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 2,
+                    lineHeight = 15.sp
+                )
+            }
+        }
+    }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Step 2 — Add Wallet Form Sheet
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AddWalletSheet(
+    initialTab: WalletTab,
     viewModel: WalletViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit
+    onDismiss: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    var selectedTab by remember { mutableStateOf(WalletTab.LIQUID) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    // Navigate back on success
+    LaunchedEffect(uiState.successMessage) {
+        if (uiState.successMessage == "Wallet added" || uiState.successMessage == "Credit card added") {
+            viewModel.clearMessages()
+            onDismiss()
+        }
+    }
+
+    ModalBottomSheet(
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        dragHandle = { BottomSheetDefaults.DragHandle() },
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
+        AddWalletFormContent(
+            initialTab = initialTab,
+            viewModel = viewModel,
+            uiState = uiState
+        )
+    }
+}
+
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+// Form Content (shared)
+// ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+@Composable
+private fun AddWalletFormContent(
+    initialTab: WalletTab,
+    viewModel: WalletViewModel,
+    uiState: WalletUiState
+) {
+    var selectedTab by remember { mutableStateOf(initialTab) }
 
     // Liquid wallet fields
     var name by remember { mutableStateOf("") }
@@ -112,184 +297,279 @@ fun AddWalletScreen(
                 )
             )
         }
-        onNavigateBack()
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        contentWindowInsets = WindowInsets(0.dp)
-    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = paddingValues.calculateBottomPadding())
+                .fillMaxWidth()
+                .fillMaxHeight(0.92f)
         ) {
-            // ── Header ─────────────────────────────────────────────────────
-            Row(
+            // ── Sheet Header ──────────────────────────────────────────────
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 4.dp, vertical = 12.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(horizontal = 20.dp)
+                    .padding(bottom = 8.dp)
             ) {
-                IconButton(onClick = onNavigateBack) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colorScheme.onBackground
-                    )
-                }
                 Text(
-                    "Add Wallet",
+                    if (selectedTab == WalletTab.LIQUID) "Cash / Bank Account" else "Credit Card",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-                TextButton(
-                    onClick = { save() },
-                    enabled = isFormValid && !uiState.isLoading
-                ) {
-                    Text(
-                        "Save",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
-                        color = if (isFormValid && !uiState.isLoading)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
-                    )
-                }
+                Spacer(Modifier.height(2.dp))
+                Text(
+                    "Fill in the details below",
+                    fontSize = 13.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
             }
 
             HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
 
-            // ── Scrollable Body ─────────────────────────────────────────────
+            // ── Error ─────────────────────────────────────────────────────
+            uiState.errorMessage?.let { err ->
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 8.dp),
+                    shape = RoundedCornerShape(12.dp),
+                    color = MaterialTheme.colorScheme.errorContainer
+                ) {
+                    Text(
+                        err,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp)
+                    )
+                }
+            }
+
+            // ── Form Body ─────────────────────────────────────────────────
             Column(
                 modifier = Modifier
                     .weight(1f)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 20.dp)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(8.dp))
 
-                // Tab Switcher
+                // Tab switcher (still visible to let user switch)
                 AddWalletTabSwitcher(selectedTab = selectedTab, onSelect = { selectedTab = it })
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(4.dp))
 
-                // ── Cash / Bank Form ──────────────────────────────────────
-                AnimatedVisibility(visible = selectedTab == WalletTab.LIQUID) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                if (selectedTab == WalletTab.LIQUID) {
+                    // ── Cash / Bank Form ──────────────────────────────────
 
-                        AddWalletSection("Account Details") {
-                            AddWalletField("Account Name", required = true) {
-                                OutlinedTextField(
-                                    value = name,
-                                    onValueChange = { name = it },
-                                    placeholder = { Text("e.g. BCA Tabungan") },
-                                    singleLine = true,
+                    AddWalletSection("Account Details") {
+                        AddWalletField("Account Name", required = true) {
+                            OutlinedTextField(
+                                value = name,
+                                onValueChange = { name = it },
+                                placeholder = { Text("e.g. BCA Tabungan") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+
+                        AddWalletField("Account Type", required = true) {
+                            Box {
+                                OutlinedButton(
+                                    onClick = { showTypeDropdown = true },
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth(),
-                                    colors = cashaFieldColors()
-                                )
-                            }
-
-                            AddWalletField("Account Type", required = true) {
-                                Box {
-                                    OutlinedButton(
-                                        onClick = { showTypeDropdown = true },
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
-                                    ) {
-                                        Icon(
-                                            walletTypeIcon(selectedType),
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp),
-                                            tint = MaterialTheme.colorScheme.primary
+                                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+                                ) {
+                                    Icon(
+                                        walletTypeIcon(selectedType),
+                                        contentDescription = null,
+                                        modifier = Modifier.size(18.dp),
+                                        tint = MaterialTheme.colorScheme.primary
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        walletTypeLabel(selectedType),
+                                        modifier = Modifier.weight(1f),
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                DropdownMenu(
+                                    expanded = showTypeDropdown,
+                                    onDismissRequest = { showTypeDropdown = false }
+                                ) {
+                                    liquidTypes.forEach { type ->
+                                        DropdownMenuItem(
+                                            text = { Text(walletTypeLabel(type)) },
+                                            leadingIcon = {
+                                                Icon(
+                                                    walletTypeIcon(type),
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp),
+                                                    tint = MaterialTheme.colorScheme.primary
+                                                )
+                                            },
+                                            onClick = {
+                                                selectedType = type
+                                                showTypeDropdown = false
+                                            }
                                         )
-                                        Spacer(Modifier.width(8.dp))
-                                        Text(
-                                            walletTypeLabel(selectedType),
-                                            modifier = Modifier.weight(1f),
-                                            fontWeight = FontWeight.Medium,
-                                            color = MaterialTheme.colorScheme.onBackground
-                                        )
-                                        Icon(
-                                            Icons.Default.KeyboardArrowDown,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = showTypeDropdown,
-                                        onDismissRequest = { showTypeDropdown = false }
-                                    ) {
-                                        liquidTypes.forEach { type ->
-                                            DropdownMenuItem(
-                                                text = { Text(walletTypeLabel(type)) },
-                                                leadingIcon = {
-                                                    Icon(
-                                                        walletTypeIcon(type),
-                                                        contentDescription = null,
-                                                        modifier = Modifier.size(18.dp),
-                                                        tint = MaterialTheme.colorScheme.primary
-                                                    )
-                                                },
-                                                onClick = {
-                                                    selectedType = type
-                                                    showTypeDropdown = false
-                                                }
-                                            )
-                                        }
                                     }
                                 }
                             }
+                        }
 
-                            AddWalletField("Bank Name") {
+                        AddWalletField("Bank Name") {
+                            OutlinedTextField(
+                                value = bankName,
+                                onValueChange = { bankName = it },
+                                placeholder = { Text("e.g. BCA") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+                    }
+
+                    AddWalletSection("Balance") {
+                        AddWalletField("Initial Balance", required = true) {
+                            CurrencyInputField(
+                                value = amountText,
+                                onValueChange = {
+                                    amountText = it
+                                    amountValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("0") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                leadingIcon = {
+                                    Text(
+                                        CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    AddWalletSection("Notes") {
+                        AddWalletField("Description") {
+                            OutlinedTextField(
+                                value = description,
+                                onValueChange = { description = it },
+                                placeholder = { Text("Optional note about this account") },
+                                singleLine = false,
+                                minLines = 2,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+                    }
+                } else {
+                    // ── Credit Card Form ──────────────────────────────────
+
+                    AddWalletSection("Card Details") {
+                        AddWalletField("Card Name", required = true) {
+                            OutlinedTextField(
+                                value = ccName,
+                                onValueChange = { ccName = it },
+                                placeholder = { Text("e.g. Citi Platinum") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+                        AddWalletField("Bank / Issuer", required = true) {
+                            OutlinedTextField(
+                                value = ccBankName,
+                                onValueChange = { ccBankName = it },
+                                placeholder = { Text("e.g. Citibank") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+                    }
+
+                    AddWalletSection("Credit Limit & Balance") {
+                        AddWalletField("Credit Limit", required = true) {
+                            CurrencyInputField(
+                                value = ccLimitText,
+                                onValueChange = {
+                                    ccLimitText = it
+                                    ccLimitValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("0") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                leadingIcon = {
+                                    Text(
+                                        CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            )
+                        }
+                        AddWalletField("Current Balance Used") {
+                            CurrencyInputField(
+                                value = ccBalanceText,
+                                onValueChange = {
+                                    ccBalanceText = it
+                                    ccBalanceValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("0") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                leadingIcon = {
+                                    Text(
+                                        CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            )
+                        }
+                    }
+
+                    AddWalletSection("Billing Cycle") {
+                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                            AddWalletField("Billing Day", modifier = Modifier.weight(1f)) {
                                 OutlinedTextField(
-                                    value = bankName,
-                                    onValueChange = { bankName = it },
-                                    placeholder = { Text("e.g. BCA") },
+                                    value = ccBillingDay,
+                                    onValueChange = {
+                                        if (it.length <= 2) ccBillingDay = it.filter { c -> c.isDigit() }
+                                    },
+                                    placeholder = { Text("1–31") },
                                     singleLine = true,
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = cashaFieldColors()
                                 )
                             }
-                        }
-
-                        AddWalletSection("Balance") {
-                            AddWalletField("Initial Balance", required = true) {
-                                CurrencyInputField(
-                                    value = amountText,
-                                    onValueChange = {
-                                        amountText = it
-                                        amountValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("0") },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    leadingIcon = {
-                                        Text(
-                                            CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                )
-                            }
-                        }
-
-                        AddWalletSection("Notes") {
-                            AddWalletField("Description") {
+                            AddWalletField("Due Day", modifier = Modifier.weight(1f)) {
                                 OutlinedTextField(
-                                    value = description,
-                                    onValueChange = { description = it },
-                                    placeholder = { Text("Optional note about this account") },
-                                    singleLine = false,
-                                    minLines = 2,
+                                    value = ccDueDay,
+                                    onValueChange = {
+                                        if (it.length <= 2) ccDueDay = it.filter { c -> c.isDigit() }
+                                    },
+                                    placeholder = { Text("1–31") },
+                                    singleLine = true,
                                     shape = RoundedCornerShape(12.dp),
                                     modifier = Modifier.fillMaxWidth(),
                                     colors = cashaFieldColors()
@@ -297,265 +577,145 @@ fun AddWalletScreen(
                             }
                         }
                     }
-                }
 
-                // ── Credit Card Form ──────────────────────────────────────
-                AnimatedVisibility(visible = selectedTab == WalletTab.CREDIT_CARD) {
-                    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-
-                        AddWalletSection("Card Details") {
-                            AddWalletField("Card Name", required = true) {
-                                OutlinedTextField(
-                                    value = ccName,
-                                    onValueChange = { ccName = it },
-                                    placeholder = { Text("e.g. Citi Platinum") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = cashaFieldColors()
-                                )
-                            }
-                            AddWalletField("Bank / Issuer", required = true) {
-                                OutlinedTextField(
-                                    value = ccBankName,
-                                    onValueChange = { ccBankName = it },
-                                    placeholder = { Text("e.g. Citibank") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = cashaFieldColors()
-                                )
-                            }
+                    AddWalletSection("Interest") {
+                        AddWalletField("Interest Rate (%)", required = true) {
+                            OutlinedTextField(
+                                value = ccInterestRateText,
+                                onValueChange = {
+                                    ccInterestRateText = it
+                                    ccInterestRateValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("e.g. 2.25") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
                         }
-
-                        AddWalletSection("Credit Limit & Balance") {
-                            AddWalletField("Credit Limit", required = true) {
-                                CurrencyInputField(
-                                    value = ccLimitText,
-                                    onValueChange = {
-                                        ccLimitText = it
-                                        ccLimitValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("0") },
-                                    modifier = Modifier.fillMaxWidth(),
+                        AddWalletField("Interest Type") {
+                            Box {
+                                OutlinedButton(
+                                    onClick = { showInterestTypeDropdown = true },
                                     shape = RoundedCornerShape(12.dp),
-                                    leadingIcon = {
-                                        Text(
-                                            CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                )
-                            }
-                            AddWalletField("Current Balance Used") {
-                                CurrencyInputField(
-                                    value = ccBalanceText,
-                                    onValueChange = {
-                                        ccBalanceText = it
-                                        ccBalanceValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("0") },
                                     modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    leadingIcon = {
-                                        Text(
-                                            CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                )
-                            }
-                        }
-
-                        AddWalletSection("Billing Cycle") {
-                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                                AddWalletField("Billing Day", modifier = Modifier.weight(1f)) {
-                                    OutlinedTextField(
-                                        value = ccBillingDay,
-                                        onValueChange = {
-                                            if (it.length <= 2) ccBillingDay = it.filter { c -> c.isDigit() }
-                                        },
-                                        placeholder = { Text("1–31") },
-                                        singleLine = true,
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        colors = cashaFieldColors()
+                                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
+                                ) {
+                                    Text(
+                                        ccInterestType,
+                                        modifier = Modifier.weight(1f),
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.onBackground
+                                    )
+                                    Icon(
+                                        Icons.Default.KeyboardArrowDown,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                AddWalletField("Due Day", modifier = Modifier.weight(1f)) {
-                                    OutlinedTextField(
-                                        value = ccDueDay,
-                                        onValueChange = {
-                                            if (it.length <= 2) ccDueDay = it.filter { c -> c.isDigit() }
-                                        },
-                                        placeholder = { Text("1–31") },
-                                        singleLine = true,
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        colors = cashaFieldColors()
+                                DropdownMenu(
+                                    expanded = showInterestTypeDropdown,
+                                    onDismissRequest = { showInterestTypeDropdown = false }
+                                ) {
+                                    listOf("MONTHLY", "FLAT").forEach { type ->
+                                        DropdownMenuItem(
+                                            text = { Text(type) },
+                                            onClick = {
+                                                ccInterestType = type
+                                                showInterestTypeDropdown = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    AddWalletSection("Optional Fees") {
+                        AddWalletField("Min Payment %") {
+                            OutlinedTextField(
+                                value = ccMinPaymentText,
+                                onValueChange = {
+                                    ccMinPaymentText = it
+                                    ccMinPaymentValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("e.g. 5.0") },
+                                singleLine = true,
+                                shape = RoundedCornerShape(12.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = cashaFieldColors()
+                            )
+                        }
+                        AddWalletField("Late Fee") {
+                            CurrencyInputField(
+                                value = ccLateFeeText,
+                                onValueChange = {
+                                    ccLateFeeText = it
+                                    ccLateFeeValue = it.toDoubleOrNull() ?: 0.0
+                                },
+                                placeholder = { Text("0") },
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(12.dp),
+                                leadingIcon = {
+                                    Text(
+                                        CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                            }
-                        }
-
-                        AddWalletSection("Interest") {
-                            AddWalletField("Interest Rate (%)", required = true) {
-                                OutlinedTextField(
-                                    value = ccInterestRateText,
-                                    onValueChange = {
-                                        ccInterestRateText = it
-                                        ccInterestRateValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("e.g. 2.25") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = cashaFieldColors()
-                                )
-                            }
-                            AddWalletField("Interest Type") {
-                                Box {
-                                    OutlinedButton(
-                                        onClick = { showInterestTypeDropdown = true },
-                                        shape = RoundedCornerShape(12.dp),
-                                        modifier = Modifier.fillMaxWidth(),
-                                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 14.dp)
-                                    ) {
-                                        Text(
-                                            ccInterestType,
-                                            modifier = Modifier.weight(1f),
-                                            fontWeight = FontWeight.Medium,
-                                            color = MaterialTheme.colorScheme.onBackground
-                                        )
-                                        Icon(
-                                            Icons.Default.KeyboardArrowDown,
-                                            contentDescription = null,
-                                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                    DropdownMenu(
-                                        expanded = showInterestTypeDropdown,
-                                        onDismissRequest = { showInterestTypeDropdown = false }
-                                    ) {
-                                        listOf("MONTHLY", "FLAT").forEach { type ->
-                                            DropdownMenuItem(
-                                                text = { Text(type) },
-                                                onClick = {
-                                                    ccInterestType = type
-                                                    showInterestTypeDropdown = false
-                                                }
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        AddWalletSection("Optional Fees") {
-                            AddWalletField("Min Payment %") {
-                                OutlinedTextField(
-                                    value = ccMinPaymentText,
-                                    onValueChange = {
-                                        ccMinPaymentText = it
-                                        ccMinPaymentValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("e.g. 5.0") },
-                                    singleLine = true,
-                                    shape = RoundedCornerShape(12.dp),
-                                    modifier = Modifier.fillMaxWidth(),
-                                    colors = cashaFieldColors()
-                                )
-                            }
-                            AddWalletField("Late Fee") {
-                                CurrencyInputField(
-                                    value = ccLateFeeText,
-                                    onValueChange = {
-                                        ccLateFeeText = it
-                                        ccLateFeeValue = it.toDoubleOrNull() ?: 0.0
-                                    },
-                                    placeholder = { Text("0") },
-                                    modifier = Modifier.fillMaxWidth(),
-                                    shape = RoundedCornerShape(12.dp),
-                                    leadingIcon = {
-                                        Text(
-                                            CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                )
-                            }
+                            )
                         }
                     }
                 }
 
-                Spacer(Modifier.height(28.dp))
+                Spacer(Modifier.height(8.dp))
+            }
 
-                // Save Button
+            // ── Submit Button ─────────────────────────────────────────────
+            Surface(
+                color = MaterialTheme.colorScheme.background,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .navigationBarsPadding()
+            ) {
                 Button(
                     onClick = { save() },
                     enabled = isFormValid && !uiState.isLoading,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(54.dp),
-                    shape = RoundedCornerShape(14.dp),
+                        .padding(horizontal = 20.dp, vertical = 12.dp)
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                    )
+                        disabledContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f)
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
                 ) {
                     if (uiState.isLoading) {
-                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = Color.White, strokeWidth = 2.dp)
+                        CircularProgressIndicator(
+                            color = Color.White,
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
                     } else {
-                        Text("Save Wallet", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Icon(Icons.Default.Check, contentDescription = null, tint = Color.White)
+                            Text("Save Wallet", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = Color.White)
+                        }
                     }
-                }
-
-                Spacer(Modifier.height(40.dp))
-            }
-        }
-    } // end Scaffold
-
-    // ── Loading Overlay ──────────────────────────────────────────────────
-    if (uiState.isLoading) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.7f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 32.dp, vertical = 24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(36.dp),
-                        strokeWidth = 3.dp
-                    )
-                    Text(
-                        "Saving wallet…",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
                 }
             }
         }
     }
-    } // end outer Box
 }
 
 // ── Segmented Tab Switcher ─────────────────────────────────────────────────────
 @Composable
-private fun AddWalletTabSwitcher(selectedTab: WalletTab, onSelect: (WalletTab) -> Unit) {
+internal fun AddWalletTabSwitcher(selectedTab: WalletTab, onSelect: (WalletTab) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -567,12 +727,10 @@ private fun AddWalletTabSwitcher(selectedTab: WalletTab, onSelect: (WalletTab) -
         WalletTab.entries.forEach { tab ->
             val selected = selectedTab == tab
             val bgColor by animateColorAsState(
-                if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                label = "tab_bg"
+                if (selected) MaterialTheme.colorScheme.primary else Color.Transparent, label = "tab_bg"
             )
             val contentColor by animateColorAsState(
-                if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
-                label = "tab_txt"
+                if (selected) Color.White else MaterialTheme.colorScheme.onSurfaceVariant, label = "tab_txt"
             )
             Surface(
                 onClick = { onSelect(tab) },
@@ -593,7 +751,7 @@ private fun AddWalletTabSwitcher(selectedTab: WalletTab, onSelect: (WalletTab) -
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = if (tab == WalletTab.LIQUID) "Cash / Bank" else "Credit Card",
+                        if (tab == WalletTab.LIQUID) "Cash / Bank" else "Credit Card",
                         fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
                         fontSize = 14.sp,
                         color = contentColor
@@ -606,7 +764,7 @@ private fun AddWalletTabSwitcher(selectedTab: WalletTab, onSelect: (WalletTab) -
 
 // ── Form Section Card ──────────────────────────────────────────────────────────
 @Composable
-private fun AddWalletSection(title: String, content: @Composable ColumnScope.() -> Unit) {
+internal fun AddWalletSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column {
         Text(
             text = title.uppercase(),
@@ -631,9 +789,9 @@ private fun AddWalletSection(title: String, content: @Composable ColumnScope.() 
     }
 }
 
-// ── Field Label + Content ──────────────────────────────────────────────────────
+// ── Field wrapper ──────────────────────────────────────────────────────────────
 @Composable
-private fun AddWalletField(
+internal fun AddWalletField(
     label: String,
     required: Boolean = false,
     modifier: Modifier = Modifier,
@@ -660,9 +818,9 @@ private fun AddWalletField(
     }
 }
 
-// ── Themed outlined field colors ───────────────────────────────────────────────
+// ── Themed field colors ────────────────────────────────────────────────────────
 @Composable
-private fun cashaFieldColors() = OutlinedTextFieldDefaults.colors(
+internal fun cashaFieldColors() = OutlinedTextFieldDefaults.colors(
     focusedBorderColor = MaterialTheme.colorScheme.primary,
     unfocusedBorderColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
     focusedLabelColor = MaterialTheme.colorScheme.primary,
