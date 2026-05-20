@@ -9,6 +9,9 @@ import com.casha.app.data.remote.dto.ChatIncomeDto
 import com.casha.app.data.remote.dto.ChatRequestDto
 import com.casha.app.data.remote.dto.ChatTransactionDto
 import com.casha.app.data.remote.dto.MultiExpenseSummaryDto
+import com.casha.app.data.remote.dto.WhatIfDataDto
+import com.casha.app.data.remote.dto.BudgetRecommendationDataDto
+import com.casha.app.data.remote.dto.toDomain
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
 import com.casha.app.domain.model.MultiExpenseSummary
@@ -129,6 +132,30 @@ class ChatRepositoryImpl @Inject constructor(
                 ChatParseResult(
                     intent = ChatParseIntent.INCOME,
                     message = message
+                )
+            }
+            "WHAT_IF" -> {
+                // Simulation only — do NOT save to DB, do NOT emit sync event
+                val whatIfDto = json.decodeFromJsonElement<WhatIfDataDto>(parseData.data)
+                ChatParseResult(
+                    intent = ChatParseIntent.WHAT_IF,
+                    message = message,
+                    whatIfSimulation = whatIfDto.toDomain()
+                )
+            }
+            "FINANCIAL_SUMMARY" -> {
+                // Display-only — show AI message, no DB save
+                ChatParseResult(
+                    intent = ChatParseIntent.FINANCIAL_SUMMARY,
+                    message = message
+                )
+            }
+            "BUDGET_RECOMMENDATION" -> {
+                val recDto = json.decodeFromJsonElement<BudgetRecommendationDataDto>(parseData.data)
+                ChatParseResult(
+                    intent = ChatParseIntent.BUDGET_RECOMMENDATION,
+                    message = message,
+                    budgetRecommendation = recDto.toDomain()
                 )
             }
             "UNKNOWN" -> {

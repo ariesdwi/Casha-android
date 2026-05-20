@@ -114,7 +114,7 @@ interface BudgetApiService {
     @GET("budgets")
     suspend fun getBudgets(
         @Query("month") month: String? = null
-    ): BaseResponse<List<BudgetDto>>
+    ): BaseResponse<BudgetListResponseDto>
 
     @GET("budgets/summary")
     suspend fun getSummary(
@@ -141,5 +141,5 @@ interface BudgetApiService {
     @POST("budgets/apply-recommendations")
     suspend fun applyRecommendations(
         @Body request: ApplyRecommendationsRequest
-    ): BaseResponse<ApplyRecommendationsResponseDto>
+    ): BaseResponse<ApplyRecommendationsResponseDto?>
 }

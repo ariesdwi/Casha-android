@@ -4,6 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.core.network.NetworkMonitor
+import com.casha.app.widget.WidgetUpdater
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.casha.app.domain.model.UpdateProfileRequest
 import com.casha.app.domain.model.UserCasha
 import com.casha.app.domain.usecase.auth.logout.DeleteAllLocalDataUseCase
@@ -35,7 +38,8 @@ class ProfileViewModel @Inject constructor(
     private val deleteAllLocalDataUseCase: DeleteAllLocalDataUseCase,
     private val authManager: AuthManager,
     private val networkMonitor: NetworkMonitor,
-    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -240,7 +244,9 @@ class ProfileViewModel @Inject constructor(
     fun togglePremiumDebug() {
         viewModelScope.launch {
             val currentStatus = _uiState.value.isPremium
-            subscriptionManager.setPremiumStatus(!currentStatus)
+            val newStatus = !currentStatus
+            subscriptionManager.setPremiumStatus(newStatus)
+            WidgetUpdater.setAuthState(context, isLoggedIn = true, isPremium = newStatus)
         }
     }
 

@@ -5,7 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
+import com.casha.app.domain.model.BudgetRecommendationData
+import com.casha.app.domain.model.WhatIfSimulation
 import com.casha.app.domain.repository.ChatRepository
+import com.casha.app.domain.repository.BudgetRepository
+import com.casha.app.data.remote.dto.ApplyRecommendationsRequest
+import com.casha.app.data.remote.dto.RecommendedBudgetPayload
 import com.casha.app.core.network.SyncEventBus
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -38,12 +43,19 @@ data class AddMessageUiState(
     val multiExpenseCount: Int = 0,
     val multiExpenseTotal: Double = 0.0,
     val multiExpenseGroupName: String = "",
-    val multiExpenseCurrency: String = ""
+    val multiExpenseCurrency: String = "",
+    // What If simulation result (only set when lastIntent == WHAT_IF)
+    val whatIfSimulation: WhatIfSimulation? = null,
+    // Budget Recommendation
+    val budgetRecommendation: BudgetRecommendationData? = null,
+    val isBudgetApplying: Boolean = false,
+    val isBudgetApplied: Boolean = false
 )
 
 @HiltViewModel
 class AddMessageViewModel @Inject constructor(
     private val chatRepository: ChatRepository,
+    private val budgetRepository: BudgetRepository,
     private val syncEventBus: SyncEventBus,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
@@ -64,10 +76,16 @@ class AddMessageViewModel @Inject constructor(
 
             try {
                 val result = chatRepository.parseChat(message)
-                val isSuccess = result.intent != ChatParseIntent.UNKNOWN
-                if (isSuccess) {
+                // Display-only intents — do not refresh dashboard state
+                val shouldSync = result.intent != ChatParseIntent.UNKNOWN &&
+                        result.intent != ChatParseIntent.WHAT_IF &&
+                        result.intent != ChatParseIntent.FINANCIAL_SUMMARY &&
+                        result.intent != ChatParseIntent.BUDGET_RECOMMENDATION
+                if (shouldSync) {
                     syncEventBus.emitSyncCompleted()
                 }
+                // Show success for all intents except UNKNOWN
+                val isSuccess = result.intent != ChatParseIntent.UNKNOWN
                 _uiState.update {
                     it.copy(
                         isSending = false,
@@ -75,6 +93,8 @@ class AddMessageViewModel @Inject constructor(
                         transactionSuccess = isSuccess,
                         aiResponseMessage = result.message,
                         lastIntent = result.intent.rawValue,
+                        whatIfSimulation = result.whatIfSimulation,
+                        budgetRecommendation = result.budgetRecommendation,
                         multiExpenseCount = result.summary?.count ?: 0,
                         multiExpenseTotal = result.summary?.total ?: 0.0,
                         multiExpenseGroupName = result.summary?.groupName ?: "",
@@ -162,6 +182,36 @@ class AddMessageViewModel @Inject constructor(
 
     fun resetState() {
         _uiState.update { AddMessageUiState() }
+    }
+
+    fun applyBudgetRecommendation(data: BudgetRecommendationData) {
+        if (_uiState.value.isBudgetApplying || _uiState.value.isBudgetApplied) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isBudgetApplying = true) }
+            try {
+                val now = java.util.Calendar.getInstance()
+                val month = String.format("%04d-%02d", now.get(java.util.Calendar.YEAR), now.get(java.util.Calendar.MONTH) + 1)
+                val request = ApplyRecommendationsRequest(
+                    month = month,
+                    budgets = data.recommendedBudgets.map { budget ->
+                        RecommendedBudgetPayload(
+                            category = budget.category,
+                            amount = budget.amount
+                        )
+                    }
+                )
+                budgetRepository.applyRemoteRecommendations(request)
+                syncEventBus.emitSyncCompleted()
+                _uiState.update { it.copy(isBudgetApplying = false, isBudgetApplied = true) }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isBudgetApplying = false,
+                        errorMessage = "Gagal menerapkan budget. Coba lagi."
+                    )
+                }
+            }
+        }
     }
 
     private fun friendlyError(e: Exception): String = when (e) {

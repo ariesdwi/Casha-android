@@ -1,8 +1,10 @@
 package com.casha.app.ui.feature.dashboard
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
+import com.casha.app.core.auth.SubscriptionManager
 import com.casha.app.core.network.NetworkMonitor
 import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.IncomeRepository
@@ -13,7 +15,10 @@ import com.casha.app.domain.usecase.goal.GetGoalsUseCase
 import com.casha.app.domain.usecase.goal.GetGoalSummaryUseCase
 import com.casha.app.domain.usecase.wallet.GetWalletsUseCase
 import com.casha.app.domain.usecase.wallet.GetWalletSummaryUseCase
+import com.casha.app.widget.WidgetUpdater
+import com.casha.app.widget.data.WidgetSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
@@ -62,10 +67,12 @@ class DashboardViewModel @Inject constructor(
     private val transactionSyncUseCase: TransactionSyncUseCase,
     private val getProfileUseCase: GetProfileUseCase,
     private val authManager: AuthManager,
+    private val subscriptionManager: SubscriptionManager,
     private val networkMonitor: NetworkMonitor,
     private val syncEventBus: SyncEventBus,
     private val transactionRepository: TransactionRepository,
-    private val incomeRepository: IncomeRepository
+    private val incomeRepository: IncomeRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -232,6 +239,9 @@ class DashboardViewModel @Inject constructor(
                         walletSummary = walletSummaryTask.await(),
                         isSyncing = false
                     ) }
+
+                    // Update widget with latest data
+                    updateWidgetData()
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isSyncing = false, errorMessage = "Dashboard refresh failed: ${e.message}") }
@@ -305,6 +315,82 @@ class DashboardViewModel @Inject constructor(
                 val formatter = java.text.SimpleDateFormat("MMM yyyy", java.util.Locale.US)
                 formatter.format(period.start)
             }
+        }
+    }
+
+    private fun updateWidgetData() {
+        viewModelScope.launch {
+            val state = _uiState.value
+            val summary = state.cashflowSummary ?: return@launch
+
+            // Read actual premium state
+            val isPremium = subscriptionManager.isPremium.firstOrNull() ?: false
+            val isLoggedIn = authManager.accessToken.firstOrNull() != null
+
+            WidgetUpdater.setAuthState(appContext, isLoggedIn = isLoggedIn, isPremium = isPremium)
+
+            // Only write summary data if user is premium and logged in
+            if (!isLoggedIn || !isPremium) return@launch
+
+            val cal = Calendar.getInstance()
+            val daysInMonth = cal.getActualMaximum(Calendar.DAY_OF_MONTH)
+            val dayOfMonth = cal.get(Calendar.DAY_OF_MONTH)
+            val daysRemaining = daysInMonth - dayOfMonth
+
+            // Compute today's spending using CUSTOM period
+            val todayStart = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            val todayEnd = Calendar.getInstance().apply {
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
+            }.time
+            val spentToday = try {
+                getTotalSpendingUseCase.execute(SpendingPeriod.CUSTOM(todayStart, todayEnd))
+            } catch (_: Exception) { 0.0 }
+
+            val budgetPct = if (summary.totalIncome > 0) {
+                ((summary.totalExpense / summary.totalIncome) * 100).toInt().coerceIn(0, 999)
+            } else 0
+
+            val safeSpend = if (daysRemaining > 0 && summary.totalIncome > 0) {
+                (summary.totalIncome - summary.totalExpense) / daysRemaining
+            } else 0.0
+
+            val status = when {
+                summary.totalIncome <= 0 -> "no_income"
+                budgetPct >= 100 -> "over_budget"
+                budgetPct >= 75 -> "caution"
+                else -> "comfortable"
+            }
+            val statusLabel = when (status) {
+                "comfortable" -> "Aman"
+                "caution" -> "Hati-hati"
+                "over_budget" -> "Over Budget"
+                "no_income" -> "Belum ada income"
+                else -> "-"
+            }
+
+            val widgetSummary = WidgetSummary(
+                safeSpendToday = safeSpend.coerceAtLeast(0.0),
+                currency = summary.currency,
+                daysRemaining = daysRemaining,
+                monthlyIncome = summary.totalIncome,
+                spentSoFar = summary.totalExpense,
+                freeRemaining = (summary.totalIncome - summary.totalExpense).coerceAtLeast(0.0),
+                status = status,
+                statusLabel = statusLabel,
+                budgetPctUsed = budgetPct,
+                lastUpdatedAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date()),
+                spentToday = spentToday
+            )
+
+            WidgetUpdater.updateSummary(appContext, widgetSummary)
         }
     }
 }

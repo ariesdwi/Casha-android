@@ -43,6 +43,9 @@ private fun getProgressColor(spentPercentage: Float): Color {
 @Composable
 fun BudgetOverviewCard(
     summary: BudgetSummary?,
+    incomeTotal: Double = 0.0,
+    totalAllocated: Double = 0.0,
+    unallocated: Double = 0.0,
     modifier: Modifier = Modifier
 ) {
     val totalBudget = summary?.totalBudget ?: 0.0
@@ -50,12 +53,16 @@ fun BudgetOverviewCard(
     val totalRemaining = summary?.totalRemaining ?: 0.0
     val spentPercentage = if (totalBudget > 0) (totalSpent / totalBudget).toFloat() else 0f
     val displayPercentage = (spentPercentage * 100).toInt()
-    
+
     val progressColor = getProgressColor(spentPercentage)
-    
+
     val isDark = isSystemInDarkTheme()
     val successColor = if (isDark) Color(0xFF81C784) else CashaSuccess
     val dangerColor = if (isDark) Color(0xFFE57373) else CashaDanger
+
+    // Allocation percentage of income
+    val allocationPct = if (incomeTotal > 0) ((totalAllocated / incomeTotal) * 100).toInt() else 0
+    val unallocatedColor = if (unallocated >= 0) successColor else dangerColor
 
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -183,6 +190,123 @@ fun BudgetOverviewCard(
                     modifier = Modifier.weight(1f),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
+            }
+
+            // Income & Allocation section — only show when we have income data
+            if (incomeTotal > 0) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Income row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowDown,
+                            contentDescription = null,
+                            tint = successColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Pendapatan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = CurrencyFormatter.format(incomeTotal),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = successColor
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Total allocated row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.KeyboardArrowUp,
+                            contentDescription = null,
+                            tint = CashaBlue,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Total Dialokasikan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Surface(
+                            shape = RoundedCornerShape(4.dp),
+                            color = CashaBlue.copy(alpha = 0.12f)
+                        ) {
+                            Text(
+                                text = "$allocationPct%",
+                                style = MaterialTheme.typography.labelSmall,
+                                color = CashaBlue,
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 2.dp)
+                            )
+                        }
+                        Text(
+                            text = CurrencyFormatter.format(totalAllocated),
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // Unallocated row
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = unallocatedColor,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Sisa Belum Dialokasikan",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = CurrencyFormatter.format(unallocated),
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = unallocatedColor
+                    )
+                }
             }
         }
     }

@@ -46,6 +46,7 @@ class MainActivity : AppCompatActivity() {
 
         // Handle notification click if app was cold started
         handleNotificationIntent(intent)
+        handleDeepLink(intent)
 
         // Request POST_NOTIFICATIONS permission on Android 13+
         askNotificationPermission()
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     override fun onNewIntent(intent: android.content.Intent) {
         super.onNewIntent(intent)
         handleNotificationIntent(intent)
+        handleDeepLink(intent)
     }
 
     /**
@@ -148,5 +150,37 @@ class MainActivity : AppCompatActivity() {
         lifecycleScope.launch {
             notificationManager.dispatch(notification)
         }
+    }
+
+    /**
+     * Handle casha:// deep links from widgets.
+     * Maps deep link paths to navigation routes.
+     */
+    private fun handleDeepLink(intent: android.content.Intent) {
+        val uri = intent.data ?: return
+        if (uri.scheme != "casha") return
+
+        val route = when (uri.host) {
+            "add-expense" -> "add_transaction"
+            "add-transaction" -> "chat"
+            "budget" -> "budget"
+            "wallet" -> "wallet_list"
+            "report" -> "report"
+            "login" -> "login"
+            "subscription" -> "subscription"
+            else -> return
+        }
+
+        // Store the pending deep link route for CashaNavHost to consume
+        pendingDeepLinkRoute = route
+    }
+
+    companion object {
+        /**
+         * Pending deep link route to be consumed by CashaNavHost after initialization.
+         * Volatile for thread-safe reads from composable.
+         */
+        @Volatile
+        var pendingDeepLinkRoute: String? = null
     }
 }

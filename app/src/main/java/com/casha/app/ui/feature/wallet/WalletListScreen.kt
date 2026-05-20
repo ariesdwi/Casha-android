@@ -461,7 +461,7 @@ private fun SwipeableWalletRow(
                                 Text(
                                     "Default",
                                     style = MaterialTheme.typography.labelSmall,
-                                    color = Color(0xFFB8860B),
+                                    color = Color(0xFFFFB300),
                                     fontWeight = FontWeight.SemiBold,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                                 )

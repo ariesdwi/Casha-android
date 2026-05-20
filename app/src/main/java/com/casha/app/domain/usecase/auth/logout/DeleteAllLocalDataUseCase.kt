@@ -1,8 +1,11 @@
 package com.casha.app.domain.usecase.auth.logout
 
+import android.content.Context
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.data.local.database.CashaDatabase
 import com.casha.app.domain.repository.NotificationRepository
+import com.casha.app.widget.WidgetUpdater
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
@@ -14,7 +17,8 @@ import javax.inject.Inject
 class DeleteAllLocalDataUseCase @Inject constructor(
     private val authManager: AuthManager,
     private val database: CashaDatabase,
-    private val notificationRepository: NotificationRepository
+    private val notificationRepository: NotificationRepository,
+    @ApplicationContext private val context: Context
 ) {
     suspend operator fun invoke() = withContext(Dispatchers.IO) {
         val pendingToken = authManager.pendingFcmToken.firstOrNull()
@@ -29,5 +33,9 @@ class DeleteAllLocalDataUseCase @Inject constructor(
         
         authManager.clearAll()
         database.clearAllTables()
+
+        // Reset widget state on logout
+        WidgetUpdater.setAuthState(context, isLoggedIn = false, isPremium = false)
+        WidgetUpdater.stopPeriodicRefresh(context)
     }
 }

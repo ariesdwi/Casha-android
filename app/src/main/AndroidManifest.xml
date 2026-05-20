@@ -8,6 +8,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
 
     <uses-feature android:name="android.hardware.camera" android:required="false" />
@@ -32,6 +33,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- Deep link for widgets -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="casha" />
             </intent-filter>
         </activity>
 
@@ -61,6 +69,55 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_paths" />
         </provider>
+
+        <!-- Widget Receivers -->
+        <receiver
+            android:name=".widget.ui.HomeSmallWidgetReceiver"
+            android:exported="true"
+            android:label="Safe Spend">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_home_small_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.ui.HomeMediumWidgetReceiver"
+            android:exported="true"
+            android:label="Budget + Actions">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_home_medium_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.ui.LockCircularWidgetReceiver"
+            android:exported="true"
+            android:label="Budget Ring">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_lock_circular_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.ui.LockRectangularWidgetReceiver"
+            android:exported="true"
+            android:label="Safe Spend Bar">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_lock_rectangular_info" />
+        </receiver>
 
     </application>
 

@@ -1,10 +1,7 @@
 package com.casha.app.domain.usecase.budget
 
 import com.casha.app.data.remote.dto.ApplyRecommendationsRequest
-import com.casha.app.domain.model.BudgetAIRecommendation
-import com.casha.app.domain.model.BudgetCasha
-import com.casha.app.domain.model.BudgetSummary
-import com.casha.app.domain.model.NewBudgetRequest
+import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.BudgetRepository
 import java.util.Date
 import java.util.UUID
@@ -108,12 +105,14 @@ class BudgetSyncUseCase @Inject constructor(
 ) {
     /**
      * Sync remote budgets to local Room database.
-     * Flow 1: RemoteRepo.fetchBudgets() → LocalRepo.mergeBudgets()
+     * Flow 1: RemoteRepo.fetchBudgetListData() → LocalRepo.mergeBudgets()
+     * Returns [BudgetListData] so callers can display income/allocation info.
      */
-    suspend fun syncAllBudgets(monthYear: String? = null) {
-        val remoteBudgets = repository.fetchRemoteBudgets(monthYear)
+    suspend fun syncAllBudgets(monthYear: String? = null): BudgetListData {
+        val listData = repository.fetchRemoteBudgetListData(monthYear)
         repository.clearLocalBudgets()
-        repository.saveLocalBudgets(remoteBudgets)
+        repository.saveLocalBudgets(listData.budgets)
+        return listData
     }
 
     /**

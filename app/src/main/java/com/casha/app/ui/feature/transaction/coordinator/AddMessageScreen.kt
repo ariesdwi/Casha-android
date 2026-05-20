@@ -53,6 +53,10 @@ fun AddMessageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var messageInput by remember { mutableStateOf("") }
+    val isWhatIfActive = uiState.showConfirmation &&
+            uiState.lastIntent == ChatParseIntent.WHAT_IF.rawValue
+    val isBudgetRecActive = uiState.showConfirmation &&
+            uiState.lastIntent == ChatParseIntent.BUDGET_RECOMMENDATION.rawValue
     
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
@@ -239,6 +243,96 @@ fun AddMessageScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        if (isWhatIfActive) {
+                            // What If active — show Simulasi Baru full-width button
+                            Button(
+                                onClick = {
+                                    viewModel.resetState()
+                                    messageInput = ""
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF6C63FF),
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Simulasi Baru", fontWeight = FontWeight.SemiBold)
+                            }
+                        } else if (isBudgetRecActive) {
+                            // Budget Recommendation active — show Apply & Reset buttons
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        uiState.budgetRecommendation?.let {
+                                            viewModel.applyBudgetRecommendation(it)
+                                        }
+                                    },
+                                    enabled = !uiState.isBudgetApplied && !uiState.isBudgetApplying,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (uiState.isBudgetApplied) Color(0xFF34C759) else Color(0xFF5856D6),
+                                        disabledContainerColor = if (uiState.isBudgetApplied) Color(0xFF34C759) else Color(0xFF5856D6).copy(alpha = 0.7f)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    if (uiState.isBudgetApplying) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Menerapkan...", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                    } else if (uiState.isBudgetApplied) {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Budget Diterapkan", fontWeight = FontWeight.SemiBold)
+                                    } else {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Terapkan Budget", fontWeight = FontWeight.SemiBold)
+                                    }
+                                }
+                                Button(
+                                    onClick = {
+                                        viewModel.resetState()
+                                        messageInput = ""
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Tanya Lagi", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
+                        } else {
                         // Green Camera Icon
                         IconButton(
                             onClick = { showSourceSelection = true },
@@ -337,6 +431,7 @@ fun AddMessageScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
+                        } // end normal chat input
                     }
                 }
             }
@@ -365,20 +460,42 @@ fun AddMessageScreen(
                 item { ProcessingMessageView() }
             } else if (uiState.showConfirmation) {
                 item {
-                    if (uiState.lastIntent == ChatParseIntent.MULTI_EXPENSE.rawValue) {
-                        MultiExpenseConfirmationView(
-                            message = uiState.aiResponseMessage,
-                            count = uiState.multiExpenseCount,
-                            total = uiState.multiExpenseTotal,
-                            groupName = uiState.multiExpenseGroupName,
-                            currency = uiState.multiExpenseCurrency
-                        )
-                    } else {
-                        ConfirmationMessageView(
-                            isSuccess = uiState.transactionSuccess,
-                            message = uiState.aiResponseMessage,
-                            intent = uiState.lastIntent
-                        )
+                    when {
+                        uiState.lastIntent == ChatParseIntent.WHAT_IF.rawValue -> {
+                            val sim = uiState.whatIfSimulation
+                            if (sim != null) {
+                                WhatIfResultCard(
+                                    simulation = sim,
+                                    message = uiState.aiResponseMessage,
+                                    onResetTapped = {
+                                        viewModel.resetState()
+                                        messageInput = ""
+                                    }
+                                )
+                            }
+                        }
+                        uiState.lastIntent == ChatParseIntent.BUDGET_RECOMMENDATION.rawValue -> {
+                            val rec = uiState.budgetRecommendation
+                            if (rec != null) {
+                                BudgetRecommendationCard(data = rec)
+                            }
+                        }
+                        uiState.lastIntent == ChatParseIntent.MULTI_EXPENSE.rawValue -> {
+                            MultiExpenseConfirmationView(
+                                message = uiState.aiResponseMessage,
+                                count = uiState.multiExpenseCount,
+                                total = uiState.multiExpenseTotal,
+                                groupName = uiState.multiExpenseGroupName,
+                                currency = uiState.multiExpenseCurrency
+                            )
+                        }
+                        else -> {
+                            ConfirmationMessageView(
+                                isSuccess = uiState.transactionSuccess,
+                                message = uiState.aiResponseMessage,
+                                intent = uiState.lastIntent
+                            )
+                        }
                     }
                 }
             }
@@ -715,6 +832,8 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
         ChatParseIntent.INCOME.rawValue -> Color(0xFF00C896)
         ChatParseIntent.PAYMENT.rawValue -> Color(0xFF6C63FF)
         ChatParseIntent.MULTI_EXPENSE.rawValue -> Color(0xFF9C27B0)
+        ChatParseIntent.FINANCIAL_SUMMARY.rawValue -> Color(0xFF009688)
+        ChatParseIntent.BUDGET_RECOMMENDATION.rawValue -> Color(0xFF5856D6)
         ChatParseIntent.UNKNOWN.rawValue -> Color(0xFF3B82F6)
         else -> Color(0xFF888AAA)
     }

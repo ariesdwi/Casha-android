@@ -35,7 +35,13 @@ fun BudgetScreen(
     var editBudgetId by remember { mutableStateOf<String?>(null) }
     var showAddBudgetSheet by remember { mutableStateOf(false) }
     var showAIAdvisorSheet by remember { mutableStateOf(false) }
-    
+
+    // Refresh data every time this screen becomes the active destination
+    // (e.g. after returning from the chat/apply-recommendation flow)
+    LaunchedEffect(Unit) {
+        viewModel.refreshBudgetData()
+    }
+
     var showPaywall by remember { mutableStateOf(false) }
 
     val pullToRefreshState = rememberPullToRefreshState()
@@ -192,6 +198,9 @@ onDismissRequest = { showPaywall = false },
                 BudgetList(
                     budgets = uiState.budgets,
                     summary = uiState.budgetSummary,
+                    incomeTotal = uiState.incomeTotal,
+                    totalAllocated = uiState.totalAllocated,
+                    unallocated = uiState.unallocated,
                     isLoading = uiState.isLoading,
                     onDelete = { viewModel.deleteBudget(it) },
                     onEdit = { id -> 

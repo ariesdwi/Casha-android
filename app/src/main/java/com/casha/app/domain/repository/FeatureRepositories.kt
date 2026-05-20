@@ -84,6 +84,7 @@ interface CategoryRepository {
 interface BudgetRepository {
     // Remote
     suspend fun fetchRemoteBudgets(month: String? = null): List<com.casha.app.domain.model.BudgetCasha>
+    suspend fun fetchRemoteBudgetListData(month: String? = null): com.casha.app.domain.model.BudgetListData
     suspend fun fetchRemoteSummary(month: String? = null): com.casha.app.domain.model.BudgetSummary
     suspend fun createRemoteBudget(request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha
     suspend fun updateRemoteBudget(id: String, request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha

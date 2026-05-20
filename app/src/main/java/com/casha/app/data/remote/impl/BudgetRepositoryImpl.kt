@@ -33,8 +33,24 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun fetchRemoteBudgets(month: String?): List<BudgetCasha> {
         val result = safeApiCall { apiService.getBudgets(month) }
         return result.fold(
-            onSuccess = { response -> response.data?.map { it.toDomain(month) } ?: emptyList() },
+            onSuccess = { response -> response.data?.budgets?.map { it.toDomain(month) } ?: emptyList() },
             onFailure = { emptyList() }
+        )
+    }
+
+    override suspend fun fetchRemoteBudgetListData(month: String?): BudgetListData {
+        val result = safeApiCall { apiService.getBudgets(month) }
+        return result.fold(
+            onSuccess = { response ->
+                val data = response.data
+                BudgetListData(
+                    budgets = data?.budgets?.map { it.toDomain(month) } ?: emptyList(),
+                    incomeTotal = data?.income?.total ?: 0.0,
+                    totalAllocated = data?.totalAllocated ?: 0.0,
+                    unallocated = data?.unallocated ?: 0.0
+                )
+            },
+            onFailure = { BudgetListData(budgets = emptyList()) }
         )
     }
 
@@ -91,8 +107,8 @@ class BudgetRepositoryImpl @Inject constructor(
     override suspend fun applyRemoteRecommendations(request: ApplyRecommendationsRequest): List<BudgetCasha> {
         val result = safeApiCall { apiService.applyRecommendations(request) }
         return result.fold(
-            onSuccess = { response -> response.data?.budgets?.map { it.toDomain() } ?: emptyList() },
-            onFailure = { emptyList() }
+            onSuccess = { emptyList() },
+            onFailure = { throw it }
         )
     }
 

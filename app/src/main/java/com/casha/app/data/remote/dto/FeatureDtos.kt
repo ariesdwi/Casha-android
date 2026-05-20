@@ -216,6 +216,25 @@ data class AddContributionApiRequest(
 
 // ── Budget DTOs ──
 
+/**
+ * Wrapper matching the actual GET /budgets response shape:
+ * { "data": { "budgets": [...], "income": {...}, "totalAllocated": ..., "unallocated": ... } }
+ */
+@Serializable
+data class BudgetListResponseDto(
+    val budgets: List<BudgetDto> = emptyList(),
+    val income: BudgetIncomeDto? = null,
+    val totalAllocated: Double = 0.0,
+    val unallocated: Double = 0.0
+)
+
+@Serializable
+data class BudgetIncomeDto(
+    val total: Double = 0.0,
+    val currency: String = "",
+    val hasIncome: Boolean = false
+)
+
 @Serializable
 data class BudgetCategoryDto(
     val id: String = "",
@@ -312,5 +331,5 @@ data class ApplyRecommendationsRequest(
 @Serializable
 data class ApplyRecommendationsResponseDto(
     val status: String,
-    val budgets: List<BudgetDto>
+    val message: String = ""
 )

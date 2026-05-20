@@ -69,18 +69,14 @@ fun MainScreen(
 ) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val snackbarHostState = remember { androidx.compose.material3.SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
 
     var activeNotification by remember { mutableStateOf<com.casha.app.domain.model.NotificationCasha?>(null) }
+    var currentToast by remember { mutableStateOf<com.casha.app.core.util.ToastEvent?>(null) }
 
-    // Collect global app-level snackbar events (e.g. email sync success/error)
+    // Collect global app-level toast events
     LaunchedEffect(Unit) {
-        com.casha.app.core.util.AppEvents.snackbar.collect { message ->
-            snackbarHostState.showSnackbar(
-                message = message,
-                duration = androidx.compose.material3.SnackbarDuration.Short
-            )
+        com.casha.app.core.util.AppEvents.toast.collect { event ->
+            currentToast = event
         }
     }
 
@@ -183,9 +179,10 @@ fun MainScreen(
     }
 
     Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        var scaffoldBottomPadding by remember { mutableStateOf(0.dp) }
+
         Scaffold(
             containerColor = Color.Transparent,
-            snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) },
             bottomBar = {
                 if (!hideBottomBar) {
                     CustomTabBar(
@@ -221,6 +218,7 @@ fun MainScreen(
                 }
             }
         ) { innerPadding ->
+        scaffoldBottomPadding = innerPadding.calculateBottomPadding()
         com.casha.app.ui.feature.transaction.coordinator.AddTransactionCoordinator(
             isPresented = showCoordinator,
             onDismiss = { showCoordinator = false },
@@ -402,12 +400,7 @@ fun MainScreen(
                         onNavigateToWallets = { navController.navigate(NavRoutes.WalletList.route) },
                         onNavigateToSubscription = {
                             if (isPremium) {
-                                coroutineScope.launch {
-                                    snackbarHostState.showSnackbar(
-                                        message = "You are already a Premium user! 🌟",
-                                        duration = androidx.compose.material3.SnackbarDuration.Short
-                                    )
-                                }
+                                com.casha.app.core.util.AppEvents.showSuccess("You are already a Premium user! 🌟")
                             } else {
                                 showPaywallSheet = true
                             }
@@ -707,6 +700,15 @@ onDismissRequest = { showPaywallSheet = false },
             }
         }
         
+        // ── Toast overlay — slides up from above the tab bar ──────────────────
+        com.casha.app.ui.component.CashaToastHost(
+            toastEvent = currentToast,
+            onDismiss = { currentToast = null },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = scaffoldBottomPadding + 8.dp)
+        )
+
         // Render top floating notification banner if present
         androidx.compose.animation.AnimatedVisibility(
             visible = activeNotification != null,

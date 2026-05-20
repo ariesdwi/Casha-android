@@ -869,4 +869,10 @@ just got a whole lot smarter.</string>
     <string name="liabilities_detail_history_view_all">View All</string>
     <string name="liabilities_detail_history_view_more">View %d more payments</string>
     <string name="liabilities_detail_history_no_payments">No payments yet</string>
+
+    <!-- Widget descriptions -->
+    <string name="widget_home_small_description">Quick view of your daily safe spend amount</string>
+    <string name="widget_home_medium_description">Budget summary with quick action buttons</string>
+    <string name="widget_lock_circular_description">Budget percentage ring for lock screen</string>
+    <string name="widget_lock_rectangular_description">Safe spend with progress bar for lock screen</string>
 </resources>
