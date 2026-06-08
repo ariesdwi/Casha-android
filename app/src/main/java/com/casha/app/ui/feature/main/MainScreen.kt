@@ -17,11 +17,13 @@ import androidx.compose.material.icons.filled.Add
 import kotlinx.coroutines.launch
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material.icons.filled.Work
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.MoreHoriz
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.PieChart
 import androidx.compose.material.icons.outlined.Work
@@ -116,8 +118,9 @@ fun MainScreen(
     val navAdd = stringResource(R.string.nav_add)
     val navTransactions = stringResource(R.string.nav_transactions)
     val navBudget = stringResource(R.string.nav_budget)
+    val navMore = "More" // TODO: Add to strings.xml
 
-    val tabs = remember(navReport, navHome, navAdd, navTransactions, navBudget) {
+    val tabs = remember(navReport, navHome, navAdd, navTransactions, navMore) {
         listOf(
             TabItem(
                 title = navReport,
@@ -145,9 +148,9 @@ fun MainScreen(
                 tag = 2
             ),
             TabItem(
-                title = navBudget,
-                icon = Icons.Outlined.CreditCard,
-                selectedIcon = Icons.Filled.CreditCard,
+                title = navMore,
+                icon = Icons.Outlined.MoreHoriz,
+                selectedIcon = Icons.Filled.MoreHoriz,
                 tag = 3
             )
         )
@@ -158,7 +161,7 @@ fun MainScreen(
         0 -> NavRoutes.Report.route
         1 -> NavRoutes.Dashboard.route
         2 -> NavRoutes.Transactions.route
-        3 -> NavRoutes.Budget.route
+        3 -> NavRoutes.More.route
         else -> NavRoutes.Dashboard.route
     }
 
@@ -354,7 +357,9 @@ fun MainScreen(
                     )
                 }
                 composable(NavRoutes.Budget.route) { 
-                    BudgetScreen()
+                    BudgetScreen(
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
                 composable(NavRoutes.Report.route) {
                     ReportScreen(
@@ -411,6 +416,52 @@ fun MainScreen(
                             }
                         }
                     )
+                }
+                
+                composable(NavRoutes.More.route) {
+                    com.casha.app.ui.feature.more.MoreScreen(
+                        onNavigateToEditProfile = { showProfileEditSheet = true },
+                        onNavigateToNotifications = { showNotificationsSheet = true },
+                        onNavigateToWallets = { navController.navigate(NavRoutes.WalletList.route) },
+                        onNavigateToBudget = { navController.navigate(NavRoutes.Budget.route) },
+                        onNavigateToPortfolio = { 
+                            if (isPremium) navController.navigate(NavRoutes.Portfolio.route)
+                            else showPaywallSheet = true
+                        },
+                        onNavigateToLiabilities = { 
+                            if (isPremium) navController.navigate(NavRoutes.Liabilities.route)
+                            else showPaywallSheet = true
+                        },
+                        onNavigateToGoalTracker = { 
+                            if (isPremium) navController.navigate(NavRoutes.GoalTracker.route)
+                            else showPaywallSheet = true
+                        },
+                        onNavigateToCategories = { navController.navigate(NavRoutes.Categories.route) },
+                        onNavigateToSubscription = {
+                            if (isPremium) {
+                                com.casha.app.core.util.AppEvents.showSuccess("You are already a Premium user! 🌟")
+                            } else {
+                                showPaywallSheet = true
+                            }
+                        },
+                        onNavigateToLanguage = { navController.navigate(NavRoutes.Language.route) },
+                        onLogout = {
+                            parentNavController.navigate(NavRoutes.Splash.route) {
+                                popUpTo(NavRoutes.Dashboard.route) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+
+                // Language Picker (placeholder)
+                composable(NavRoutes.Language.route) {
+                    // TODO: Implement LanguagePickerScreen
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("Language Picker - Coming Soon")
+                    }
                 }
 
                 // Routes below are kept for navigation stability but logic is moved to modals above

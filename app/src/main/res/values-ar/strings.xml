@@ -503,6 +503,17 @@
     <string name="nav_add">إضافة</string>
     <string name="nav_transactions">المعاملات</string>
     <string name="nav_budget">الميزانية</string>
+    <string name="nav_more">المزيد</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">إعدادات الحساب</string>
+    <string name="more_section_financial_tools">الأدوات المالية</string>
+    <string name="more_section_app_settings">إعدادات التطبيق</string>
+    <string name="more_section_subscription_account">الاشتراك والحساب</string>
+    <string name="more_title">المزيد</string>
+    <string name="more_menu_wallets">المحافظ</string>
+    <string name="more_menu_language">اللغة</string>
+    
     <string name="subscription_button_lifetime">احصل على الوصول مدى الحياة</string>
     <string name="subscription_button_processing">جاري المعالجة...</string>
     <string name="subscription_button_retrying">إعادة المحاولة...</string>

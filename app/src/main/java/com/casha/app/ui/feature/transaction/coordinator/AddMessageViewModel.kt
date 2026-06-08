@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
 import com.casha.app.domain.model.BudgetRecommendationData
+import com.casha.app.domain.model.FinancialSummaryData
 import com.casha.app.domain.model.WhatIfSimulation
 import com.casha.app.domain.repository.ChatRepository
 import com.casha.app.domain.repository.BudgetRepository
@@ -49,7 +50,9 @@ data class AddMessageUiState(
     // Budget Recommendation
     val budgetRecommendation: BudgetRecommendationData? = null,
     val isBudgetApplying: Boolean = false,
-    val isBudgetApplied: Boolean = false
+    val isBudgetApplied: Boolean = false,
+    // Financial Summary
+    val financialSummary: FinancialSummaryData? = null
 )
 
 @HiltViewModel
@@ -95,6 +98,7 @@ class AddMessageViewModel @Inject constructor(
                         lastIntent = result.intent.rawValue,
                         whatIfSimulation = result.whatIfSimulation,
                         budgetRecommendation = result.budgetRecommendation,
+                        financialSummary = result.financialSummary,
                         multiExpenseCount = result.summary?.count ?: 0,
                         multiExpenseTotal = result.summary?.total ?: 0.0,
                         multiExpenseGroupName = result.summary?.groupName ?: "",

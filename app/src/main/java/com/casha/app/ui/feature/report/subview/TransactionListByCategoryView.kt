@@ -65,7 +65,9 @@ fun TransactionListByCategoryView(
             TransactionList(
                 sections = sections,
                 isLoading = uiState.isLoading,
-                onClick = { id, type -> onNavigateToDetail(id, type) }
+                onClick = { id, type -> onNavigateToDetail(id, type) },
+                onEdit = null,
+                onDelete = null
             )
 
             if (uiState.isLoading) {

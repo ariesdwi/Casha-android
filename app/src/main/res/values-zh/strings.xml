@@ -240,7 +240,21 @@
     <string name="liabilities_delete_message">您确定要删除该负债吗？</string>
     <string name="liabilities_section_overdue">已逾期</string>
     <string name="liabilities_section_paid_off">已还清</string>
-<string name="nav_report">报告</string><string name="nav_dashboard">首页</string><string name="nav_add">添加</string><string name="nav_transactions">交易</string><string name="nav_budget">预算</string>
+<string name="nav_report">报告</string>
+<string name="nav_dashboard">首页</string>
+<string name="nav_add">添加</string>
+<string name="nav_transactions">交易</string>
+<string name="nav_budget">预算</string>
+<string name="nav_more">更多</string>
+
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">账户设置</string>
+    <string name="more_section_financial_tools">财务工具</string>
+    <string name="more_section_app_settings">应用设置</string>
+    <string name="more_section_subscription_account">订阅和账户</string>
+    <string name="more_title">更多</string>
+    <string name="more_menu_wallets">钱包</string>
+    <string name="more_menu_language">语言</string>
 
     <!-- ── Onboarding ── -->
     <string name="onboarding_skip">跳过</string>

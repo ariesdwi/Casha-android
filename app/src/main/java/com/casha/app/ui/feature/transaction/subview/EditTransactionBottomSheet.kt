@@ -66,6 +66,9 @@ fun EditTransactionBottomSheet(
     val dateFormatter = remember { SimpleDateFormat("EEE, d MMM yyyy · HH:mm", Locale("id", "ID")) }
 
     val isFormValid = amountValue > 0 && name.isNotEmpty() && category.isNotEmpty()
+    
+    // Task 11.2: Sync state for inline indicator
+    val isSynced = transaction.isSynced
 
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
@@ -128,6 +131,40 @@ fun EditTransactionBottomSheet(
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Task 11.2: Inline sync status indicator
+                if (!isSynced) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
+                        ),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(16.dp),
+                                strokeWidth = 2.dp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Syncing with server...",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
+                    }
+                }
+                
                 // ── Amount ───────────────────────────────────────
                 InputCard(title = "Jumlah *") {
                     CurrencyInputField(

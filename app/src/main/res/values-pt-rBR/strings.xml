@@ -503,6 +503,17 @@
     <string name="nav_add">Adicionar</string>
     <string name="nav_transactions">Transações</string>
     <string name="nav_budget">Orçamento</string>
+    <string name="nav_more">Mais</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">Configurações da Conta</string>
+    <string name="more_section_financial_tools">Ferramentas Financeiras</string>
+    <string name="more_section_app_settings">Configurações do App</string>
+    <string name="more_section_subscription_account">Assinatura e Conta</string>
+    <string name="more_title">Mais</string>
+    <string name="more_menu_wallets">Carteiras</string>
+    <string name="more_menu_language">Idioma</string>
+    
     <string name="subscription_button_lifetime">Obter Acesso Vitalício</string>
     <string name="subscription_button_processing">Processando...</string>
     <string name="subscription_button_retrying">Tentando novamente...</string>

@@ -58,6 +58,10 @@
     <string name="dashboard_unsynced_message_name">Anda memiliki transaksi yang menunggu sinkronisasi sejak %1$s. Transaksi akan sinkron secara otomatis saat online.</string>
     <string name="dashboard_unsynced_message_count">Anda memiliki %1$d transaksi yang menunggu sinkronisasi. Transaksi akan sinkron secara otomatis saat online.</string>
     <string name="dashboard_unsynced_title">Transaksi Belum Sinkron</string>
+    <string name="dashboard_wallet_summary_total">Total Aset</string>
+    <string name="dashboard_wallet_summary_wallets">%d dompet</string>
+    <string name="dashboard_budget_alert_title">Peringatan Anggaran</string>
+    <string name="dashboard_budget_alert_remaining">Sisa %s</string>
     <string name="budget_action_cancel">Batal</string>
     <string name="budget_action_delete">Hapus Anggaran</string>
     <string name="budget_action_save">Simpan</string>
@@ -438,6 +442,17 @@
     <string name="nav_add">Tambah</string>
     <string name="nav_transactions">Transaksi</string>
     <string name="nav_budget">Anggaran</string>
+    <string name="nav_more">Lainnya</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">Pengaturan Akun</string>
+    <string name="more_section_financial_tools">Alat Keuangan</string>
+    <string name="more_section_app_settings">Pengaturan Aplikasi</string>
+    <string name="more_section_subscription_account">Langganan &amp; Akun</string>
+    <string name="more_title">Lainnya</string>
+    <string name="more_menu_wallets">Dompet</string>
+    <string name="more_menu_language">Bahasa</string>
+    
     <string name="subscription_button_lifetime">Dapatkan Akses Seumur Hidup</string>
     <string name="subscription_button_processing">Memproses...</string>
     <string name="subscription_button_retrying">Mencoba ulang...</string>

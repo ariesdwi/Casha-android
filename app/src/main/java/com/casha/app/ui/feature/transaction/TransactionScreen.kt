@@ -30,7 +30,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.core.util.DateHelper
+import com.casha.app.ui.feature.transaction.subview.PeriodSummaryCard
 import com.casha.app.ui.feature.transaction.subview.TransactionList
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,6 +49,10 @@ fun TransactionScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     
+    // Task 10.2: Context menu action state management
+    var showDeleteConfirmation by remember { mutableStateOf(false) }
+    var transactionToDelete by remember { mutableStateOf<Pair<String, String>?>(null) }
+    
     // For iOS matching background
     val gradientBackground = Brush.linearGradient(
         colors = listOf(
@@ -56,6 +62,10 @@ fun TransactionScreen(
     )
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    
+    // Task 12.2: Error handling state
+    var showDeleteError by remember { mutableStateOf(false) }
+    var deleteErrorMessage by remember { mutableStateOf("") }
 
     Scaffold(
         modifier = Modifier
@@ -290,14 +300,33 @@ onDismissRequest = { showDateRangePicker = false },
                     }
                 }
 
+                // Period Summary Card (positioned between filter bar and transaction list)
+                // Task 8.1: Add period summary to transaction list view
+                val sectionsToDisplay = if (uiState.isSearching) uiState.filteredTransactions else uiState.cashflowSections
+                
+                // Calculate period summary using remember to cache with sections dependency
+                val periodSummary = remember(sectionsToDisplay) {
+                    sectionsToDisplay.calculatePeriodSummary()
+                }
+
+                // Display period summary only when not in search mode and has data
+                if (!uiState.isSearching && sectionsToDisplay.isNotEmpty()) {
+                    PeriodSummaryCard(
+                        totalIncome = periodSummary.totalIncome,
+                        totalExpense = periodSummary.totalExpense,
+                        netAmount = periodSummary.netAmount,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                }
+
                 // Content with Pull-to-Refresh
                 PullToRefreshBox(
                     isRefreshing = uiState.isLoading,
                     onRefresh = { viewModel.syncData() },
                     modifier = Modifier.weight(1f)
                 ) {
-                    val sectionsToDisplay = if (uiState.isSearching) uiState.filteredTransactions else uiState.cashflowSections
-                    
                     if (sectionsToDisplay.isEmpty() && !uiState.isLoading) {
                         if (uiState.isSearching) {
                             EmptySearchStateView(searchQuery = uiState.searchQuery)
@@ -307,7 +336,9 @@ onDismissRequest = { showDateRangePicker = false },
                                 sections = emptyList(),
                                 isLoading = false,
                                 onClick = { _, _ -> },
-                                onGroupClick = onNavigateToGroupDetail
+                                onGroupClick = onNavigateToGroupDetail,
+                                onEdit = null,
+                                onDelete = null
                             )
                         }
                     } else {
@@ -315,12 +346,124 @@ onDismissRequest = { showDateRangePicker = false },
                             sections = sectionsToDisplay,
                             isLoading = uiState.isLoading,
                             onClick = { id, type -> onNavigateToTransactionDetail(id, type) },
-                            onGroupClick = onNavigateToGroupDetail
+                            onGroupClick = onNavigateToGroupDetail,
+                            onEdit = { id, type ->
+                                // Navigate to detail screen which has edit functionality
+                                onNavigateToTransactionDetail(id, type)
+                            },
+                            onDelete = { id, type ->
+                                // Show delete confirmation dialog
+                                transactionToDelete = Pair(id, type)
+                                showDeleteConfirmation = true
+                            }
                         )
                     }
                 }
             }
         }
+    }
+    
+    // Task 10.2: Delete Confirmation Dialog from Context Menu
+    if (showDeleteConfirmation && transactionToDelete != null) {
+        val (transactionId, transactionType) = transactionToDelete!!
+        
+        // Find the transaction to show its details in confirmation
+        val transaction = if (transactionType == "INCOME") {
+            uiState.rawIncomes.find { it.id == transactionId || it.remoteId == transactionId }?.let { 
+                with(CashflowUiUtils) { it.toTransaction() }
+            }
+        } else {
+            uiState.rawTransactions.find { it.id == transactionId || it.remoteId == transactionId }
+        }
+        
+        AlertDialog(
+            onDismissRequest = { 
+                showDeleteConfirmation = false
+                transactionToDelete = null
+            },
+            title = { 
+                Text("Delete Transaction?")
+            },
+            text = { 
+                Text(
+                    if (transaction != null) {
+                        "Are you sure you want to delete \"${transaction.name}\" (${CurrencyFormatter.format(transaction.amount)})?"
+                    } else {
+                        "Are you sure you want to delete this transaction?"
+                    }
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        // Task 12.2: Execute delete with error handling
+                        try {
+                            if (transactionType == "INCOME") {
+                                viewModel.deleteIncome(transactionId) {
+                                    // Task 12.2: Refresh handled by ViewModel on success
+                                }
+                            } else {
+                                viewModel.deleteTransaction(transactionId) {
+                                    // Task 12.2: Refresh handled by ViewModel on success
+                                }
+                            }
+                            showDeleteConfirmation = false
+                            transactionToDelete = null
+                        } catch (e: Exception) {
+                            // Task 12.2: Show error dialog if delete fails
+                            deleteErrorMessage = e.message ?: "Failed to delete transaction"
+                            showDeleteError = true
+                            showDeleteConfirmation = false
+                            transactionToDelete = null
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
+                    )
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { 
+                        showDeleteConfirmation = false
+                        transactionToDelete = null
+                    }
+                ) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+    
+    // Task 12.2: Delete Error Dialog
+    if (showDeleteError) {
+        AlertDialog(
+            onDismissRequest = { showDeleteError = false },
+            title = { 
+                Text("Delete Failed")
+            },
+            text = { 
+                Text(
+                    "Unable to delete the transaction. ${deleteErrorMessage}\n\nThe transaction has been retained in your list. Please try again."
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showDeleteError = false }
+                ) {
+                    Text("OK")
+                }
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Close,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
+        )
     }
 }
 

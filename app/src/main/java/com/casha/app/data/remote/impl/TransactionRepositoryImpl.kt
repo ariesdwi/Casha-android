@@ -212,6 +212,45 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getDailySpending(
+        startDate: Date,
+        endDate: Date
+    ): List<com.casha.app.domain.model.DailySpending> {
+        val rows = transactionDao.getDailySpendingBetween(startDate.time, endDate.time)
+        return rows.mapNotNull { row ->
+            runCatching {
+                com.casha.app.domain.model.DailySpending(
+                    date = java.time.LocalDate.parse(row.date),
+                    amount = row.total
+                )
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getMonthlySpending(
+        startDate: Date,
+        endDate: Date
+    ): List<com.casha.app.domain.model.MonthlySpending> {
+        val rows = transactionDao.getMonthlySpendingBetween(startDate.time, endDate.time)
+        return rows.mapNotNull { row ->
+            runCatching {
+                com.casha.app.domain.model.MonthlySpending(
+                    month = java.time.YearMonth.parse(row.month),
+                    amount = row.total
+                )
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getTransactionsByDate(
+        date: java.time.LocalDate
+    ): List<TransactionCasha> {
+        val zoneOffset = java.util.TimeZone.getDefault().toZoneId()
+        val startMs = date.atStartOfDay(zoneOffset).toInstant().toEpochMilli()
+        val endMs   = date.plusDays(1).atStartOfDay(zoneOffset).toInstant().toEpochMilli()
+        return transactionDao.getTransactionsByDate(startMs, endMs).map { it.toDomain() }
+    }
+
     override suspend fun getUnsyncCount(): Int {
         return transactionDao.getUnsyncedTransactions().size
     }

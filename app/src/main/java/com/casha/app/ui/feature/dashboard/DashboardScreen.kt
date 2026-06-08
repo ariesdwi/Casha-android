@@ -74,38 +74,6 @@ fun DashboardScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                     }
-
-                    // Profile Circle in Navigation
-                    Surface(
-                        onClick = { navController.navigate(NavRoutes.Profile.route) },
-                        shape = CircleShape,
-                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f),
-                        modifier = Modifier.size(32.dp),
-                        tonalElevation = 2.dp
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(
-                                            MaterialTheme.colorScheme.primary,
-                                            MaterialTheme.colorScheme.secondary
-                                        )
-                                    ),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = initial,
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.width(16.dp))
                 },
                 windowInsets = WindowInsets(0.dp),
                 scrollBehavior = scrollBehavior,
@@ -129,6 +97,7 @@ fun DashboardScreen(
                 contentPadding = PaddingValues(bottom = 120.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                // 1. Welcome Header
                 item {
                     val hour = calendar.get(Calendar.HOUR_OF_DAY)
                     val greetingText = when (hour) {
@@ -141,6 +110,7 @@ fun DashboardScreen(
                     )
                 }
                 
+                // 2. Wallet Card Deck (main swiper)
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         WalletCardDeck(
@@ -156,6 +126,22 @@ fun DashboardScreen(
                     }
                 }
 
+                // 3. Budget Alert Banner (NEW - conditional)
+                if (uiState.budgetAlerts.isNotEmpty()) {
+                    item {
+                        Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                            BudgetAlertBanner(
+                                alerts = uiState.budgetAlerts,
+                                onAlertClick = { budget ->
+                                    // Navigate to Budget tab (no detail screen exists yet)
+                                    navController.navigate(NavRoutes.Budget.route)
+                                }
+                            )
+                        }
+                    }
+                }
+                
+                // 4. Report Section - Spending This Month (chart)
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         ReportSection(
@@ -167,17 +153,8 @@ fun DashboardScreen(
                         )
                     }
                 }
-                
-                item {
-                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
-                        GoalSection(
-                            goals = uiState.goals,
-                            onSeeAllClick = { navController.navigate(Screen.GoalTracker.route) },
-                            onGoalClick = { goalId -> navController.navigate(Screen.GoalDetail(goalId).route) }
-                        )
-                    }
-                }
-                
+
+                // 5. Recent Transactions
                 item {
                     Box(modifier = Modifier.padding(horizontal = 16.dp)) {
                         RecentTransactionsSection(
@@ -185,6 +162,17 @@ fun DashboardScreen(
                             onTransactionClick = { transactionId, cashflowType ->
                                 navController.navigate(Screen.TransactionDetail(transactionId, cashflowType).route)
                             }
+                        )
+                    }
+                }
+                
+                // 6. Goal Section
+                item {
+                    Box(modifier = Modifier.padding(horizontal = 16.dp)) {
+                        GoalSection(
+                            goals = uiState.goals,
+                            onSeeAllClick = { navController.navigate(Screen.GoalTracker.route) },
+                            onGoalClick = { goalId -> navController.navigate(Screen.GoalDetail(goalId).route) }
                         )
                     }
                 }

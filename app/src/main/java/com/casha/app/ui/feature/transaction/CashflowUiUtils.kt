@@ -8,10 +8,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
+import com.casha.app.domain.model.CashflowDateSection
 import com.casha.app.domain.model.DisplaySegment
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.IncomeCasha
 import com.casha.app.ui.theme.*
+
+/**
+ * Period summary containing aggregated financial data for a time period.
+ */
+data class PeriodSummary(
+    val totalIncome: Double,
+    val totalExpense: Double,
+    val netAmount: Double
+)
 
 /**
  * Shared UI utilities for rendering Cashflow items (Incomes & Transactions).
@@ -150,4 +160,30 @@ object CashflowUiUtils {
             icon = null
         )
     }
+}
+
+
+/**
+ * Extension function to calculate period summary from a list of CashflowDateSections.
+ * Returns aggregated financial data for the period: total income, total expense, and net amount.
+ * Handles empty lists gracefully by returning zero values.
+ */
+fun List<CashflowDateSection>.calculatePeriodSummary(): PeriodSummary {
+    val allItems = this.flatMap { it.items }
+    
+    val totalIncome = allItems
+        .filter { it.type == CashflowType.INCOME }
+        .sumOf { it.amount }
+    
+    val totalExpense = allItems
+        .filter { it.type == CashflowType.EXPENSE }
+        .sumOf { it.amount }
+    
+    val netAmount = totalIncome - totalExpense
+    
+    return PeriodSummary(
+        totalIncome = totalIncome,
+        totalExpense = totalExpense,
+        netAmount = netAmount
+    )
 }

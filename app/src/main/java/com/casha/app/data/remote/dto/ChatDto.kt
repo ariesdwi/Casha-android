@@ -307,3 +307,80 @@ fun LoanPayoffDto.toDomain(): com.casha.app.domain.model.LoanPayoff =
         monthlyPayment = monthlyPayment,
         monthsToPayoff = monthsToPayoff
     )
+
+// ─── Financial Summary DTOs ──────────────────────────────────────────────────
+
+@Serializable
+data class FinancialSummaryDataDto(
+    val period: FinancialSummaryPeriodDto = FinancialSummaryPeriodDto(),
+    val income: FinancialSummaryIncomeDto = FinancialSummaryIncomeDto(),
+    val spending: FinancialSummarySpendingDto = FinancialSummarySpendingDto(),
+    val budget: FinancialSummaryBudgetDto = FinancialSummaryBudgetDto(),
+    @SerialName("safeToSpend") val safeToSpend: FinancialSummarySafeToSpendDto = FinancialSummarySafeToSpendDto(),
+    val assets: FinancialSummaryAssetsDto = FinancialSummaryAssetsDto(),
+    val currency: String = "IDR"
+)
+
+@Serializable
+data class FinancialSummaryPeriodDto(
+    val month: String = "",
+    val year: Int = 0,
+    @SerialName("daysPassed") val daysPassed: Int = 0,
+    @SerialName("daysRemaining") val daysRemaining: Int = 0
+)
+
+@Serializable
+data class FinancialSummaryIncomeDto(val total: Double = 0.0)
+
+@Serializable
+data class FinancialSummarySpendingDto(val total: Double = 0.0)
+
+@Serializable
+data class FinancialSummaryBudgetDto(
+    val total: Double = 0.0,
+    val spent: Double = 0.0,
+    val remaining: Double = 0.0,
+    val percentage: Int = 0
+)
+
+@Serializable
+data class FinancialSummarySafeToSpendDto(
+    val daily: Double = 0.0,
+    val remaining: Double = 0.0
+)
+
+@Serializable
+data class FinancialSummaryAssetsDto(
+    val total: Double = 0.0,
+    @SerialName("totalWallet") val totalWallet: Double? = null,
+    @SerialName("totalLiquidAssets") val totalLiquidAssets: Double? = null,
+    @SerialName("totalDebt") val totalDebt: Double? = null,
+    val accounts: List<FinancialSummaryAccountDto> = emptyList()
+)
+
+@Serializable
+data class FinancialSummaryAccountDto(
+    val name: String = "",
+    val amount: Double = 0.0
+)
+
+fun FinancialSummaryDataDto.toDomain(): com.casha.app.domain.model.FinancialSummaryData =
+    com.casha.app.domain.model.FinancialSummaryData(
+        period = com.casha.app.domain.model.FinancialSummaryData.Period(
+            month = period.month,
+            year = period.year,
+            daysRemaining = period.daysRemaining
+        ),
+        totalIncome = income.total,
+        totalSpending = spending.total,
+        budgetTotal = budget.total,
+        budgetSpent = budget.spent,
+        budgetRemaining = budget.remaining,
+        budgetPercentage = budget.percentage,
+        safeToSpendDaily = safeToSpend.daily,
+        safeToSpendRemaining = safeToSpend.remaining,
+        totalWallet = assets.totalWallet ?: assets.total,
+        totalLiquidAssets = assets.totalLiquidAssets ?: 0.0,
+        totalDebt = assets.totalDebt ?: 0.0,
+        currency = currency
+    )

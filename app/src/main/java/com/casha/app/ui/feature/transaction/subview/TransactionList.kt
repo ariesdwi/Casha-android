@@ -17,12 +17,25 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.casha.app.domain.model.CashflowDateSection
 
+/**
+ * Displays a list of transaction sections with context menu support.
+ * 
+ * @param sections List of cashflow date sections to display
+ * @param isLoading Whether data is currently loading
+ * @param onClick Callback when an item is clicked (id, type)
+ * @param onGroupClick Callback when a grouped transaction is clicked
+ * @param onEdit Callback when edit is selected from context menu (id, type)
+ * @param onDelete Callback when delete is selected from context menu (id, type)
+ * @param modifier Optional modifier
+ */
 @Composable
 fun TransactionList(
     sections: List<CashflowDateSection>,
     isLoading: Boolean,
     onClick: (String, String) -> Unit = { _, _ -> },
     onGroupClick: (String) -> Unit = {},
+    onEdit: ((String, String) -> Unit)? = null,
+    onDelete: ((String, String) -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     if (sections.isEmpty() && !isLoading) {
@@ -38,7 +51,9 @@ fun TransactionList(
                     TransactionSectionCard(
                         section = section,
                         onClick = onClick,
-                        onGroupClick = onGroupClick
+                        onGroupClick = onGroupClick,
+                        onEdit = onEdit,
+                        onDelete = onDelete
                     )
                 }
             }

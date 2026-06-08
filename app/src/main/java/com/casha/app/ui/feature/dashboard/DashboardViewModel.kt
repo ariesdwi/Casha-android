@@ -48,7 +48,8 @@ data class DashboardUiState(
     val errorMessage: String? = null,
     val wallets: List<Wallet> = emptyList(),
     val walletSummary: WalletSummary? = null,
-    val defaultWalletId: String? = null
+    val defaultWalletId: String? = null,
+    val budgetAlerts: List<BudgetCasha> = emptyList()
 )
 
 @HiltViewModel
@@ -66,6 +67,7 @@ class DashboardViewModel @Inject constructor(
     private val cashflowSyncUseCase: CashflowSyncUseCase,
     private val transactionSyncUseCase: TransactionSyncUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val getBudgetAlertsUseCase: com.casha.app.domain.usecase.budget.GetBudgetAlertsUseCase,
     private val authManager: AuthManager,
     private val subscriptionManager: SubscriptionManager,
     private val networkMonitor: NetworkMonitor,
@@ -226,6 +228,7 @@ class DashboardViewModel @Inject constructor(
                     val goalSummaryTask = async { getGoalSummaryUseCase.execute() }
                     val walletsTask = async { try { getWalletsUseCase.execute() } catch (_: Exception) { emptyList() } }
                     val walletSummaryTask = async { try { getWalletSummaryUseCase.execute() } catch (_: Exception) { null } }
+                    val budgetAlertsTask = async { try { getBudgetAlertsUseCase(monthStr) } catch (_: Exception) { emptyList() } }
 
                     _uiState.update { it.copy(
                         totalSpending = spendingTask.await(),
@@ -237,6 +240,7 @@ class DashboardViewModel @Inject constructor(
                         goalSummary = goalSummaryTask.await(),
                         wallets = walletsTask.await(),
                         walletSummary = walletSummaryTask.await(),
+                        budgetAlerts = budgetAlertsTask.await(),
                         isSyncing = false
                     ) }
 

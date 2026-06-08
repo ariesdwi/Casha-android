@@ -18,8 +18,8 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 38
-        versionName = "1.4.2"
+        versionCode = 39
+        versionName = "1.4.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com\"")

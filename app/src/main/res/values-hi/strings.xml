@@ -503,6 +503,17 @@
     <string name="nav_add">जोड़ें</string>
     <string name="nav_transactions">लेनदेन</string>
     <string name="nav_budget">बजट</string>
+    <string name="nav_more">अधिक</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">खाता सेटिंग्स</string>
+    <string name="more_section_financial_tools">वित्तीय उपकरण</string>
+    <string name="more_section_app_settings">ऐप सेटिंग्स</string>
+    <string name="more_section_subscription_account">सदस्यता और खाता</string>
+    <string name="more_title">अधिक</string>
+    <string name="more_menu_wallets">वॉलेट</string>
+    <string name="more_menu_language">भाषा</string>
+    
     <string name="subscription_button_lifetime">आजीवन एक्सेस प्राप्त करें</string>
     <string name="subscription_button_processing">प्रसंस्करण...</string>
     <string name="subscription_button_retrying">पुनः प्रयास...</string>

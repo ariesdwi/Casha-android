@@ -161,6 +161,10 @@ just got a whole lot smarter.</string>
     <string name="dashboard_unsynced_message_name">You have transactions waiting to sync since %1$s. They will sync automatically when online.</string>
     <string name="dashboard_unsynced_message_count">You have %1$d transaction(s) waiting to sync. They will sync automatically when online.</string>
     <string name="dashboard_unsynced_title">Unsynced Transactions</string>
+    <string name="dashboard_wallet_summary_total">Total Assets</string>
+    <string name="dashboard_wallet_summary_wallets">%d wallets</string>
+    <string name="dashboard_budget_alert_title">Budget Alert</string>
+    <string name="dashboard_budget_alert_remaining">%s left</string>
     <string name="budget_action_cancel">Cancel</string>
     <string name="budget_action_delete">Delete Budget</string>
     <string name="budget_action_save">Save</string>
@@ -413,12 +417,16 @@ just got a whole lot smarter.</string>
     <string name="transactions_tenor_select_title">Select Tenor</string>
     <string name="transactions_title">Transactions</string>
     <string name="report_action_filter">Filter</string>
+    <string name="report_calendar_title">Daily Report</string>
     <string name="report_category_detail_empty_message">No %s transactions found</string>
     <string name="report_category_detail_summary_total_amount">Total Amount</string>
     <string name="report_category_detail_summary_transaction_count">Transactions</string>
+    <string name="report_daily_transactions_empty">No transactions on this day.</string>
     <string name="report_empty_message">No data available</string>
     <string name="report_error_chart_not_supported">Chart only supported on iOS 17+</string>
+    <string name="report_filter_custom">Custom Range</string>
     <string name="report_filter_year">This Year</string>
+    <string name="report_no_spending_day">No spending on this day</string>
     <string name="report_percentage_of_total">%d%% of total</string>
     <string name="report_section_spending_by_category">Spending by Category</string>
     <string name="report_title">Report</string>
@@ -541,6 +549,17 @@ just got a whole lot smarter.</string>
     <string name="nav_add">Add</string>
     <string name="nav_transactions">Transactions</string>
     <string name="nav_budget">Budget</string>
+    <string name="nav_more">More</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">Account Settings</string>
+    <string name="more_section_financial_tools">Financial Tools</string>
+    <string name="more_section_app_settings">App Settings</string>
+    <string name="more_section_subscription_account">Subscription &amp; Account</string>
+    <string name="more_title">More</string>
+    <string name="more_menu_wallets">Wallets</string>
+    <string name="more_menu_language">Language</string>
+    
     <string name="budget_banner_of">of %s</string>
     <string name="category">Category</string>
     <string name="subscription_button_retrying">Retrying...</string>

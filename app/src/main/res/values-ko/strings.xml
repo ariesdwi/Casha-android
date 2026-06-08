@@ -503,6 +503,17 @@
     <string name="nav_add">추가</string>
     <string name="nav_transactions">거래</string>
     <string name="nav_budget">예산</string>
+    <string name="nav_more">더보기</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">계정 설정</string>
+    <string name="more_section_financial_tools">금융 도구</string>
+    <string name="more_section_app_settings">앱 설정</string>
+    <string name="more_section_subscription_account">구독 및 계정</string>
+    <string name="more_title">더보기</string>
+    <string name="more_menu_wallets">지갑</string>
+    <string name="more_menu_language">언어</string>
+    
     <string name="subscription_button_lifetime">평생 이용권 받기</string>
     <string name="subscription_button_processing">처리 중...</string>
     <string name="subscription_button_retrying">재시도 중...</string>

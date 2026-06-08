@@ -69,7 +69,8 @@ data class ChatParseResult(
     val expenses: List<TransactionCasha>? = null,
     val summary: MultiExpenseSummary? = null,
     val whatIfSimulation: WhatIfSimulation? = null,
-    val budgetRecommendation: BudgetRecommendationData? = null
+    val budgetRecommendation: BudgetRecommendationData? = null,
+    val financialSummary: FinancialSummaryData? = null
 )
 
 // ─── Budget Recommendation Models ────────────────────────────────────────────
@@ -106,3 +107,27 @@ data class LoanPayoff(
     val monthlyPayment: Double,
     val monthsToPayoff: Int
 )
+
+// ─── Financial Summary Model ──────────────────────────────────────────────────
+
+data class FinancialSummaryData(
+    val period: Period,
+    val totalIncome: Double,
+    val totalSpending: Double,
+    val budgetTotal: Double,
+    val budgetSpent: Double,
+    val budgetRemaining: Double,
+    val budgetPercentage: Int,
+    val safeToSpendDaily: Double,
+    val safeToSpendRemaining: Double,
+    val totalWallet: Double,
+    val totalLiquidAssets: Double,
+    val totalDebt: Double,
+    val currency: String
+) {
+    data class Period(
+        val month: String,
+        val year: Int,
+        val daysRemaining: Int
+    )
+}

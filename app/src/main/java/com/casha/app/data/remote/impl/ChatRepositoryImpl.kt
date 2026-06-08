@@ -11,6 +11,7 @@ import com.casha.app.data.remote.dto.ChatTransactionDto
 import com.casha.app.data.remote.dto.MultiExpenseSummaryDto
 import com.casha.app.data.remote.dto.WhatIfDataDto
 import com.casha.app.data.remote.dto.BudgetRecommendationDataDto
+import com.casha.app.data.remote.dto.FinancialSummaryDataDto
 import com.casha.app.data.remote.dto.toDomain
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
@@ -144,10 +145,14 @@ class ChatRepositoryImpl @Inject constructor(
                 )
             }
             "FINANCIAL_SUMMARY" -> {
-                // Display-only — show AI message, no DB save
+                // Display-only — show AI message + structured card, no DB save
+                val summaryDto = try {
+                    json.decodeFromJsonElement<FinancialSummaryDataDto>(parseData.data)
+                } catch (_: Exception) { null }
                 ChatParseResult(
                     intent = ChatParseIntent.FINANCIAL_SUMMARY,
-                    message = message
+                    message = message,
+                    financialSummary = summaryDto?.toDomain()
                 )
             }
             "BUDGET_RECOMMENDATION" -> {

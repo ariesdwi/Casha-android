@@ -489,6 +489,18 @@ fun AddMessageScreen(
                                 currency = uiState.multiExpenseCurrency
                             )
                         }
+                        uiState.lastIntent == ChatParseIntent.FINANCIAL_SUMMARY.rawValue -> {
+                            val summary = uiState.financialSummary
+                            if (summary != null) {
+                                FinancialSummaryCard(data = summary)
+                            } else {
+                                ConfirmationMessageView(
+                                    isSuccess = uiState.transactionSuccess,
+                                    message = uiState.aiResponseMessage,
+                                    intent = uiState.lastIntent
+                                )
+                            }
+                        }
                         else -> {
                             ConfirmationMessageView(
                                 isSuccess = uiState.transactionSuccess,

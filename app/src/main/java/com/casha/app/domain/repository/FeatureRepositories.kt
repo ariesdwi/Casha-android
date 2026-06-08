@@ -22,6 +22,9 @@ interface TransactionRepository {
     suspend fun fetchSpendingReport(): SpendingReport
     suspend fun getTransactionsByCategory(category: String, startDate: java.util.Date, endDate: java.util.Date): List<TransactionCasha>
     suspend fun getCategorySpendings(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.ChartCategorySpending>
+    suspend fun getDailySpending(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.DailySpending>
+    suspend fun getMonthlySpending(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.MonthlySpending>
+    suspend fun getTransactionsByDate(date: java.time.LocalDate): List<TransactionCasha>
     
     // Command
     suspend fun saveTransaction(transaction: TransactionCasha)

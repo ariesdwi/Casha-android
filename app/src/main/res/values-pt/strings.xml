@@ -210,7 +210,21 @@
     <string name="liabilities_delete_message">Tem certeza que deseja excluir este passivo?</string>
     <string name="liabilities_section_overdue">Vencido</string>
     <string name="liabilities_section_paid_off">Quitado</string>
-<string name="nav_report">Relatório</string><string name="nav_dashboard">Início</string><string name="nav_add">Adicionar</string><string name="nav_transactions">Transações</string><string name="nav_budget">Orçamento</string>
+<string name="nav_report">Relatório</string>
+<string name="nav_dashboard">Início</string>
+<string name="nav_add">Adicionar</string>
+<string name="nav_transactions">Transações</string>
+<string name="nav_budget">Orçamento</string>
+<string name="nav_more">Mais</string>
+
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">Configurações da Conta</string>
+    <string name="more_section_financial_tools">Ferramentas Financeiras</string>
+    <string name="more_section_app_settings">Configurações do App</string>
+    <string name="more_section_subscription_account">Assinatura e Conta</string>
+    <string name="more_title">Mais</string>
+    <string name="more_menu_wallets">Carteiras</string>
+    <string name="more_menu_language">Idioma</string>
 
     <!-- ── Onboarding ── -->
     <string name="onboarding_skip">Pular</string>

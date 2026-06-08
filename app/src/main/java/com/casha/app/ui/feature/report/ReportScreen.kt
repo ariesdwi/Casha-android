@@ -9,7 +9,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.PieChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -21,7 +20,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.casha.app.core.util.CurrencyFormatter
 import com.casha.app.domain.model.ReportFilterPeriod
+import com.casha.app.ui.feature.report.subview.DailyTransactionBottomSheet
+import com.casha.app.ui.feature.report.subview.ReportCalendarView
 import com.casha.app.ui.feature.report.subview.ReportCategoryList
 import com.casha.app.ui.feature.report.subview.ReportCategoryPieChart
 import androidx.compose.ui.res.stringResource
@@ -115,6 +117,15 @@ onDismissRequest = { viewModel.dismissPaywall() },
         }
     }
 
+    val selectedDay = uiState.selectedDay
+    if (uiState.showDaySheet && selectedDay != null) {
+        DailyTransactionBottomSheet(
+            date = selectedDay,
+            transactions = uiState.selectedDayTransactions,
+            onDismiss = { viewModel.dismissDaySheet() }
+        )
+    }
+
     Scaffold(
         modifier = Modifier
             .fillMaxSize()
@@ -205,7 +216,10 @@ onDismissRequest = { viewModel.dismissPaywall() },
                     uiState = uiState,
                     onNavigateToCategoryDetail = { category ->
                         viewModel.onCategoryClicked(category, onNavigateToCategoryDetail)
-                    }
+                    },
+                    onNavigatePeriod = { viewModel.navigatePeriod(it) },
+                    onDayClick = { viewModel.selectDay(it) },
+                    onMonthTap = { viewModel.onMonthTap(it) }
                 )
             }
 
@@ -226,58 +240,106 @@ onDismissRequest = { viewModel.dismissPaywall() },
 @Composable
 private fun ScrollViewContent(
     uiState: ReportUiState,
-    onNavigateToCategoryDetail: (String) -> Unit
+    onNavigateToCategoryDetail: (String) -> Unit,
+    onNavigatePeriod: (Int) -> Unit,
+    onDayClick: (java.time.LocalDate) -> Unit,
+    onMonthTap: (java.time.YearMonth) -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        verticalArrangement = Arrangement.spacedBy(24.dp)
     ) {
-        // Sub-Header
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = Modifier.padding(top = 8.dp)) {
-            Text(
-                text = stringResource(R.string.report_section_spending_by_category),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            val subtitleText = when (uiState.selectedPeriod) {
-                ReportFilterPeriod.WEEK -> stringResource(R.string.report_filter_week)
-                ReportFilterPeriod.MONTH -> stringResource(R.string.report_filter_month)
-                ReportFilterPeriod.YEAR -> stringResource(R.string.report_filter_year)
-                ReportFilterPeriod.CUSTOM -> {
-                    val fmt = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
-                    val start = uiState.customStartDate
-                    val end = uiState.customEndDate
-                    if (start != null && end != null) "${fmt.format(start)} – ${fmt.format(end)}"
-                    else stringResource(R.string.transactions_filter_custom_range)
-                }
+        Spacer(modifier = Modifier.height(0.dp))
+
+        // ── Calendar Section ──────────────────────────────────────────────
+        if (uiState.selectedPeriod != ReportFilterPeriod.CUSTOM) {
+            // Section header (outside card, matching iOS)
+            val calendarTitle = when (uiState.selectedPeriod) {
+                ReportFilterPeriod.WEEK  -> "Weekly Calendar"
+                ReportFilterPeriod.YEAR  -> "Monthly Calendar"
+                else -> "Daily Calendar"
             }
-            
-            Text(
-                text = subtitleText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            val calendarSubtitle = when (uiState.selectedPeriod) {
+                ReportFilterPeriod.WEEK -> {
+                    val ws = uiState.calendarWeekStart
+                    val we = ws.plusDays(6)
+                    val fmt = java.time.format.DateTimeFormatter.ofPattern("d MMM", Locale.getDefault())
+                    "${ws.format(fmt)} – ${we.format(fmt)}"
+                }
+                ReportFilterPeriod.YEAR -> "${uiState.calendarDisplayYear}"
+                else -> uiState.calendarDisplayMonth.month.getDisplayName(
+                    java.time.format.TextStyle.FULL, Locale.getDefault()
+                ) + " ${uiState.calendarDisplayMonth.year}"
+            }
+            SectionHeader(title = calendarTitle, subtitle = calendarSubtitle)
+            ReportCalendarView(
+                selectedPeriod = uiState.selectedPeriod,
+                calendarDisplayMonth = uiState.calendarDisplayMonth,
+                calendarWeekStart = uiState.calendarWeekStart,
+                calendarDisplayYear = uiState.calendarDisplayYear,
+                dailySpending = uiState.dailySpending,
+                monthlySpending = uiState.monthlySpending,
+                isLoading = uiState.isLoading,
+                onNavigate = onNavigatePeriod,
+                onDayClick = onDayClick,
+                onMonthTap = onMonthTap
             )
         }
 
-        // Chart Section
-        ReportCategoryPieChart(
-            data = uiState.categorySpendings,
-            modifier = Modifier.padding(vertical = 8.dp)
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+        // ── Chart Section ─────────────────────────────────────────────────
+        val chartSubtitle = when (uiState.selectedPeriod) {
+            ReportFilterPeriod.WEEK -> stringResource(R.string.report_filter_week)
+            ReportFilterPeriod.MONTH -> stringResource(R.string.report_filter_month)
+            ReportFilterPeriod.YEAR -> stringResource(R.string.report_filter_year)
+            ReportFilterPeriod.CUSTOM -> {
+                val fmt = SimpleDateFormat("d MMM yyyy", Locale.getDefault())
+                val s = uiState.customStartDate; val e = uiState.customEndDate
+                if (s != null && e != null) "${fmt.format(s)} – ${fmt.format(e)}" else "Custom Range"
+            }
+        }
+        SectionHeader(
+            title = stringResource(R.string.report_section_spending_by_category),
+            subtitle = chartSubtitle
         )
 
-        // List Section 
-        ReportCategoryList(
+        // ── Pie Chart ─────────────────────────────────────────────────────
+        ReportCategoryPieChart(
             data = uiState.categorySpendings,
-            hasPremiumAccess = uiState.isPremium,
-            onCategoryClick = onNavigateToCategoryDetail
+            modifier = Modifier
         )
-        
-        Spacer(modifier = Modifier.height(120.dp))
+
+        // ── Category List ─────────────────────────────────────────────────
+        if (uiState.categorySpendings.isNotEmpty()) {
+            ReportCategoryList(
+                data = uiState.categorySpendings,
+                hasPremiumAccess = uiState.isPremium,
+                onCategoryClick = onNavigateToCategoryDetail
+            )
+        }
+
+        Spacer(modifier = Modifier.height(40.dp))
+    }
+}
+
+@Composable
+private fun SectionHeader(title: String, subtitle: String) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineSmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onSurface
+        )
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 

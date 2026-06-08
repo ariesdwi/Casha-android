@@ -210,3 +210,58 @@ class RecalculateBudgetSpentUseCase @Inject constructor(
         budgetSyncUseCase.syncAllBudgets(month)
     }
 }
+
+/**
+ * Calculates budget alerts using smart threshold logic.
+ *
+ * Smart threshold adjusts based on month progress:
+ * - threshold = min(monthElapsedFraction + 0.10, 0.90)
+ * - Example: Day 15 of 30 → threshold = 0.60 (60%)
+ * - Prevents early-month false alarms
+ *
+ * Returns max 2 budget alerts sorted by severity (highest % used first).
+ *
+ * **Flow:**
+ * 1. Try to fetch fresh budgets from remote (if online)
+ * 2. Save to local database for caching
+ * 3. Calculate alerts from local data
+ * 4. If remote fetch fails, fall back to cached local data
+ */
+class GetBudgetAlertsUseCase @Inject constructor(
+    private val repository: BudgetRepository
+) {
+    suspend operator fun invoke(month: String? = null): List<BudgetCasha> {
+        // Try to fetch fresh data from remote first (if online)
+        try {
+            val remoteBudgets = repository.fetchRemoteBudgets(month)
+            if (remoteBudgets.isNotEmpty()) {
+                // Save to local for caching
+                repository.clearLocalBudgets()
+                repository.saveLocalBudgets(remoteBudgets)
+            }
+        } catch (e: Exception) {
+            // Remote fetch failed (offline or network error)
+            // Will fall back to local cache below
+        }
+        
+        // Fetch budgets from local database (either just synced or cached)
+        val budgets = repository.getLocalBudgets(month)
+        
+        // Calculate smart threshold
+        val calendar = java.util.Calendar.getInstance()
+        val dayOfMonth = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+        val daysInMonth = calendar.getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
+        val monthElapsedFraction = dayOfMonth.toDouble() / daysInMonth.toDouble()
+        val threshold = kotlin.math.min(monthElapsedFraction + 0.10, 0.90)
+        
+        // Filter budgets exceeding threshold
+        return budgets
+            .filter { budget ->
+                budget.amount > 0 && (budget.spent / budget.amount) > threshold
+            }
+            .sortedByDescending { budget ->
+                budget.spent / budget.amount
+            }
+            .take(2)
+    }
+}
