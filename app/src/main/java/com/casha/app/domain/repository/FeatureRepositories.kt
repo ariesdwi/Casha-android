@@ -2,6 +2,7 @@ package com.casha.app.domain.repository
 
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowSummary
+import com.casha.app.domain.model.SafeSpendToday
 import com.casha.app.domain.model.SpendingPeriod
 import com.casha.app.domain.model.SpendingReport
 import com.casha.app.domain.model.TransactionCasha
@@ -39,8 +40,22 @@ interface TransactionRepository {
 interface CashflowRepository {
     suspend fun getHistory(month: String?, year: String?, page: Int, pageSize: Int): CashflowHistoryResponse
     suspend fun getSummary(month: String?, year: String?): CashflowSummary
+    suspend fun getSafeSpendToday(): SafeSpendToday
     suspend fun deleteGroup(groupId: String)
     suspend fun renameGroup(groupId: String, newName: String)
+    
+    /**
+     * Fetch ALL pages of cashflow history automatically
+     * @param month Optional month filter (format: "2026-06")
+     * @param year Optional year filter (format: "2026")
+     * @param pageSize Number of items per page (default: 100)
+     * @return Complete list of all entries across all pages
+     */
+    suspend fun getHistoryAllPages(
+        month: String? = null,
+        year: String? = null,
+        pageSize: Int = 100
+    ): List<CashflowEntry>
 }
 
 /**

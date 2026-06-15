@@ -64,4 +64,10 @@ play-store-credentials.json
 *.swo
 *~
 
+# Python virtual environment
+.venv/
+venv/
+__pycache__/
+*.pyc
+
 casha-30ee7-e52de804def5.json

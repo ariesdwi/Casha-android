@@ -3,13 +3,17 @@ package com.casha.app.ui.feature.auth
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
+import com.casha.app.core.auth.SubscriptionManager
 import com.casha.app.domain.usecase.auth.LoginUseCase
 import com.casha.app.domain.usecase.auth.GoogleLoginUseCase
 import com.casha.app.domain.usecase.notification.FcmRegistrationUseCase
+import com.casha.app.widget.WidgetUpdateCoordinator
+import com.casha.app.widget.data.WidgetPreferences
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,7 +32,9 @@ class LoginViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
     private val googleLoginUseCase: GoogleLoginUseCase,
     private val authManager: AuthManager,
-    private val fcmRegistrationUseCase: FcmRegistrationUseCase
+    private val subscriptionManager: SubscriptionManager,
+    private val fcmRegistrationUseCase: FcmRegistrationUseCase,
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -54,6 +60,20 @@ class LoginViewModel @Inject constructor(
             try {
                 val result = loginUseCase(state.email.trim(), state.password)
                 authManager.saveAccessToken(result.token)
+                
+                // ✅ Save login state to widget preferences
+                WidgetPreferences.setLoggedIn(context, true)
+                
+                // ✅ Check and save premium status
+                val isPremium = try {
+                    subscriptionManager.isPremium.firstOrNull() ?: false
+                } catch (_: Exception) { false }
+                WidgetPreferences.setPremium(context, isPremium)
+                
+                // ✅ Emit widget update event for real-time widget state change
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.LoginStateChanged
+                )
                 
                 // Safely trigger FCM token registration now that JWT is saved
                 fcmRegistrationUseCase()
@@ -81,6 +101,20 @@ class LoginViewModel @Inject constructor(
             try {
                 val result = googleLoginUseCase(idToken)
                 authManager.saveAccessToken(result.token)
+                
+                // ✅ Save login state to widget preferences
+                WidgetPreferences.setLoggedIn(context, true)
+                
+                // ✅ Check and save premium status
+                val isPremium = try {
+                    subscriptionManager.isPremium.firstOrNull() ?: false
+                } catch (_: Exception) { false }
+                WidgetPreferences.setPremium(context, isPremium)
+                
+                // ✅ Emit widget update event for real-time widget state change
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.LoginStateChanged
+                )
                 
                 // Safely trigger FCM token registration now that JWT is saved
                 fcmRegistrationUseCase()

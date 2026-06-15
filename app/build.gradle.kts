@@ -18,8 +18,8 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 39
-        versionName = "1.4.3"
+        versionCode = 41
+        versionName = "1.4.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com\"")
@@ -84,6 +84,10 @@ android {
 
     // Disable ART profile embedding to fix INSTALL_BASELINE_PROFILE_FAILED on local devices
     experimentalProperties["android.experimental.art-profile-r8-rewriting"] = false
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -174,6 +178,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)

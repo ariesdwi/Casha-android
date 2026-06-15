@@ -3,6 +3,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -72,12 +73,14 @@ fun AddAssetTransactionScreen(
         amount.isNotBlank()
     }
 
+    val isDark = isSystemInDarkTheme()
+
     ModalBottomSheet(
-modifier = Modifier.fillMaxSize(),
-onDismissRequest = onNavigateBack,
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
     ) {
         Column(
             modifier = Modifier
@@ -238,7 +241,7 @@ onDismissRequest = onNavigateBack,
 
             // ── Submit Section ──────────────────────────────────
             Surface(
-                color = Color(0xFFF8F9FA),
+                color = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA),
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()

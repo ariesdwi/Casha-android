@@ -2,6 +2,7 @@ package com.casha.app.widget.data
 
 import android.content.Context
 import kotlinx.serialization.json.Json
+import java.time.Instant
 
 /**
  * SharedPreferences-based storage for widget data.
@@ -12,6 +13,7 @@ object WidgetPreferences {
     private const val KEY_WIDGET_SUMMARY = "widgetSummary"
     private const val KEY_IS_LOGGED_IN = "isLoggedIn"
     private const val KEY_IS_PREMIUM = "isPremium"
+    private const val KEY_LAST_UPDATED_AT = "lastUpdatedAt" // Epoch millis
 
     private val json = Json { ignoreUnknownKeys = true }
 
@@ -34,12 +36,28 @@ object WidgetPreferences {
 
     fun isPremium(context: Context): Boolean =
         prefs(context).getBoolean(KEY_IS_PREMIUM, false)
+    
+    /**
+     * Get the timestamp of when widget data was last updated.
+     * Used to determine data staleness in the worker.
+     * 
+     * @return Instant of last update, or null if never updated
+     */
+    fun getLastUpdatedAt(context: Context): Instant? {
+        val epochMillis = prefs(context).getLong(KEY_LAST_UPDATED_AT, -1L)
+        return if (epochMillis > 0) {
+            Instant.ofEpochMilli(epochMillis)
+        } else {
+            null
+        }
+    }
 
     // ── Write (called from main app) ──
 
     fun saveSummary(context: Context, summary: WidgetSummary) {
         prefs(context).edit()
             .putString(KEY_WIDGET_SUMMARY, json.encodeToString(WidgetSummary.serializer(), summary))
+            .putLong(KEY_LAST_UPDATED_AT, System.currentTimeMillis()) // Auto-update timestamp
             .apply()
     }
 
@@ -49,5 +67,15 @@ object WidgetPreferences {
 
     fun setPremium(context: Context, premium: Boolean) {
         prefs(context).edit().putBoolean(KEY_IS_PREMIUM, premium).apply()
+    }
+    
+    /**
+     * Manually update the last updated timestamp.
+     * Usually called automatically by saveSummary(), but can be called explicitly if needed.
+     */
+    fun updateTimestamp(context: Context) {
+        prefs(context).edit()
+            .putLong(KEY_LAST_UPDATED_AT, System.currentTimeMillis())
+            .apply()
     }
 }

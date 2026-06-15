@@ -11,6 +11,7 @@ import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase
 import com.casha.app.domain.usecase.transaction.*
 import com.casha.app.domain.model.CreateIncomeRequest
 import com.casha.app.core.network.SyncEventBus
+import com.casha.app.widget.WidgetUpdateCoordinator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -238,6 +239,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 addTransactionUseCase(request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event for real-time widget refresh
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -252,6 +259,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 addIncomeUseCase(request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -265,6 +278,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 updateIncomeUseCase(id, request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -289,6 +308,12 @@ class TransactionViewModel @Inject constructor(
                     )
                     updateTransactionUseCase(updated)
                     syncEventBus.emitSyncCompleted()
+                    
+                    // ✅ Emit widget update event
+                    WidgetUpdateCoordinator.emitUpdate(
+                        WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                    )
+                    
                     syncData()
                 }
             } catch (e: Exception) {
@@ -303,6 +328,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 deleteTransactionUseCase(id)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
                 onSuccess?.invoke()
             } catch (e: Exception) {
@@ -317,6 +348,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 deleteIncomeUseCase(id)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
                 onSuccess?.invoke()
             } catch (e: Exception) {

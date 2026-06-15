@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.dashboard
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,7 +63,16 @@ fun BudgetAlertBanner(
 }
 
 /**
- * Individual budget alert card
+ * Color configuration for budget alert cards
+ */
+private data class AlertColors(
+    val primary: Color,
+    val background: Color,
+    val iconBackground: Color
+)
+
+/**
+ * Individual budget alert card with professional light/dark mode colors
  */
 @Composable
 private fun BudgetAlertCard(
@@ -70,6 +80,8 @@ private fun BudgetAlertCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+    
     val percentUsed = if (budget.amount > 0) {
         (budget.spent / budget.amount * 100).toInt()
     } else {
@@ -78,17 +90,67 @@ private fun BudgetAlertCard(
     
     val remaining = budget.remaining
     
-    // Determine severity color
-    val (alertColor, alertColorBg) = when {
-        percentUsed >= 90 -> CashaDanger to CashaDanger.copy(alpha = 0.1f)
-        percentUsed >= 70 -> CashaWarning to CashaWarning.copy(alpha = 0.1f)
-        else -> CashaWarning to CashaWarning.copy(alpha = 0.1f)
+    // Professional color palette for both light and dark modes
+    val alertColors = when {
+        // Critical: ≥90% (Danger/Red)
+        percentUsed >= 90 -> {
+            if (isDark) {
+                AlertColors(
+                    primary = Color(0xFFFF8A80),        // Soft red for dark mode
+                    background = Color(0xFF4A1C1C),     // Dark red background
+                    iconBackground = Color(0xFF6B2929)   // Icon background
+                )
+            } else {
+                AlertColors(
+                    primary = Color(0xFFD32F2F),        // Vibrant red for light mode
+                    background = Color(0xFFFFEBEE),     // Very light red background
+                    iconBackground = Color(0xFFFFCDD2)   // Light red icon background
+                )
+            }
+        }
+        // Warning: 70-89% (Orange/Amber)
+        percentUsed >= 70 -> {
+            if (isDark) {
+                AlertColors(
+                    primary = Color(0xFFFFD54F),        // Soft amber for dark mode
+                    background = Color(0xFF4A3A1C),     // Dark amber background
+                    iconBackground = Color(0xFF6B5329)   // Icon background
+                )
+            } else {
+                AlertColors(
+                    primary = Color(0xFFF57C00),        // Vibrant orange for light mode
+                    background = Color(0xFFFFF3E0),     // Very light amber background
+                    iconBackground = Color(0xFFFFE0B2)   // Light amber icon background
+                )
+            }
+        }
+        // Default: <70% (shouldn't show, but fallback to warning)
+        else -> {
+            if (isDark) {
+                AlertColors(
+                    primary = Color(0xFFFFD54F),
+                    background = Color(0xFF4A3A1C),
+                    iconBackground = Color(0xFF6B5329)
+                )
+            } else {
+                AlertColors(
+                    primary = Color(0xFFF57C00),
+                    background = Color(0xFFFFF3E0),
+                    iconBackground = Color(0xFFFFE0B2)
+                )
+            }
+        }
     }
 
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(20.dp))
+            .shadow(
+                elevation = if (isDark) 0.dp else 1.dp,
+                shape = RoundedCornerShape(16.dp),
+                ambientColor = if (isDark) Color.Transparent else alertColors.primary.copy(alpha = 0.1f),
+                spotColor = if (isDark) Color.Transparent else alertColors.primary.copy(alpha = 0.1f)
+            )
             .clickable(
                 onClickLabel = "View ${budget.category} budget details"
             ) { onClick() }
@@ -96,66 +158,75 @@ private fun BudgetAlertCard(
                 contentDescription = "Budget alert: ${budget.category} category " +
                     "$percentUsed percent used, ${CurrencyFormatter.format(remaining)} remaining"
             },
-        shape = RoundedCornerShape(20.dp),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = alertColorBg
+            containerColor = alertColors.background
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 0.dp
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp)
-                .heightIn(min = 48.dp), // Minimum touch target
+                .padding(horizontal = 16.dp, vertical = 14.dp)
+                .heightIn(min = 56.dp), // Better touch target
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(14.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.weight(1f)
             ) {
-                // Warning icon
+                // Warning icon with improved styling
                 Box(
                     modifier = Modifier
-                        .size(32.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
-                        .background(alertColor.copy(alpha = 0.15f)),
+                        .background(alertColors.iconBackground),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.Warning,
                         contentDescription = null,
-                        tint = alertColor,
-                        modifier = Modifier.size(18.dp)
+                        tint = alertColors.primary,
+                        modifier = Modifier.size(20.dp)
                     )
                 }
 
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
                     modifier = Modifier.weight(1f)
                 ) {
+                    // Category name
                     Text(
                         text = budget.category,
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = alertColor
+                        style = MaterialTheme.typography.titleSmall.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = alertColors.primary
                     )
                     
+                    // Usage info
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
                             text = "$percentUsed% used",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = alertColor.copy(alpha = 0.8f),
-                            fontWeight = FontWeight.Medium
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.Medium
+                            ),
+                            color = alertColors.primary.copy(alpha = if (isDark) 0.85f else 0.75f)
                         )
                         
-                        Text(
-                            text = "•",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = alertColor.copy(alpha = 0.5f)
+                        // Dot separator
+                        Box(
+                            modifier = Modifier
+                                .size(3.dp)
+                                .clip(CircleShape)
+                                .background(alertColors.primary.copy(alpha = 0.4f))
                         )
                         
                         Text(
@@ -164,18 +235,18 @@ private fun BudgetAlertCard(
                                 CurrencyFormatter.format(remaining.coerceAtLeast(0.0))
                             ),
                             style = MaterialTheme.typography.bodySmall,
-                            color = alertColor.copy(alpha = 0.8f)
+                            color = alertColors.primary.copy(alpha = if (isDark) 0.85f else 0.75f)
                         )
                     }
                 }
             }
 
-            // Chevron icon
+            // Chevron icon with improved styling
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = null,
-                tint = alertColor,
-                modifier = Modifier.size(24.dp)
+                tint = alertColors.primary.copy(alpha = 0.6f),
+                modifier = Modifier.size(22.dp)
             )
         }
     }

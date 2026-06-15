@@ -3,6 +3,7 @@ package com.casha.app.ui.feature.portfolio
 import android.app.DatePickerDialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -80,6 +81,7 @@ fun CreateAssetScreen(
 
     val isQuantityBased = selectedType.isQuantityBased
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isDark = isSystemInDarkTheme()
 
     val calculatedAmount = remember(quantity, pricePerUnit) {
         val qty = quantity.toDoubleOrNull()
@@ -99,7 +101,7 @@ fun CreateAssetScreen(
         onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
     ) {
         Column(
             modifier = Modifier
@@ -245,12 +247,12 @@ fun CreateAssetScreen(
                     description = description, onDescriptionChange = { description = it }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(50.dp)) // Increased from 24dp to 50dp for better bottom spacing
             }
 
             // ── Submit Section ──────────────────────────────────
             Surface(
-                color = Color(0xFFF8F9FA),
+                color = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA),
                 modifier = Modifier
                     .fillMaxWidth()
                     .navigationBarsPadding()
@@ -353,7 +355,7 @@ fun CreateAssetScreen(
             onDismissRequest = { showingTypePicker = false },
             sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
             dragHandle = { BottomSheetDefaults.DragHandle() },
-            containerColor = Color(0xFFF8F9FA)
+            containerColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
         ) {
             Column(modifier = Modifier.fillMaxHeight(0.8f)) {
                 Text(

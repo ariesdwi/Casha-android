@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.core.network.NetworkMonitor
 import com.casha.app.widget.WidgetUpdater
+import com.casha.app.widget.WidgetUpdateCoordinator
+import com.casha.app.widget.data.WidgetPreferences
 import android.content.Context
 import dagger.hilt.android.qualifiers.ApplicationContext
 import com.casha.app.domain.model.UpdateProfileRequest
@@ -232,6 +234,15 @@ class ProfileViewModel @Inject constructor(
             try {
                 deleteAllLocalDataUseCase()
                 authManager.clearAll()
+                
+                // ✅ Save logout state to widget preferences
+                WidgetPreferences.setLoggedIn(context, false)
+                
+                // ✅ Emit widget update event for real-time widget state change
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.LoginStateChanged
+                )
+                
                 _uiState.update { it.copy(isLoading = false, isLoggedOut = true) }
             } catch (e: Exception) {
                 _uiState.update {
@@ -246,7 +257,14 @@ class ProfileViewModel @Inject constructor(
             val currentStatus = _uiState.value.isPremium
             val newStatus = !currentStatus
             subscriptionManager.setPremiumStatus(newStatus)
+            
+            // Save to widget preferences (old way - keeping for compatibility)
             WidgetUpdater.setAuthState(context, isLoggedIn = true, isPremium = newStatus)
+            
+            // ✅ Emit widget update event for real-time widget state change
+            WidgetUpdateCoordinator.emitUpdate(
+                WidgetUpdateCoordinator.WidgetUpdateEvent.PremiumStateChanged
+            )
         }
     }
 

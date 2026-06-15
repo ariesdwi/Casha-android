@@ -68,6 +68,20 @@ data class CashflowSummaryDto(
 )
 
 @Serializable
+data class SafeSpendTodayDto(
+    val safeSpendToday: Double = 0.0,
+    val currency: String = com.casha.app.core.util.CurrencyFormatter.defaultCurrency,
+    val daysRemaining: Int = 0,
+    val budgetPctUsed: Int = 0,
+    val monthlyIncome: Double = 0.0,
+    val spentSoFar: Double = 0.0,
+    val pendingObligations: Double = 0.0,
+    val freeRemaining: Double = 0.0,
+    val status: String = "",
+    val statusLabel: String = ""
+)
+
+@Serializable
 data class CategoryDto(
     val id: String = "",
     val name: String = "",

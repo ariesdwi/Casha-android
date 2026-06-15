@@ -65,8 +65,8 @@ fun CategoryListScreen(
         Box(modifier = Modifier.padding(padding)) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 // User Categories Section
                 val userCategories = uiState.categories.filter { !it.isSystem }
@@ -91,12 +91,26 @@ fun CategoryListScreen(
                         }
                     }
                 } else {
-                    items(userCategories, key = { it.id }) { category ->
-                        SwipeableCategoryRow(
-                            category = category,
-                            onEdit = { showingEditSheet = it },
-                            onDelete = { viewModel.removeCategory(it.id) }
-                        )
+                    // Grid layout for user categories (2 columns)
+                    items(userCategories.chunked(2)) { rowCategories ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            rowCategories.forEach { category ->
+                                Box(modifier = Modifier.weight(1f)) {
+                                    CategoryGridCard(
+                                        category = category,
+                                        onEdit = { showingEditSheet = it },
+                                        onDelete = { viewModel.removeCategory(it.id) }
+                                    )
+                                }
+                            }
+                            // Fill empty space if odd number of items
+                            if (rowCategories.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
 
@@ -105,8 +119,26 @@ fun CategoryListScreen(
                 item {
                     CategorySectionHeader(stringResource(R.string.profile_category_system_title))
                 }
-                items(systemCategories, key = { it.id }) { category ->
-                    CategoryRow(category)
+                
+                // Grid layout for system categories (2 columns)
+                items(systemCategories.chunked(2)) { rowCategories ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        rowCategories.forEach { category ->
+                            Box(modifier = Modifier.weight(1f)) {
+                                CategoryGridCard(
+                                    category = category,
+                                    isSystemCategory = true
+                                )
+                            }
+                        }
+                        // Fill empty space if odd number of items
+                        if (rowCategories.size == 1) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
             }
 
@@ -160,8 +192,149 @@ fun CategorySectionHeader(title: String) {
         style = MaterialTheme.typography.labelMedium,
         color = MaterialTheme.colorScheme.primary,
         fontWeight = FontWeight.Bold,
-        modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)
+        modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
     )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CategoryGridCard(
+    category: CategoryCasha,
+    isSystemCategory: Boolean = false,
+    onEdit: ((CategoryCasha) -> Unit)? = null,
+    onDelete: ((CategoryCasha) -> Unit)? = null
+) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    
+    Surface(
+        onClick = {
+            if (!isSystemCategory && onEdit != null) {
+                onEdit(category)
+            }
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(1f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+        tonalElevation = 0.dp
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // Lock icon for system categories or status indicator
+            if (isSystemCategory) {
+                Icon(
+                    imageVector = Icons.Default.Lock,
+                    contentDescription = "System Category",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(16.dp)
+                )
+            } else if (!category.isActive) {
+                Surface(
+                    modifier = Modifier.align(Alignment.TopEnd),
+                    shape = androidx.compose.foundation.shape.CircleShape,
+                    color = MaterialTheme.colorScheme.errorContainer
+                ) {
+                    Text(
+                        text = "Inactive",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.error,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            
+            // Long press menu for user categories
+            if (!isSystemCategory && onDelete != null) {
+                IconButton(
+                    onClick = { showDeleteDialog = true },
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .size(24.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Options",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
+
+            // Content: Icon and Name centered
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                // Category Icon/Initial with circular background
+                Surface(
+                    modifier = Modifier.size(64.dp),
+                    shape = androidx.compose.foundation.shape.CircleShape,
+                    color = if (isSystemCategory) 
+                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                    else 
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Text(
+                            text = category.name.take(1).uppercase(),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = if (isSystemCategory) 
+                                MaterialTheme.colorScheme.primary 
+                            else 
+                                MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                // Category Name
+                Text(
+                    text = category.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 2,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+            }
+        }
+    }
+    
+    // Delete Confirmation Dialog
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Category") },
+            text = { Text("Are you sure you want to delete '${category.name}'? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDelete?.invoke(category)
+                        showDeleteDialog = false
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = CashaDanger)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 }
 
 @Composable

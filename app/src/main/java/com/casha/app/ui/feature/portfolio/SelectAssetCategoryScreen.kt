@@ -2,6 +2,7 @@ package com.casha.app.ui.feature.portfolio
 import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -105,13 +106,14 @@ fun SelectAssetCategoryScreen(
     onCategorySelected: (AssetCategory) -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val isDark = isSystemInDarkTheme()
 
     ModalBottomSheet(
-modifier = Modifier.fillMaxSize(),
-onDismissRequest = onNavigateBack,
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = onNavigateBack,
         sheetState = sheetState,
         dragHandle = { BottomSheetDefaults.DragHandle() },
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
     ) {
         Column(
             modifier = Modifier

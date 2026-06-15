@@ -18,6 +18,9 @@ interface CashflowApiService {
         @Query("year") year: String? = null
     ): BaseResponse<CashflowSummaryDto>
     
+    @GET("cashflow/safe-spend-today")
+    suspend fun getSafeSpendToday(): BaseResponse<SafeSpendTodayDto>
+    
     @PATCH("cashflow/{type}/{id}")
     suspend fun updateCashflow(
         @Path("type") type: String,

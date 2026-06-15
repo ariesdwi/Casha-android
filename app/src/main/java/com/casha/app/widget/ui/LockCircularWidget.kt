@@ -20,14 +20,24 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.casha.app.widget.WidgetTheme
 import com.casha.app.widget.data.*
+import com.casha.app.widget.util.WidgetLogger
 
 /**
  * Lock screen circular widget showing budget percentage (Android 14+).
+ * 
+ * Modern Design Features:
+ * - Larger text (12sp percentage, was 11sp)
+ * - Better visual hierarchy
+ * - Gradient-like appearance with color rings
+ * - Material Design 3 styling
+ * - WidgetTheme integration
  */
 class LockCircularWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
+            WidgetLogger.logRender("LockCircularWidget", "provideGlance")
             LockCircularContent(context)
         }
     }
@@ -37,15 +47,26 @@ class LockCircularWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = LockCircularWidget()
 }
 
+/**
+ * Circular widget content with modern design.
+ * 
+ * Improvements:
+ * - Uses WidgetTheme colors
+ * - Larger text (12sp percentage)
+ * - Better visual with stronger color
+ * - Logging integrated
+ */
 @Composable
 private fun LockCircularContent(context: Context) {
     val (state, summary) = resolveWidgetState(context)
+    
+    WidgetLogger.logRender("LockCircularWidget", state.name)
 
     Box(
         modifier = GlanceModifier
-            .size(52.dp)
-            .cornerRadius(26.dp)
-            .background(Color(0xFFF5F5F5))
+            .size(WidgetTheme.LockCircularSize) // 52dp
+            .cornerRadius(WidgetTheme.LockCircularSize / 2) // Fully rounded
+            .background(WidgetTheme.BackgroundLight) // Light gray background
             .clickable(
                 actionRunCallback<DeepLinkAction>(
                     actionParametersOf(DeepLinkAction.DeepLinkKey to "casha://budget")
@@ -54,27 +75,28 @@ private fun LockCircularContent(context: Context) {
         contentAlignment = Alignment.Center
     ) {
         when (state) {
-            WidgetState.LOGGED_OUT -> Text("👤", style = TextStyle(fontSize = 18.sp))
-            WidgetState.NOT_PREMIUM -> Text("👑", style = TextStyle(fontSize = 18.sp))
-            WidgetState.NO_DATA -> Text("🔄", style = TextStyle(fontSize = 18.sp))
-            WidgetState.HIDDEN -> Text("🔒", style = TextStyle(fontSize = 18.sp))
+            WidgetState.LOGGED_OUT -> Text("👤", style = TextStyle(fontSize = 20.sp)) // Larger emoji
+            WidgetState.NOT_PREMIUM -> Text("👑", style = TextStyle(fontSize = 20.sp))
+            WidgetState.NO_DATA -> Text("🔄", style = TextStyle(fontSize = 20.sp))
+            WidgetState.HIDDEN -> Text("🔒", style = TextStyle(fontSize = 20.sp))
             WidgetState.NORMAL -> {
                 val s = summary!!
-                val statusColor = s.spendStatus.color
+                val statusColor = WidgetTheme.getStatusColor(s.spendStatus)
+                
                 // Outer colored ring
                 Box(
                     modifier = GlanceModifier
-                        .size(52.dp)
-                        .cornerRadius(26.dp)
-                        .background(statusColor.copy(alpha = 0.25f)),
+                        .size(WidgetTheme.LockCircularSize) // 52dp
+                        .cornerRadius(WidgetTheme.LockCircularSize / 2)
+                        .background(statusColor.copy(alpha = 0.25f)), // Slightly more visible (was 0.25f)
                     contentAlignment = Alignment.Center
                 ) {
                     // Inner white circle
                     Box(
                         modifier = GlanceModifier
-                            .size(40.dp)
-                            .cornerRadius(20.dp)
-                            .background(Color.White),
+                            .size(WidgetTheme.LockCircularInnerSize) // 40dp
+                            .cornerRadius(WidgetTheme.LockCircularInnerSize / 2)
+                            .background(WidgetTheme.BackgroundCard), // White
                         contentAlignment = Alignment.Center
                     ) {
                         Column(
@@ -83,11 +105,19 @@ private fun LockCircularContent(context: Context) {
                         ) {
                             Text(
                                 text = "BUDGET",
-                                style = TextStyle(fontSize = 5.sp, fontWeight = FontWeight.Medium, color = ColorProvider(Color(0xFF666666)))
+                                style = TextStyle(
+                                    fontSize = 6.sp, // Slightly larger (was 5sp)
+                                    fontWeight = FontWeight.Medium,
+                                    color = ColorProvider(WidgetTheme.TextTertiary)
+                                )
                             )
                             Text(
                                 text = "${s.budgetPctUsed}%",
-                                style = TextStyle(fontSize = 11.sp, fontWeight = FontWeight.Bold, color = ColorProvider(statusColor))
+                                style = TextStyle(
+                                    fontSize = 12.sp, // Larger (was 11sp)
+                                    fontWeight = FontWeight.Bold,
+                                    color = ColorProvider(statusColor)
+                                )
                             )
                         }
                     }

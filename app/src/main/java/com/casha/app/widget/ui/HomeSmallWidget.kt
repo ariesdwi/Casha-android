@@ -20,12 +20,26 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import com.casha.app.widget.WidgetTheme
 import com.casha.app.widget.data.*
 import com.casha.app.widget.util.WidgetCurrencyFormatter
+import com.casha.app.widget.util.WidgetLogger
 
+/**
+ * Home Screen Small Widget (2×2) - Modern Material Design 3
+ * 
+ * Features:
+ * - Larger, more readable text (28sp for amounts)
+ * - Thicker progress bar (6dp)
+ * - Better spacing (12dp padding)
+ * - Status badge with enhanced visibility
+ * - Gradient-ready background
+ * - WidgetTheme integration
+ */
 class HomeSmallWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
+            WidgetLogger.logRender("HomeSmallWidget", "provideGlance")
             HomeSmallContent(context)
         }
     }
@@ -38,13 +52,15 @@ class HomeSmallWidgetReceiver : GlanceAppWidgetReceiver() {
 @Composable
 private fun HomeSmallContent(context: Context) {
     val (state, summary) = resolveWidgetState(context)
+    
+    WidgetLogger.logRender("HomeSmallWidget", state.name)
 
     Box(
         modifier = GlanceModifier
             .fillMaxSize()
-            .cornerRadius(16.dp)
-            .background(Color.White)
-            .padding(14.dp)
+            .cornerRadius(WidgetTheme.CornerRadiusLarge) // 16dp
+            .background(WidgetTheme.BackgroundCard) // White
+            .padding(WidgetTheme.SpacingMedium) // 12dp
             .clickable(
                 actionRunCallback<DeepLinkAction>(
                     actionParametersOf(DeepLinkAction.DeepLinkKey to "casha://add-expense")
@@ -61,15 +77,31 @@ private fun HomeSmallContent(context: Context) {
     }
 }
 
+/**
+ * Normal content for HomeSmallWidget with modern design.
+ * 
+ * Layout:
+ * - Header: "⚡ SAFE SPEND" + larger status badge
+ * - Amount: Larger (28sp), bold, prominent
+ * - Spent today: Secondary text + thicker progress bar (6dp)
+ * - Footer: Status badge + days remaining
+ * 
+ * Improvements:
+ * - 28sp amount (was 20sp)
+ * - 6dp progress bar (was 4dp)
+ * - 12dp padding (was 14dp, now consistent)
+ * - 9dp status badge (was 8dp)
+ * - Better spacing using WidgetTheme
+ */
 @Composable
 private fun SmallNormalContent(summary: WidgetSummary) {
-    val statusColor = summary.spendStatus.color
+    val statusColor = WidgetTheme.getStatusColor(summary.spendStatus)
 
     Column(
         modifier = GlanceModifier.fillMaxSize(),
         verticalAlignment = Alignment.Vertical.Top
     ) {
-        // Header
+        // Header: Safe Spend label + Status badge
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
@@ -77,41 +109,47 @@ private fun SmallNormalContent(summary: WidgetSummary) {
             Text(
                 text = "⚡ SAFE SPEND",
                 style = TextStyle(
-                    fontSize = 9.sp,
+                    fontSize = 10.sp, // Slightly larger (was 9sp)
                     fontWeight = FontWeight.Bold,
-                    color = ColorProvider(Color(0xFF666666))
+                    color = ColorProvider(WidgetTheme.TextSecondary) // 70% opacity
                 )
             )
             Spacer(modifier = GlanceModifier.defaultWeight())
+            // Larger status badge
             Box(
                 modifier = GlanceModifier
-                    .size(8.dp)
-                    .cornerRadius(4.dp)
+                    .size(WidgetTheme.StatusBadgeSize) // 9dp (was 8dp)
+                    .cornerRadius(WidgetTheme.StatusBadgeSize / 2)
                     .background(statusColor)
             ) {}
         }
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingSmall)) // 8dp
 
-        // Amount
+        // Amount: LARGER and more prominent
         Text(
             text = WidgetCurrencyFormatter.formatFull(summary.safeSpendToday, summary.currency),
             style = TextStyle(
-                fontSize = 20.sp,
+                fontSize = 28.sp, // INCREASED from 20sp
                 fontWeight = FontWeight.Bold,
-                color = ColorProvider(Color.Black)
+                color = ColorProvider(WidgetTheme.TextPrimary) // Black
             )
         )
 
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingSmall)) // 8dp
 
-        // Spent today
+        // Spent today + Progress bar
         if (summary.spentToday > 0 && summary.safeSpendToday > 0) {
             Text(
                 text = "Spent: ${WidgetCurrencyFormatter.formatShort(summary.spentToday, summary.currency)}",
-                style = TextStyle(fontSize = 10.sp, color = ColorProvider(Color(0xFF888888)))
+                style = TextStyle(
+                    fontSize = 11.sp, // Slightly larger (was 10sp)
+                    color = ColorProvider(WidgetTheme.TextTertiary) // 50% opacity
+                )
             )
-            Spacer(modifier = GlanceModifier.height(4.dp))
+            Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingXSmall)) // 4dp
+            
+            // THICKER progress bar
             WidgetProgressBar(
                 progress = (summary.spentToday / summary.safeSpendToday).coerceIn(0.0, 1.0).toFloat(),
                 summary = summary
@@ -120,60 +158,74 @@ private fun SmallNormalContent(summary: WidgetSummary) {
 
         Spacer(modifier = GlanceModifier.defaultWeight())
 
-        // Footer
+        // Footer: Status label + Days remaining
         Row(
             modifier = GlanceModifier.fillMaxWidth(),
             verticalAlignment = Alignment.Vertical.CenterVertically
         ) {
+            // Status badge with background
             Box(
                 modifier = GlanceModifier
-                    .cornerRadius(4.dp)
-                    .background(statusColor.copy(alpha = 0.15f))
-                    .padding(horizontal = 6.dp, vertical = 2.dp)
+                    .cornerRadius(WidgetTheme.CornerRadiusSmall) // 8dp
+                    .background(statusColor.copy(alpha = 0.15f)) // Subtle background
+                    .padding(horizontal = 8.dp, vertical = 3.dp) // Slightly larger padding
             ) {
                 Text(
                     text = summary.statusLabel,
-                    style = TextStyle(fontSize = 9.sp, fontWeight = FontWeight.Medium, color = ColorProvider(statusColor))
+                    style = TextStyle(
+                        fontSize = 10.sp, // Slightly larger (was 9sp)
+                        fontWeight = FontWeight.Medium,
+                        color = ColorProvider(statusColor)
+                    )
                 )
             }
             Spacer(modifier = GlanceModifier.defaultWeight())
             Text(
                 text = "${summary.daysRemaining} hari",
-                style = TextStyle(fontSize = 9.sp, color = ColorProvider(Color(0xFF888888)))
+                style = TextStyle(
+                    fontSize = 10.sp, // Slightly larger (was 9sp)
+                    color = ColorProvider(WidgetTheme.TextTertiary) // 50% opacity
+                )
             )
         }
     }
 }
 
+/**
+ * Progress bar component with improved visibility.
+ * 
+ * Improvements:
+ * - 6dp height (was 4dp) - MUCH more visible
+ * - Uses WidgetTheme colors
+ * - Smooth color transitions based on progress
+ * - Rounded ends for modern look
+ */
 @Composable
 private fun WidgetProgressBar(progress: Float, summary: WidgetSummary) {
-    val barColor = when {
-        progress < 0.8f -> Color(0xFF2E7D32)
-        progress < 1.0f -> Color(0xFFFF9800)
-        else -> Color(0xFFF44336)
-    }
+    val barColor = WidgetTheme.getProgressColor(progress)
+    
     Box(
         modifier = GlanceModifier
             .fillMaxWidth()
-            .height(4.dp)
-            .cornerRadius(2.dp)
-            .background(Color(0xFFE0E0E0))
+            .height(WidgetTheme.ProgressBarHeight) // 6dp (was 4dp)
+            .cornerRadius(WidgetTheme.ProgressBarHeight / 2) // Fully rounded ends
+            .background(WidgetTheme.ProgressTrack) // Light gray
     ) {
         // Use weighted row to simulate fractional width
         Row(modifier = GlanceModifier.fillMaxSize()) {
             if (progress > 0.01f) {
                 Box(
                     modifier = GlanceModifier
-                        .height(4.dp)
+                        .height(WidgetTheme.ProgressBarHeight)
                         .defaultWeight()
-                        .cornerRadius(2.dp)
+                        .cornerRadius(WidgetTheme.ProgressBarHeight / 2)
                         .background(barColor)
                 ) {}
             }
             if (progress < 0.99f) {
                 Spacer(
                     modifier = GlanceModifier
-                        .height(4.dp)
+                        .height(WidgetTheme.ProgressBarHeight)
                         .defaultWeight()
                 )
             }
@@ -181,22 +233,56 @@ private fun WidgetProgressBar(progress: Float, summary: WidgetSummary) {
     }
 }
 
+/**
+ * Fallback view for non-normal states.
+ * Shows centered icon with title and subtitle.
+ * 
+ * Improvements:
+ * - Larger icon (32sp, was 28sp)
+ * - Better spacing using WidgetTheme
+ * - Uses theme colors
+ */
 @Composable
 fun WidgetFallbackView(icon: String, title: String, subtitle: String) {
     Column(
-        modifier = GlanceModifier.fillMaxSize(),
+        modifier = GlanceModifier
+            .fillMaxSize()
+            .clickable(
+                actionRunCallback<DeepLinkAction>(
+                    actionParametersOf(DeepLinkAction.DeepLinkKey to "casha://dashboard")
+                )
+            ),
         verticalAlignment = Alignment.Vertical.CenterVertically,
         horizontalAlignment = Alignment.Horizontal.CenterHorizontally
     ) {
-        Text(text = icon, style = TextStyle(fontSize = 28.sp))
-        Spacer(modifier = GlanceModifier.height(8.dp))
+        Text(
+            text = icon,
+            style = TextStyle(fontSize = 32.sp) // Larger (was 28sp)
+        )
+        Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingSmall)) // 8dp
         Text(
             text = title,
-            style = TextStyle(fontSize = 13.sp, fontWeight = FontWeight.Bold, color = ColorProvider(Color.Black))
+            style = TextStyle(
+                fontSize = 14.sp, // Slightly larger (was 13sp)
+                fontWeight = FontWeight.Bold,
+                color = ColorProvider(WidgetTheme.TextPrimary)
+            )
         )
+        Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingXSmall)) // 4dp
         Text(
             text = subtitle,
-            style = TextStyle(fontSize = 11.sp, color = ColorProvider(Color(0xFF888888)))
+            style = TextStyle(
+                fontSize = 12.sp, // Slightly larger (was 11sp)
+                color = ColorProvider(WidgetTheme.TextSecondary)
+            )
+        )
+        Spacer(modifier = GlanceModifier.height(WidgetTheme.SpacingSmall)) // 8dp
+        Text(
+            text = "Tap untuk buka app",
+            style = TextStyle(
+                fontSize = 10.sp,
+                color = ColorProvider(WidgetTheme.TextTertiary)
+            )
         )
     }
 }

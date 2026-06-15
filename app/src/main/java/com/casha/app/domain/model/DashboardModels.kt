@@ -58,6 +58,23 @@ data class CashflowSummary(
 )
 
 /**
+ * Safe spend today data from API.
+ * This replaces manual widget calculation with server-side computation.
+ */
+data class SafeSpendToday(
+    val safeSpendToday: Double,
+    val currency: String,
+    val daysRemaining: Int,
+    val budgetPctUsed: Int,
+    val monthlyIncome: Double,
+    val spentSoFar: Double,
+    val pendingObligations: Double,
+    val freeRemaining: Double,
+    val status: String,
+    val statusLabel: String
+)
+
+/**
  * Data for spending reports/charts.
  */
 data class SpendingReport(
