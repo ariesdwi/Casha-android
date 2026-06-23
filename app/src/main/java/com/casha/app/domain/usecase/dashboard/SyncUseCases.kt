@@ -206,7 +206,7 @@ class CashflowSyncUseCase @Inject constructor(
             }
 
         // Incomes from IncomeDao
-        val allIncomes = incomeDao.getAllIncomes().firstOrNull() ?: emptyList()
+        val allIncomes = incomeDao.getAllIncomesOnce()
         val incomes = allIncomes
             .filter { it.datetime.time >= startDate.time && it.datetime.time <= endDate.time }
             .map { entity ->
