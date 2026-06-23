@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.Liability
 import com.casha.app.ui.feature.liability.LiabilityState
 import java.text.SimpleDateFormat
@@ -45,9 +46,6 @@ fun AddInstallmentFormView(
     var tenor by remember { mutableStateOf("") }
     var currentMonth by remember { mutableStateOf("") }
     var startDate by remember { mutableStateOf(Date()) }
-
-    var totalAmountFocused by remember { mutableStateOf(false) }
-    var monthlyAmountFocused by remember { mutableStateOf(false) }
     var showDatePicker by remember { mutableStateOf(false) }
 
     val isFormValid = name.isNotBlank() && totalAmount.isNotBlank() && monthlyAmount.isNotBlank() && tenor.isNotBlank()
@@ -106,13 +104,11 @@ onDismissRequest = onDismissRequest,
 
                 // Total Amount
                 InputCard(title = stringResource(R.string.liabilities_add_installment_total)) {
-                    OutlinedTextField(
-                        value = if (totalAmountFocused) totalAmount else if (totalAmount.isNotEmpty()) CurrencyFormatter.formatInput(totalAmount) else "",
-                        onValueChange = { totalAmount = it.replace(",", ".") },
+                    CurrencyInputField(
+                        value = totalAmount,
+                        onValueChange = { totalAmount = it },
                         placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { totalAmountFocused = it.isFocused },
-                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = cashaBorderlessTextFieldColors(),
                         leadingIcon = { Text(currencySymbol, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },
@@ -122,13 +118,11 @@ onDismissRequest = onDismissRequest,
 
                 // Monthly Amount
                 InputCard(title = stringResource(R.string.liabilities_add_installment_per_month)) {
-                    OutlinedTextField(
-                        value = if (monthlyAmountFocused) monthlyAmount else if (monthlyAmount.isNotEmpty()) CurrencyFormatter.formatInput(monthlyAmount) else "",
-                        onValueChange = { monthlyAmount = it.replace(",", ".") },
+                    CurrencyInputField(
+                        value = monthlyAmount,
+                        onValueChange = { monthlyAmount = it },
                         placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                        modifier = Modifier.fillMaxWidth().onFocusChanged { monthlyAmountFocused = it.isFocused },
-                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = cashaBorderlessTextFieldColors(),
                         leadingIcon = { Text(currencySymbol, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)) },

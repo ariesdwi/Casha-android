@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -52,6 +53,10 @@ fun AddMessageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var messageInput by remember { mutableStateOf("") }
+    val isWhatIfActive = uiState.showConfirmation &&
+            uiState.lastIntent == ChatParseIntent.WHAT_IF.rawValue
+    val isBudgetRecActive = uiState.showConfirmation &&
+            uiState.lastIntent == ChatParseIntent.BUDGET_RECOMMENDATION.rawValue
     
     val focusManager = LocalFocusManager.current
     val listState = rememberLazyListState()
@@ -79,13 +84,18 @@ fun AddMessageScreen(
     }
 
     // ── Camera Launcher ──
-    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { success ->
         if (success) {
             cameraImageUri?.let { viewModel.sendImage(it) }
+        } else {
+            // Camera was cancelled or failed to write — show non-blocking error
+            if (cameraImageUri != null) {
+                android.widget.Toast.makeText(context, "Photo capture failed. Please try again.", android.widget.Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -93,12 +103,23 @@ fun AddMessageScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            val tempFile = File(context.cacheDir, "chat_camera_${System.currentTimeMillis()}.jpg")
+            val tempFile = File(context.cacheDir, "chat_camera_${System.currentTimeMillis()}.jpg").also { it.createNewFile() }
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
                 tempFile
             )
+            // Explicitly grant write permission to all camera apps (some ignore FLAG_GRANT_WRITE_URI_PERMISSION in the intent)
+            val cameraIntent = android.content.Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            context.packageManager
+                .queryIntentActivities(cameraIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+                .forEach { resolveInfo ->
+                    context.grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        uri,
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                }
             cameraImageUri = uri
             cameraLauncher.launch(uri)
         } else {
@@ -222,6 +243,96 @@ fun AddMessageScreen(
                             .padding(horizontal = 16.dp, vertical = 10.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        if (isWhatIfActive) {
+                            // What If active — show Simulasi Baru full-width button
+                            Button(
+                                onClick = {
+                                    viewModel.resetState()
+                                    messageInput = ""
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = Color(0xFF6C63FF),
+                                    contentColor = Color.White
+                                ),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.Refresh,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Simulasi Baru", fontWeight = FontWeight.SemiBold)
+                            }
+                        } else if (isBudgetRecActive) {
+                            // Budget Recommendation active — show Apply & Reset buttons
+                            Column(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Button(
+                                    onClick = {
+                                        uiState.budgetRecommendation?.let {
+                                            viewModel.applyBudgetRecommendation(it)
+                                        }
+                                    },
+                                    enabled = !uiState.isBudgetApplied && !uiState.isBudgetApplying,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = if (uiState.isBudgetApplied) Color(0xFF34C759) else Color(0xFF5856D6),
+                                        disabledContainerColor = if (uiState.isBudgetApplied) Color(0xFF34C759) else Color(0xFF5856D6).copy(alpha = 0.7f)
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    if (uiState.isBudgetApplying) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.size(18.dp),
+                                            color = Color.White,
+                                            strokeWidth = 2.dp
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Menerapkan...", color = Color.White, fontWeight = FontWeight.SemiBold)
+                                    } else if (uiState.isBudgetApplied) {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Budget Diterapkan", fontWeight = FontWeight.SemiBold)
+                                    } else {
+                                        Icon(
+                                            Icons.Default.CheckCircle,
+                                            contentDescription = null,
+                                            modifier = Modifier.size(18.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(8.dp))
+                                        Text("Terapkan Budget", fontWeight = FontWeight.SemiBold)
+                                    }
+                                }
+                                Button(
+                                    onClick = {
+                                        viewModel.resetState()
+                                        messageInput = ""
+                                    },
+                                    modifier = Modifier.fillMaxWidth(),
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                                    ),
+                                    shape = RoundedCornerShape(12.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Refresh,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Tanya Lagi", color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.SemiBold)
+                                }
+                            }
+                        } else {
                         // Green Camera Icon
                         IconButton(
                             onClick = { showSourceSelection = true },
@@ -320,6 +431,7 @@ fun AddMessageScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
+                        } // end normal chat input
                     }
                 }
             }
@@ -348,11 +460,55 @@ fun AddMessageScreen(
                 item { ProcessingMessageView() }
             } else if (uiState.showConfirmation) {
                 item {
-                    ConfirmationMessageView(
-                        isSuccess = uiState.transactionSuccess,
-                        message = uiState.aiResponseMessage,
-                        intent = uiState.lastIntent
-                    )
+                    when {
+                        uiState.lastIntent == ChatParseIntent.WHAT_IF.rawValue -> {
+                            val sim = uiState.whatIfSimulation
+                            if (sim != null) {
+                                WhatIfResultCard(
+                                    simulation = sim,
+                                    message = uiState.aiResponseMessage,
+                                    onResetTapped = {
+                                        viewModel.resetState()
+                                        messageInput = ""
+                                    }
+                                )
+                            }
+                        }
+                        uiState.lastIntent == ChatParseIntent.BUDGET_RECOMMENDATION.rawValue -> {
+                            val rec = uiState.budgetRecommendation
+                            if (rec != null) {
+                                BudgetRecommendationCard(data = rec)
+                            }
+                        }
+                        uiState.lastIntent == ChatParseIntent.MULTI_EXPENSE.rawValue -> {
+                            MultiExpenseConfirmationView(
+                                message = uiState.aiResponseMessage,
+                                count = uiState.multiExpenseCount,
+                                total = uiState.multiExpenseTotal,
+                                groupName = uiState.multiExpenseGroupName,
+                                currency = uiState.multiExpenseCurrency
+                            )
+                        }
+                        uiState.lastIntent == ChatParseIntent.FINANCIAL_SUMMARY.rawValue -> {
+                            val summary = uiState.financialSummary
+                            if (summary != null) {
+                                FinancialSummaryCard(data = summary)
+                            } else {
+                                ConfirmationMessageView(
+                                    isSuccess = uiState.transactionSuccess,
+                                    message = uiState.aiResponseMessage,
+                                    intent = uiState.lastIntent
+                                )
+                            }
+                        }
+                        else -> {
+                            ConfirmationMessageView(
+                                isSuccess = uiState.transactionSuccess,
+                                message = uiState.aiResponseMessage,
+                                intent = uiState.lastIntent
+                            )
+                        }
+                    }
                 }
             }
 
@@ -687,6 +843,9 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
         ChatParseIntent.EXPENSE.rawValue -> Color(0xFFFF6B6B)
         ChatParseIntent.INCOME.rawValue -> Color(0xFF00C896)
         ChatParseIntent.PAYMENT.rawValue -> Color(0xFF6C63FF)
+        ChatParseIntent.MULTI_EXPENSE.rawValue -> Color(0xFF9C27B0)
+        ChatParseIntent.FINANCIAL_SUMMARY.rawValue -> Color(0xFF009688)
+        ChatParseIntent.BUDGET_RECOMMENDATION.rawValue -> Color(0xFF5856D6)
         ChatParseIntent.UNKNOWN.rawValue -> Color(0xFF3B82F6)
         else -> Color(0xFF888AAA)
     }
@@ -748,6 +907,104 @@ fun ConfirmationMessageView(isSuccess: Boolean, message: String, intent: String)
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun MultiExpenseConfirmationView(
+    message: String,
+    count: Int,
+    total: Double,
+    groupName: String,
+    currency: String
+) {
+    val purple = Color(0xFF9C27B0)
+
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.Top) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .background(purple.copy(alpha = 0.1f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = null,
+                        tint = purple,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Multi-Expense Logged",
+                            style = MaterialTheme.typography.bodyMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Surface(
+                            color = purple.copy(alpha = 0.1f),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text(
+                                text = "MULTI",
+                                color = purple,
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            if (count > 0) {
+                Spacer(modifier = Modifier.height(12.dp))
+                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Column {
+                        Text(
+                            text = groupName.ifEmpty { "Multi Expense" },
+                            style = MaterialTheme.typography.labelMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "$count items",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Text(
+                        text = com.casha.app.core.util.CurrencyFormatter.format(total, currency.ifEmpty { com.casha.app.core.util.CurrencyFormatter.defaultCurrency }),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = purple
+                    )
+                }
             }
         }
     }

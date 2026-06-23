@@ -19,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.InterestType
 import java.text.SimpleDateFormat
 import java.util.*
@@ -52,15 +53,12 @@ fun StudentLoanFormView(
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // ── Jumlah Pinjaman ─────────────────────────────────────
-        var isPrincipalFocused by remember { mutableStateOf(false) }
         InputCard(title = "Jumlah Pinjaman *") {
-            OutlinedTextField(
-                value = if (isPrincipalFocused) principal else if (principal.isNotEmpty()) CurrencyFormatter.formatInput(principal) else "",
+            CurrencyInputField(
+                value = principal,
                 onValueChange = onPrincipalChange,
                 placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth().onFocusChanged { isPrincipalFocused = it.isFocused },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = cashaBorderlessTextFieldColors(),
                 leadingIcon = {
@@ -80,15 +78,12 @@ fun StudentLoanFormView(
         }
 
         // ── Sisa Hutang ─────────────────────────────────────────
-        var isCurrentBalanceFocused by remember { mutableStateOf(false) }
         InputCard(title = "Sisa Hutang") {
-            OutlinedTextField(
-                value = if (isCurrentBalanceFocused) currentBalance else if (currentBalance.isNotEmpty()) CurrencyFormatter.formatInput(currentBalance) else "",
+            CurrencyInputField(
+                value = currentBalance,
                 onValueChange = onCurrentBalanceChange,
                 placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth().onFocusChanged { isCurrentBalanceFocused = it.isFocused },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = cashaBorderlessTextFieldColors(),
                 leadingIcon = {
@@ -144,16 +139,13 @@ fun StudentLoanFormView(
         }
 
         // ── Cicilan Bulanan ─────────────────────────────────────
-        var isInstallmentFocused by remember { mutableStateOf(false) }
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             InputCard(title = "Cicilan Bulanan") {
-                OutlinedTextField(
-                    value = if (isInstallmentFocused) monthlyInstallment else if (monthlyInstallment.isNotEmpty()) CurrencyFormatter.formatInput(monthlyInstallment) else "",
+                CurrencyInputField(
+                    value = monthlyInstallment,
                     onValueChange = onMonthlyInstallmentChange,
                     placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth().onFocusChanged { isInstallmentFocused = it.isFocused },
-                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = cashaBorderlessTextFieldColors(),
                     leadingIcon = {

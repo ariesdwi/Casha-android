@@ -355,6 +355,8 @@
     <string name="profile_section_subscription">订阅</string>
     <string name="profile_status_free">免费</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">免费用户</string>
+    <string name="profile_status_premium_label">Premium用户</string>
     <string name="profile_subscription_active">活跃</string>
     <string name="profile_subscription_inactive">不活跃</string>
     <string name="profile_subscription_status">Premium 状态</string>
@@ -414,6 +416,17 @@
     <string name="nav_add">添加</string>
     <string name="nav_transactions">交易</string>
     <string name="nav_budget">预算</string>
+    <string name="nav_more">更多</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">账户设置</string>
+    <string name="more_section_financial_tools">财务工具</string>
+    <string name="more_section_app_settings">应用设置</string>
+    <string name="more_section_subscription_account">订阅和账户</string>
+    <string name="more_title">更多</string>
+    <string name="more_menu_wallets">钱包</string>
+    <string name="more_menu_language">语言</string>
+    
     <string name="subscription_button_lifetime">获取终身访问</string>
     <string name="subscription_button_processing">处理中...</string>
     <string name="subscription_button_retrying">重试中...</string>

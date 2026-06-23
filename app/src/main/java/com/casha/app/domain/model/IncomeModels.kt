@@ -13,6 +13,8 @@ data class IncomeCasha(
     val isRecurring: Boolean,
     val frequency: IncomeFrequency?,
     val note: String?,
+    val isSynced: Boolean = false,
+    val remoteId: String? = null,
     val createdAt: Date,
     val updatedAt: Date
 )

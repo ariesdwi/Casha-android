@@ -1,5 +1,7 @@
 package com.casha.app.domain.model
 
+import java.time.LocalDate
+import java.time.YearMonth
 import java.util.Date
 
 /**
@@ -20,4 +22,20 @@ data class ChartCategorySpending(
     val category: String,
     val total: Double,
     val percentage: Double
+)
+
+/**
+ * Daily spending amount for a single calendar day.
+ */
+data class DailySpending(
+    val date: LocalDate,
+    val amount: Double
+)
+
+/**
+ * Monthly spending total for year-view calendar tiles.
+ */
+data class MonthlySpending(
+    val month: YearMonth,
+    val amount: Double
 )

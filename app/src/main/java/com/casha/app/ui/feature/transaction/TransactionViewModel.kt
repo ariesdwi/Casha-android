@@ -11,6 +11,7 @@ import com.casha.app.domain.usecase.dashboard.GetCashflowHistoryUseCase
 import com.casha.app.domain.usecase.transaction.*
 import com.casha.app.domain.model.CreateIncomeRequest
 import com.casha.app.core.network.SyncEventBus
+import com.casha.app.widget.WidgetUpdateCoordinator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -53,7 +54,8 @@ class TransactionViewModel @Inject constructor(
     private val getIncomesUseCase: GetIncomesUseCase,
     private val updateIncomeUseCase: UpdateIncomeUseCase,
     private val deleteIncomeUseCase: DeleteIncomeUseCase,
-    private val syncEventBus: SyncEventBus
+    private val syncEventBus: SyncEventBus,
+    private val cashflowRepository: com.casha.app.domain.repository.CashflowRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TransactionUiState())
@@ -231,11 +233,18 @@ class TransactionViewModel @Inject constructor(
     }
 
     fun addTransaction(request: TransactionRequest) {
+        if (_uiState.value.isLoading) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 addTransactionUseCase(request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event for real-time widget refresh
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -244,11 +253,18 @@ class TransactionViewModel @Inject constructor(
     }
 
     fun addIncome(request: CreateIncomeRequest) {
+        if (_uiState.value.isLoading) return
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 addIncomeUseCase(request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -262,6 +278,12 @@ class TransactionViewModel @Inject constructor(
             try {
                 updateIncomeUseCase(id, request)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
@@ -273,7 +295,9 @@ class TransactionViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val existing = _uiState.value.rawTransactions.find { it.id == id }
+                // Find by id or remoteId to handle locally-added transactions
+                // whose Room id is a local UUID but the cashflow list uses the server remoteId
+                val existing = _uiState.value.rawTransactions.find { it.id == id || it.remoteId == id }
                 if (existing != null) {
                     val updated = existing.copy(
                         name = request.name,
@@ -284,6 +308,12 @@ class TransactionViewModel @Inject constructor(
                     )
                     updateTransactionUseCase(updated)
                     syncEventBus.emitSyncCompleted()
+                    
+                    // ✅ Emit widget update event
+                    WidgetUpdateCoordinator.emitUpdate(
+                        WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                    )
+                    
                     syncData()
                 }
             } catch (e: Exception) {
@@ -292,24 +322,65 @@ class TransactionViewModel @Inject constructor(
         }
     }
 
-    fun deleteTransaction(id: String) {
+    fun deleteTransaction(id: String, onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteTransactionUseCase(id)
                 syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
                 syncData()
+                onSuccess?.invoke()
             } catch (e: Exception) {
                 _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
             }
         }
     }
 
-    fun deleteIncome(id: String) {
+    fun deleteIncome(id: String, onSuccess: (() -> Unit)? = null) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
                 deleteIncomeUseCase(id)
+                syncEventBus.emitSyncCompleted()
+                
+                // ✅ Emit widget update event
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.TransactionAdded
+                )
+                
+                syncData()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun deleteGroup(groupId: String, onSuccess: (() -> Unit)? = null) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                cashflowRepository.deleteGroup(groupId)
+                syncEventBus.emitSyncCompleted()
+                syncData()
+                onSuccess?.invoke()
+            } catch (e: Exception) {
+                _uiState.update { it.copy(isLoading = false, errorMessage = e.message) }
+            }
+        }
+    }
+
+    fun renameGroup(groupId: String, newName: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                cashflowRepository.renameGroup(groupId, newName)
                 syncEventBus.emitSyncCompleted()
                 syncData()
             } catch (e: Exception) {
@@ -337,7 +408,8 @@ class TransactionViewModel @Inject constructor(
                     yesterdayStr -> "Yesterday"
                     else -> dayFormatter.format(parsed)
                 }
-                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+                val segments = CashflowUiUtils.buildDisplaySegments(entries)
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries, segments = segments)
             }
     }
 }

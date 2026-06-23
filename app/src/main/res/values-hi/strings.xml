@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">AI के साथ चैट करें</string>
     <string name="add_transaction_coordinator_button_manual">मैनुअल प्रविष्टि</string>
     <string name="add_transaction_coordinator_button_photo_library">फ़ोटो लाइब्रेरी</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">सभी सुविधाओं को अनलॉक करने के लिए प्रीमियम में अपग्रेड करें ✨</string>
     <string name="add_transaction_coordinator_message_premium">चुनें कि आप लेन-देन कैसे जोड़ना चाहते हैं</string>
     <string name="add_transaction_coordinator_title">लेन-देन जोड़ें</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">सदस्यता</string>
     <string name="profile_status_free">मुफ्त</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">मुफ्त उपयोगकर्ता</string>
+    <string name="profile_status_premium_label">Premium उपयोगकर्ता</string>
     <string name="profile_subscription_active">सक्रिय</string>
     <string name="profile_subscription_inactive">निष्क्रिय</string>
     <string name="profile_subscription_status">Premium स्थिति</string>
@@ -499,6 +503,17 @@
     <string name="nav_add">जोड़ें</string>
     <string name="nav_transactions">लेनदेन</string>
     <string name="nav_budget">बजट</string>
+    <string name="nav_more">अधिक</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">खाता सेटिंग्स</string>
+    <string name="more_section_financial_tools">वित्तीय उपकरण</string>
+    <string name="more_section_app_settings">ऐप सेटिंग्स</string>
+    <string name="more_section_subscription_account">सदस्यता और खाता</string>
+    <string name="more_title">अधिक</string>
+    <string name="more_menu_wallets">वॉलेट</string>
+    <string name="more_menu_language">भाषा</string>
+    
     <string name="subscription_button_lifetime">आजीवन एक्सेस प्राप्त करें</string>
     <string name="subscription_button_processing">प्रसंस्करण...</string>
     <string name="subscription_button_retrying">पुनः प्रयास...</string>

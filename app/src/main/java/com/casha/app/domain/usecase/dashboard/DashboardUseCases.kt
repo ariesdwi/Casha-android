@@ -46,7 +46,8 @@ class GetCashflowHistoryUseCase @Inject constructor(
 }
 
 data class CashflowHistoryResponse(
-    val entries: List<CashflowEntry>
+    val entries: List<CashflowEntry>,
+    val pagination: com.casha.app.data.remote.dto.CashflowPaginationDto? = null
 )
 
 class GetCashflowSummaryUseCase @Inject constructor(
@@ -54,6 +55,14 @@ class GetCashflowSummaryUseCase @Inject constructor(
 ) {
     suspend fun execute(month: String?, year: String?): CashflowSummary {
         return repository.getSummary(month, year)
+    }
+}
+
+class GetSafeSpendTodayUseCase @Inject constructor(
+    private val repository: CashflowRepository
+) {
+    suspend fun execute(): SafeSpendToday {
+        return repository.getSafeSpendToday()
     }
 }
 

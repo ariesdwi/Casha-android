@@ -8,11 +8,19 @@ import com.casha.app.data.remote.api.ChatApiService
 import com.casha.app.data.remote.dto.ChatIncomeDto
 import com.casha.app.data.remote.dto.ChatRequestDto
 import com.casha.app.data.remote.dto.ChatTransactionDto
+import com.casha.app.data.remote.dto.MultiExpenseSummaryDto
+import com.casha.app.data.remote.dto.WhatIfDataDto
+import com.casha.app.data.remote.dto.BudgetRecommendationDataDto
+import com.casha.app.data.remote.dto.FinancialSummaryDataDto
+import com.casha.app.data.remote.dto.toDomain
 import com.casha.app.domain.model.ChatParseIntent
 import com.casha.app.domain.model.ChatParseResult
+import com.casha.app.domain.model.MultiExpenseSummary
+import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.repository.ChatRepository
 import com.casha.app.core.network.safeApiCall
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.decodeFromJsonElement
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -62,7 +70,7 @@ class ChatRepositoryImpl @Inject constructor(
         val parseData = response.data ?: throw Exception("No data returned from API: ${response.message}")
         
         val intentString = parseData.intent
-        val message = response.message
+        val message = parseData.message ?: response.message
         
         return when (intentString) {
             "EXPENSE", "PAYMENT" -> {
@@ -71,14 +79,16 @@ class ChatRepositoryImpl @Inject constructor(
                 val entity = TransactionEntity(
                     id = transactionDto.id.ifEmpty { java.util.UUID.randomUUID().toString() },
                     name = transactionDto.name,
-                    category = transactionDto.category.ifEmpty { "Other" },
+                    category = transactionDto.categoryName.ifEmpty { "Other" },
                     amount = transactionDto.amount,
                     datetime = try { dateFormat.parse(transactionDto.datetime) ?: Date() } catch (e: Exception) { Date() },
                     note = transactionDto.note,
                     isSynced = true,
                     remoteId = transactionDto.id,
                     createdAt = try { transactionDto.createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
-                    updatedAt = try { transactionDto.updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
+                    updatedAt = try { transactionDto.updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
+                    groupId = transactionDto.groupId,
+                    groupName = transactionDto.groupName
                 )
                 transactionDao.insertTransaction(entity)
                 
@@ -113,6 +123,8 @@ class ChatRepositoryImpl @Inject constructor(
                     isRecurring = incomeDto.isRecurring,
                     frequency = frequencyResolved,
                     note = incomeDto.note,
+                    isSynced = true,
+                    remoteId = incomeDto.id,
                     createdAt = try { incomeDto.createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
                     updatedAt = try { incomeDto.updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
                 )
@@ -123,12 +135,105 @@ class ChatRepositoryImpl @Inject constructor(
                     message = message
                 )
             }
+            "WHAT_IF" -> {
+                // Simulation only — do NOT save to DB, do NOT emit sync event
+                val whatIfDto = json.decodeFromJsonElement<WhatIfDataDto>(parseData.data)
+                ChatParseResult(
+                    intent = ChatParseIntent.WHAT_IF,
+                    message = message,
+                    whatIfSimulation = whatIfDto.toDomain()
+                )
+            }
+            "FINANCIAL_SUMMARY" -> {
+                // Display-only — show AI message + structured card, no DB save
+                val summaryDto = try {
+                    json.decodeFromJsonElement<FinancialSummaryDataDto>(parseData.data)
+                } catch (_: Exception) { null }
+                ChatParseResult(
+                    intent = ChatParseIntent.FINANCIAL_SUMMARY,
+                    message = message,
+                    financialSummary = summaryDto?.toDomain()
+                )
+            }
+            "BUDGET_RECOMMENDATION" -> {
+                val recDto = json.decodeFromJsonElement<BudgetRecommendationDataDto>(parseData.data)
+                ChatParseResult(
+                    intent = ChatParseIntent.BUDGET_RECOMMENDATION,
+                    message = message,
+                    budgetRecommendation = recDto.toDomain()
+                )
+            }
             "UNKNOWN" -> {
                 // For unknown intents, we just return the AI's message
                 // so the UI can display it without saving any transaction.
                 ChatParseResult(
                     intent = ChatParseIntent.UNKNOWN,
                     message = message
+                )
+            }
+            "MULTI_EXPENSE" -> {
+                // data is an array of ChatTransactionDto
+                val transactionDtos: List<ChatTransactionDto> = if (parseData.data is JsonArray) {
+                    json.decodeFromJsonElement<List<ChatTransactionDto>>(parseData.data)
+                } else {
+                    // Fallback: single item wrapped
+                    listOf(json.decodeFromJsonElement<ChatTransactionDto>(parseData.data))
+                }
+
+                val domainExpenses = mutableListOf<TransactionCasha>()
+
+                for (dto in transactionDtos) {
+                    val id = dto.id.ifEmpty { java.util.UUID.randomUUID().toString() }
+                    val entity = TransactionEntity(
+                        id = id,
+                        name = dto.name,
+                        category = dto.categoryName.ifEmpty { "Other" },
+                        amount = dto.amount,
+                        datetime = try { dateFormat.parse(dto.datetime) ?: Date() } catch (e: Exception) { Date() },
+                        note = dto.note,
+                        isSynced = true,
+                        remoteId = dto.id,
+                        createdAt = try { dto.createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
+                        updatedAt = try { dto.updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
+                        groupId = dto.groupId,
+                        groupName = dto.groupName
+                    )
+                    transactionDao.insertTransaction(entity)
+
+                    domainExpenses.add(
+                        TransactionCasha(
+                            id = entity.id,
+                            name = entity.name,
+                            category = entity.category,
+                            amount = entity.amount,
+                            datetime = entity.datetime,
+                            note = entity.note,
+                            isSynced = true,
+                            remoteId = entity.remoteId,
+                            createdAt = entity.createdAt,
+                            updatedAt = entity.updatedAt,
+                            groupId = entity.groupId,
+                            groupName = entity.groupName
+                        )
+                    )
+                }
+
+                val summaryDto = parseData.summary
+                val summary = summaryDto?.let {
+                    MultiExpenseSummary(
+                        groupId = it.groupId,
+                        groupName = it.groupName,
+                        count = it.count,
+                        total = it.total,
+                        currency = it.currency
+                    )
+                }
+
+                ChatParseResult(
+                    intent = ChatParseIntent.MULTI_EXPENSE,
+                    message = message,
+                    expenses = domainExpenses,
+                    summary = summary
                 )
             }
             else -> {

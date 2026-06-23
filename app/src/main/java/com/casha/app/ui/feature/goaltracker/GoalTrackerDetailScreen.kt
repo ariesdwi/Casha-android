@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.res.stringResource
 import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.*
 import kotlinx.coroutines.launch
 import java.util.*
@@ -449,7 +450,7 @@ fun GoalProgressSection(goal: Goal) {
                 InfoChip(
                     icon = Icons.Default.Info, // Placeholder icon
                     label = stringResource(R.string.goal_label_still_needed),
-                    value = CurrencyFormatter.format(remaining, goal.currency),
+                    value = if (remaining >= 1_000_000) CurrencyFormatter.formatCompact(remaining, goal.currency) else CurrencyFormatter.format(remaining, goal.currency),
                     color = MaterialTheme.colorScheme.error, // cashaDanger (substituting for Accent/Warning red)
                     modifier = Modifier.weight(1f)
                 )
@@ -458,7 +459,7 @@ fun GoalProgressSection(goal: Goal) {
                     InfoChip(
                         icon = Icons.Default.DateRange,
                         label = stringResource(R.string.goal_label_per_month),
-                        value = CurrencyFormatter.format(goal.progress.monthlySavingsNeeded, goal.currency),
+                        value = if (goal.progress.monthlySavingsNeeded >= 1_000_000) CurrencyFormatter.formatCompact(goal.progress.monthlySavingsNeeded, goal.currency) else CurrencyFormatter.format(goal.progress.monthlySavingsNeeded, goal.currency),
                         color = goalColor,
                         modifier = Modifier.weight(1f)
                     )
@@ -498,7 +499,14 @@ fun InfoChip(
 
             Column {
                 Text(text = label, fontSize = 10.sp, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(text = value, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, maxLines = 1)
+                Text(
+                    text = value,
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
             }
         }
     }
@@ -713,26 +721,24 @@ fun EditGoalSection(
 
         // Target Amount
         InputCard(title = stringResource(R.string.goal_input_target_amount)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                OutlinedTextField(
-                    value = targetAmount,
-                    onValueChange = onTargetAmountChange,
-                    placeholder = { Text("0") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
-                    textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedBorderColor = Color.Transparent,
-                        focusedBorderColor = Color.Transparent
+            CurrencyInputField(
+                value = targetAmount,
+                onValueChange = onTargetAmountChange,
+                currencyCode = CurrencyFormatter.defaultCurrency,
+                placeholder = { Text("0") },
+                leadingIcon = {
+                    Text(
+                        text = CurrencyFormatter.symbol(CurrencyFormatter.defaultCurrency),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                },
+                modifier = Modifier.fillMaxWidth(),
+                textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent
                 )
-            }
+            )
         }
 
         // Category (Reuse simple clickable card)
@@ -862,16 +868,22 @@ onDismissRequest = onDismiss,
                             fontWeight = FontWeight.Bold,
                             color = goalColor
                         )
-                        BasicTextField(
+                        CurrencyInputField(
                             value = amount,
                             onValueChange = { amount = it },
+                            currencyCode = goal.currency ?: CurrencyFormatter.defaultCurrency,
                             textStyle = androidx.compose.ui.text.TextStyle(
                                 fontSize = 36.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface
                             ),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color.Transparent,
+                                unfocusedBorderColor = Color.Transparent,
+                                focusedContainerColor = Color.Transparent,
+                                unfocusedContainerColor = Color.Transparent
+                            )
                         )
                     }
                 }

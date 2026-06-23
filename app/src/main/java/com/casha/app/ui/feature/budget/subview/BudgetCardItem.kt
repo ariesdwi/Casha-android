@@ -43,7 +43,8 @@ fun BudgetCardItem(
     budget: BudgetCasha,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isSwipeEnabled: Boolean = true
 ) {
     var showDeleteDialog by remember { mutableStateOf(false) }
     
@@ -82,14 +83,7 @@ fun BudgetCardItem(
         )
     }
 
-    SwipeToDismissBox(
-        state = dismissState,
-        enableDismissFromStartToEnd = false,
-        backgroundContent = {
-            BudgetSwipeBackground(dismissState)
-        },
-        modifier = modifier
-    ) {
+    val cardContent = @Composable {
         Card(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(20.dp),
@@ -107,6 +101,23 @@ fun BudgetCardItem(
                 BudgetProgressPart(budget)
                 BudgetFooterPart(budget)
             }
+        }
+    }
+
+    if (isSwipeEnabled) {
+        SwipeToDismissBox(
+            state = dismissState,
+            enableDismissFromStartToEnd = false,
+            backgroundContent = {
+                BudgetSwipeBackground(dismissState)
+            },
+            modifier = modifier
+        ) {
+            cardContent()
+        }
+    } else {
+        Box(modifier = modifier) {
+            cardContent()
         }
     }
 }

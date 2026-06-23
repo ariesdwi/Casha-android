@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">Conversar com IA</string>
     <string name="add_transaction_coordinator_button_manual">Entrada manual</string>
     <string name="add_transaction_coordinator_button_photo_library">Biblioteca de fotos</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">Atualize para o Premium para desbloquear todos os recursos ✨</string>
     <string name="add_transaction_coordinator_message_premium">Escolha como deseja adicionar uma transação</string>
     <string name="add_transaction_coordinator_title">Adicionar transação</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">Assinatura</string>
     <string name="profile_status_free">Gratuito</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">Usuário Gratuito</string>
+    <string name="profile_status_premium_label">Usuário Premium</string>
     <string name="profile_subscription_active">ATIVO</string>
     <string name="profile_subscription_inactive">INATIVO</string>
     <string name="profile_subscription_status">Status Premium</string>
@@ -499,6 +503,17 @@
     <string name="nav_add">Adicionar</string>
     <string name="nav_transactions">Transações</string>
     <string name="nav_budget">Orçamento</string>
+    <string name="nav_more">Mais</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">Configurações da Conta</string>
+    <string name="more_section_financial_tools">Ferramentas Financeiras</string>
+    <string name="more_section_app_settings">Configurações do App</string>
+    <string name="more_section_subscription_account">Assinatura e Conta</string>
+    <string name="more_title">Mais</string>
+    <string name="more_menu_wallets">Carteiras</string>
+    <string name="more_menu_language">Idioma</string>
+    
     <string name="subscription_button_lifetime">Obter Acesso Vitalício</string>
     <string name="subscription_button_processing">Processando...</string>
     <string name="subscription_button_retrying">Tentando novamente...</string>

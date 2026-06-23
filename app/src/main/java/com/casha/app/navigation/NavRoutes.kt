@@ -40,6 +40,10 @@ sealed class NavRoutes(val route: String) {
         fun createRoute(transactionId: String, cashflowType: String) = "transaction_detail/$transactionId/$cashflowType"
     }
 
+    data object GroupDetail : NavRoutes("group_detail/{groupId}") {
+        fun createRoute(groupId: String) = "group_detail/$groupId"
+    }
+
     // ── Goal Tracker ──
     data object GoalTracker : NavRoutes("goal_tracker")
     data object GoalTrackerDetail : NavRoutes("goal_tracker_detail/{goalId}") {
@@ -80,6 +84,17 @@ sealed class NavRoutes(val route: String) {
     data object ProfileEdit : NavRoutes("profile_edit")
     data object Notifications : NavRoutes("notifications")
     data object Categories : NavRoutes("categories")
+
+    // ── More ──
+    data object More : NavRoutes("more")
+    data object Language : NavRoutes("language")
+
+    // ── Wallets ──
+    data object WalletList : NavRoutes("wallet_list")
+    data object EditWallet : NavRoutes("edit_wallet/{walletId}/{source}") {
+        fun createRoute(walletId: String, source: String) = "edit_wallet/$walletId/$source"
+    }
+    data object TransferWallet : NavRoutes("transfer_wallet")
 
     // ── Other ──
     data object Recommendation : NavRoutes("recommendation")

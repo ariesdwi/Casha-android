@@ -8,9 +8,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowType
+import com.casha.app.domain.model.CashflowDateSection
+import com.casha.app.domain.model.DisplaySegment
 import com.casha.app.domain.model.TransactionCasha
 import com.casha.app.domain.model.IncomeCasha
 import com.casha.app.ui.theme.*
+
+/**
+ * Period summary containing aggregated financial data for a time period.
+ */
+data class PeriodSummary(
+    val totalIncome: Double,
+    val totalExpense: Double,
+    val netAmount: Double
+)
 
 /**
  * Shared UI utilities for rendering Cashflow items (Incomes & Transactions).
@@ -72,8 +83,42 @@ object CashflowUiUtils {
                     yesterdayStr -> "Yesterday"
                     else -> dayFormatter.format(parsed)
                 }
-                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries)
+                val segments = buildDisplaySegments(entries)
+                com.casha.app.domain.model.CashflowDateSection(day = day, date = displayDate, items = entries, segments = segments)
             }
+    }
+
+    /**
+     * Collapses entries with the same groupId into DisplaySegment.Grouped,
+     * and wraps individual (ungrouped) entries as DisplaySegment.Individual.
+     */
+    fun buildDisplaySegments(entries: List<CashflowEntry>): List<DisplaySegment> {
+        val segments = mutableListOf<DisplaySegment>()
+        val groupedById = mutableMapOf<String, MutableList<CashflowEntry>>()
+        val ungrouped = mutableListOf<CashflowEntry>()
+
+        for (entry in entries) {
+            val gId = entry.groupId
+            if (gId != null) {
+                groupedById.getOrPut(gId) { mutableListOf() }.add(entry)
+            } else {
+                ungrouped.add(entry)
+            }
+        }
+
+        // Build grouped segments
+        for ((groupId, items) in groupedById) {
+            val groupName = items.firstOrNull()?.groupName ?: "Multi Expense"
+            val total = items.sumOf { it.amount }
+            segments.add(DisplaySegment.Grouped(groupId = groupId, groupName = groupName, items = items, totalAmount = total))
+        }
+
+        // Build individual segments
+        for (entry in ungrouped) {
+            segments.add(DisplaySegment.Individual(entry))
+        }
+
+        return segments
     }
 
     fun TransactionCasha.toCashflowEntry(): CashflowEntry {
@@ -84,7 +129,9 @@ object CashflowUiUtils {
             category = this.category,
             type = CashflowType.EXPENSE,
             date = this.datetime,
-            icon = null
+            icon = null,
+            groupId = this.groupId,
+            groupName = this.groupName
         )
     }
 
@@ -113,4 +160,30 @@ object CashflowUiUtils {
             icon = null
         )
     }
+}
+
+
+/**
+ * Extension function to calculate period summary from a list of CashflowDateSections.
+ * Returns aggregated financial data for the period: total income, total expense, and net amount.
+ * Handles empty lists gracefully by returning zero values.
+ */
+fun List<CashflowDateSection>.calculatePeriodSummary(): PeriodSummary {
+    val allItems = this.flatMap { it.items }
+    
+    val totalIncome = allItems
+        .filter { it.type == CashflowType.INCOME }
+        .sumOf { it.amount }
+    
+    val totalExpense = allItems
+        .filter { it.type == CashflowType.EXPENSE }
+        .sumOf { it.amount }
+    
+    val netAmount = totalIncome - totalExpense
+    
+    return PeriodSummary(
+        totalIncome = totalIncome,
+        totalExpense = totalExpense,
+        netAmount = netAmount
+    )
 }

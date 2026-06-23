@@ -168,8 +168,8 @@ fun CreateAssetStockSection(
                 value = pricePerUnit,
                 onValueChange = onPricePerUnitChange,
                 placeholder = "0",
-                keyboardType = KeyboardType.Decimal,
-                leadingText = currencySymbol
+                leadingText = currencySymbol,
+                isCurrency = true
             )
         }
 
@@ -339,8 +339,8 @@ fun CreateAssetGenericInvestmentSection(
                 value = pricePerUnit,
                 onValueChange = onPricePerUnitChange,
                 placeholder = "0",
-                keyboardType = KeyboardType.Decimal,
-                leadingText = currencySymbol
+                leadingText = currencySymbol,
+                isCurrency = true
             )
         }
         
@@ -395,8 +395,8 @@ fun CreateAssetAmountSection(
                 value = amount,
                 onValueChange = onAmountChange,
                 placeholder = "0",
-                keyboardType = KeyboardType.Decimal,
-                leadingText = currencySymbol
+                leadingText = currencySymbol,
+                isCurrency = true
             )
         }
     }

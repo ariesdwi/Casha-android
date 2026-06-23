@@ -4,6 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
 import com.casha.app.core.network.NetworkMonitor
+import com.casha.app.widget.WidgetUpdater
+import com.casha.app.widget.WidgetUpdateCoordinator
+import com.casha.app.widget.data.WidgetPreferences
+import android.content.Context
+import dagger.hilt.android.qualifiers.ApplicationContext
 import com.casha.app.domain.model.UpdateProfileRequest
 import com.casha.app.domain.model.UserCasha
 import com.casha.app.domain.usecase.auth.logout.DeleteAllLocalDataUseCase
@@ -35,7 +40,8 @@ class ProfileViewModel @Inject constructor(
     private val deleteAllLocalDataUseCase: DeleteAllLocalDataUseCase,
     private val authManager: AuthManager,
     private val networkMonitor: NetworkMonitor,
-    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager
+    private val subscriptionManager: com.casha.app.core.auth.SubscriptionManager,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(ProfileUiState())
@@ -53,6 +59,39 @@ class ProfileViewModel @Inject constructor(
                 }
             }
             .launchIn(viewModelScope)
+
+        // Observe local cached profile changes
+        viewModelScope.launch {
+            combine(
+                authManager.userName,
+                authManager.userEmail,
+                authManager.userAvatar,
+                authManager.selectedCurrency
+            ) { name, email, avatar, currency ->
+                if (name != null) {
+                    val currentProfile = _uiState.value.profile
+                    _uiState.update { state ->
+                        state.copy(
+                            profile = currentProfile?.copy(
+                                name = name,
+                                email = email ?: "",
+                                avatar = avatar,
+                                currency = currency ?: "USD"
+                            ) ?: UserCasha(
+                                id = "",
+                                email = email ?: "",
+                                name = name,
+                                avatar = avatar,
+                                phone = null,
+                                currency = currency ?: "USD",
+                                createdAt = Date(),
+                                updatedAt = Date()
+                            )
+                        )
+                    }
+                }
+            }.collect()
+        }
 
         // Initial load
         viewModelScope.launch {
@@ -195,6 +234,15 @@ class ProfileViewModel @Inject constructor(
             try {
                 deleteAllLocalDataUseCase()
                 authManager.clearAll()
+                
+                // ✅ Save logout state to widget preferences
+                WidgetPreferences.setLoggedIn(context, false)
+                
+                // ✅ Emit widget update event for real-time widget state change
+                WidgetUpdateCoordinator.emitUpdate(
+                    WidgetUpdateCoordinator.WidgetUpdateEvent.LoginStateChanged
+                )
+                
                 _uiState.update { it.copy(isLoading = false, isLoggedOut = true) }
             } catch (e: Exception) {
                 _uiState.update {
@@ -207,7 +255,16 @@ class ProfileViewModel @Inject constructor(
     fun togglePremiumDebug() {
         viewModelScope.launch {
             val currentStatus = _uiState.value.isPremium
-            subscriptionManager.setPremiumStatus(!currentStatus)
+            val newStatus = !currentStatus
+            subscriptionManager.setPremiumStatus(newStatus)
+            
+            // Save to widget preferences (old way - keeping for compatibility)
+            WidgetUpdater.setAuthState(context, isLoggedIn = true, isPremium = newStatus)
+            
+            // ✅ Emit widget update event for real-time widget state change
+            WidgetUpdateCoordinator.emitUpdate(
+                WidgetUpdateCoordinator.WidgetUpdateEvent.PremiumStateChanged
+            )
         }
     }
 

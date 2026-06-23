@@ -212,6 +212,45 @@ class TransactionRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getDailySpending(
+        startDate: Date,
+        endDate: Date
+    ): List<com.casha.app.domain.model.DailySpending> {
+        val rows = transactionDao.getDailySpendingBetween(startDate.time, endDate.time)
+        return rows.mapNotNull { row ->
+            runCatching {
+                com.casha.app.domain.model.DailySpending(
+                    date = java.time.LocalDate.parse(row.date),
+                    amount = row.total
+                )
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getMonthlySpending(
+        startDate: Date,
+        endDate: Date
+    ): List<com.casha.app.domain.model.MonthlySpending> {
+        val rows = transactionDao.getMonthlySpendingBetween(startDate.time, endDate.time)
+        return rows.mapNotNull { row ->
+            runCatching {
+                com.casha.app.domain.model.MonthlySpending(
+                    month = java.time.YearMonth.parse(row.month),
+                    amount = row.total
+                )
+            }.getOrNull()
+        }
+    }
+
+    override suspend fun getTransactionsByDate(
+        date: java.time.LocalDate
+    ): List<TransactionCasha> {
+        val zoneOffset = java.util.TimeZone.getDefault().toZoneId()
+        val startMs = date.atStartOfDay(zoneOffset).toInstant().toEpochMilli()
+        val endMs   = date.plusDays(1).atStartOfDay(zoneOffset).toInstant().toEpochMilli()
+        return transactionDao.getTransactionsByDate(startMs, endMs).map { it.toDomain() }
+    }
+
     override suspend fun getUnsyncCount(): Int {
         return transactionDao.getUnsyncedTransactions().size
     }
@@ -265,6 +304,7 @@ class TransactionRepositoryImpl @Inject constructor(
                     amount = request.amount,
                     category = request.category ?: local.category,
                     datetime = dateFormat.parse(request.datetime) ?: local.datetime,
+                    note = request.note,
                     isSynced = true
                 )
                 transactionDao.insertTransaction(updatedEntity)
@@ -314,7 +354,9 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = isSynced,
         remoteId = remoteId,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        groupId = groupId,
+        groupName = groupName
     )
 
     private fun TransactionCasha.toEntity() = TransactionEntity(
@@ -327,7 +369,10 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = isSynced,
         remoteId = remoteId,
         createdAt = createdAt,
-        updatedAt = updatedAt
+        updatedAt = updatedAt,
+        groupId = groupId,
+        groupName = groupName,
+        assetId = assetId
     )
 
     private fun TransactionEntity.toUploadDto() = TransactionUploadDto(
@@ -336,7 +381,8 @@ class TransactionRepositoryImpl @Inject constructor(
         category = category,
         amount = amount,
         datetime = dateFormat.format(datetime),
-        note = note
+        note = note,
+        assetId = assetId
     )
 
     private fun TransactionDto.toEntity() = TransactionEntity(
@@ -349,6 +395,7 @@ class TransactionRepositoryImpl @Inject constructor(
         isSynced = true,
         remoteId = id,
         createdAt = try { createdAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
-        updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() }
+        updatedAt = try { updatedAt?.let { dateFormat.parse(it) } ?: Date() } catch (e: Exception) { Date() },
+        assetId = assetId
     )
 }

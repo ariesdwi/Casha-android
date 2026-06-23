@@ -53,7 +53,9 @@ class CashflowSyncUseCase @Inject constructor(
                         isSynced = true,
                         remoteId = entry.id,
                         createdAt = entry.date,
-                        updatedAt = entry.date
+                        updatedAt = entry.date,
+                        groupId = entry.groupId,
+                        groupName = entry.groupName
                     )
                 }
                 transactionDao.insertTransactions(transactionEntities)
@@ -63,16 +65,18 @@ class CashflowSyncUseCase @Inject constructor(
             if (incomes.isNotEmpty()) {
                 val incomeEntities = incomes.map { entry ->
                     IncomeEntity(
-                        id = entry.id,
+                        id = entry.id, // Using server ID as primary key
                         name = entry.title,
                         amount = entry.amount,
                         datetime = entry.date,
-                        type = IncomeType.OTHER,
+                        type = try { entry.category.let { IncomeType.valueOf(it.uppercase()) } } catch (e: Exception) { IncomeType.OTHER },
                         source = null,
                         assetId = null,
                         isRecurring = false,
                         frequency = null,
                         note = null,
+                        isSynced = true,
+                        remoteId = entry.id,
                         createdAt = entry.date,
                         updatedAt = entry.date
                     )
@@ -85,6 +89,99 @@ class CashflowSyncUseCase @Inject constructor(
             // On failure, fall back to local data
             return loadFromLocal(startDate = Date(0), endDate = Date())
         }
+    }
+
+    /**
+     * Sync and fetch ALL pages of cashflow data
+     * @param month Optional month filter (format: "2026-06")
+     * @param year Optional year filter (format: "2026")
+     * @return Complete list of all entries
+     */
+    suspend fun syncAndFetchAll(
+        month: String? = null,
+        year: String? = null
+    ): List<CashflowEntry> {
+        android.util.Log.d(TAG, "🔄 Starting syncAndFetchAll - month: ${month ?: "all"}, year: ${year ?: "all"}")
+        
+        try {
+            // 1️⃣ Fetch ALL pages from remote
+            val allEntries = cashflowRepository.getHistoryAllPages(
+                month = month,
+                year = year,
+                pageSize = 100
+            )
+            
+            if (allEntries.isEmpty()) {
+                android.util.Log.d(TAG, "ℹ️ No entries returned from API")
+                return emptyList()
+            }
+            
+            // 2️⃣ Split by type
+            val expenses = allEntries.filter { it.type == CashflowType.EXPENSE }
+            val incomes = allEntries.filter { it.type == CashflowType.INCOME }
+            
+            android.util.Log.d(TAG, "💾 Merging to local DB: ${expenses.size} expenses, ${incomes.size} incomes")
+            
+            // 3️⃣ Map & merge expenses → TransactionEntity
+            if (expenses.isNotEmpty()) {
+                val transactionEntities = expenses.map { it.toTransactionEntity() }
+                transactionDao.insertTransactions(transactionEntities)
+            }
+            
+            // 4️⃣ Map & merge incomes → IncomeEntity
+            if (incomes.isNotEmpty()) {
+                val incomeEntities = incomes.map { it.toIncomeEntity() }
+                incomeDao.insertIncomes(incomeEntities)
+            }
+            
+            android.util.Log.d(TAG, "✅ syncAndFetchAll complete: ${allEntries.size} items")
+            return allEntries
+            
+        } catch (e: Exception) {
+            android.util.Log.e(TAG, "❌ syncAndFetchAll failed", e)
+            throw e
+        }
+    }
+    
+    // Extension functions for mapping
+    private fun CashflowEntry.toTransactionEntity(): TransactionEntity {
+        return TransactionEntity(
+            id = id,
+            name = title,
+            category = category,
+            amount = amount,
+            datetime = date,
+            note = null,
+            isSynced = true,
+            remoteId = id,
+            createdAt = date,
+            updatedAt = date,
+            groupId = groupId,
+            groupName = groupName
+        )
+    }
+    
+    private fun CashflowEntry.toIncomeEntity(): IncomeEntity {
+        return IncomeEntity(
+            id = id,
+            name = title,
+            amount = amount,
+            datetime = date,
+            type = try { 
+                category.let { IncomeType.valueOf(it.uppercase()) } 
+            } catch (e: Exception) { 
+                IncomeType.OTHER 
+            },
+            source = null,
+            assetId = null,
+            isRecurring = false,
+            frequency = null,
+            note = null,
+            isSynced = true,
+            remoteId = id,
+            createdAt = date,
+            updatedAt = date
+        )
     }
 
     /**
@@ -102,12 +199,14 @@ class CashflowSyncUseCase @Inject constructor(
                     amount = entity.amount,
                     category = entity.category,
                     type = CashflowType.EXPENSE,
-                    date = entity.datetime
+                    date = entity.datetime,
+                    groupId = entity.groupId,
+                    groupName = entity.groupName
                 )
             }
 
         // Incomes from IncomeDao
-        val allIncomes = incomeDao.getAllIncomes().firstOrNull() ?: emptyList()
+        val allIncomes = incomeDao.getAllIncomesOnce()
         val incomes = allIncomes
             .filter { it.datetime.time >= startDate.time && it.datetime.time <= endDate.time }
             .map { entity ->
@@ -144,6 +243,10 @@ class CashflowSyncUseCase @Inject constructor(
             netBalance = totalIncome - totalExpense,
             periodLabel = monthLabel
         )
+    }
+
+    companion object {
+        private const val TAG = "CashflowSyncUseCase"
     }
 }
 

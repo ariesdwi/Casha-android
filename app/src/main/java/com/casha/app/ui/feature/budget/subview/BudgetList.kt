@@ -22,6 +22,9 @@ import com.casha.app.R
 fun BudgetList(
     budgets: List<BudgetCasha>,
     summary: BudgetSummary?,
+    incomeTotal: Double = 0.0,
+    totalAllocated: Double = 0.0,
+    unallocated: Double = 0.0,
     isLoading: Boolean,
     onDelete: (String) -> Unit,
     onEdit: (String) -> Unit,
@@ -38,7 +41,12 @@ fun BudgetList(
             contentAlignment = Alignment.TopCenter
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                BudgetOverviewCard(summary = summary)
+                BudgetOverviewCard(
+                    summary = summary,
+                    incomeTotal = incomeTotal,
+                    totalAllocated = totalAllocated,
+                    unallocated = unallocated
+                )
                 BudgetEmptyState(onNavigateToAIRecommendations = onNavigateToAIRecommendations)
             }
         }
@@ -50,7 +58,12 @@ fun BudgetList(
         ) {
             // Summary item
             item {
-                BudgetOverviewCard(summary = summary)
+                BudgetOverviewCard(
+                    summary = summary,
+                    incomeTotal = incomeTotal,
+                    totalAllocated = totalAllocated,
+                    unallocated = unallocated
+                )
             }
 
             items(budgets, key = { it.id }) { budget ->

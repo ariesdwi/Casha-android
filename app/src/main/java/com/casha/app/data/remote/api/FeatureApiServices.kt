@@ -18,6 +18,9 @@ interface CashflowApiService {
         @Query("year") year: String? = null
     ): BaseResponse<CashflowSummaryDto>
     
+    @GET("cashflow/safe-spend-today")
+    suspend fun getSafeSpendToday(): BaseResponse<SafeSpendTodayDto>
+    
     @PATCH("cashflow/{type}/{id}")
     suspend fun updateCashflow(
         @Path("type") type: String,
@@ -34,6 +37,17 @@ interface CashflowApiService {
     suspend fun deleteCashflow(
         @Path("type") type: String,
         @Path("id") id: String
+    ): BaseResponse<Unit>
+
+    @DELETE("cashflow/EXPENSE_GROUP/{groupId}")
+    suspend fun deleteExpenseGroup(
+        @Path("groupId") groupId: String
+    ): BaseResponse<Unit>
+
+    @PATCH("cashflow/EXPENSE_GROUP/{groupId}")
+    suspend fun renameExpenseGroup(
+        @Path("groupId") groupId: String,
+        @Body request: RenameGroupRequestDto
     ): BaseResponse<Unit>
 }
 
@@ -103,7 +117,7 @@ interface BudgetApiService {
     @GET("budgets")
     suspend fun getBudgets(
         @Query("month") month: String? = null
-    ): BaseResponse<List<BudgetDto>>
+    ): BaseResponse<BudgetListResponseDto>
 
     @GET("budgets/summary")
     suspend fun getSummary(
@@ -130,5 +144,5 @@ interface BudgetApiService {
     @POST("budgets/apply-recommendations")
     suspend fun applyRecommendations(
         @Body request: ApplyRecommendationsRequest
-    ): BaseResponse<ApplyRecommendationsResponseDto>
+    ): BaseResponse<ApplyRecommendationsResponseDto?>
 }

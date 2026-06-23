@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import com.casha.app.R
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.GoalCategory
 import java.util.*
 
@@ -81,14 +83,16 @@ fun AddGoalScreen(
     }
 
     var showingCategoryPicker by remember { mutableStateOf(false) }
+    val isDark = isSystemInDarkTheme()
+    val backgroundColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
 
     Scaffold(
-        containerColor = Color(0xFFF8F9FA)
+        containerColor = backgroundColor
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF8F9FA))
+                .background(backgroundColor)
                 .padding(bottom = paddingValues.calculateBottomPadding() + 32.dp)
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(20.dp)
@@ -166,26 +170,24 @@ fun AddGoalScreen(
 
             // Target Amount Input
             InputCard(title = stringResource(R.string.goal_input_target_amount)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = CurrencyFormatter.symbol(userCurrency),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    OutlinedTextField(
-                        value = targetAmount,
-                        onValueChange = { targetAmount = it },
-                        placeholder = { Text("0") },
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color.Transparent,
-                            focusedBorderColor = Color.Transparent
+                CurrencyInputField(
+                    value = targetAmount,
+                    onValueChange = { targetAmount = it },
+                    currencyCode = userCurrency,
+                    placeholder = { Text("0") },
+                    leadingIcon = {
+                        Text(
+                            text = CurrencyFormatter.symbol(userCurrency),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedBorderColor = Color.Transparent,
+                        focusedBorderColor = Color.Transparent
                     )
-                }
+                )
             }
 
             // Timeline Section

@@ -29,13 +29,20 @@ import kotlinx.coroutines.delay
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
+    onNavigateBack: (() -> Unit)? = null,
     viewModel: BudgetViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
     var editBudgetId by remember { mutableStateOf<String?>(null) }
     var showAddBudgetSheet by remember { mutableStateOf(false) }
     var showAIAdvisorSheet by remember { mutableStateOf(false) }
-    
+
+    // Refresh data every time this screen becomes the active destination
+    // (e.g. after returning from the chat/apply-recommendation flow)
+    LaunchedEffect(Unit) {
+        viewModel.refreshBudgetData()
+    }
+
     var showPaywall by remember { mutableStateOf(false) }
 
     val pullToRefreshState = rememberPullToRefreshState()
@@ -49,6 +56,17 @@ fun BudgetScreen(
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                navigationIcon = {
+                    // Show back button only when onNavigateBack is provided
+                    if (onNavigateBack != null) {
+                        IconButton(onClick = onNavigateBack) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowBack,
+                                contentDescription = "Back"
+                            )
+                        }
+                    }
                 },
                 actions = {
                     Surface(
@@ -192,6 +210,9 @@ onDismissRequest = { showPaywall = false },
                 BudgetList(
                     budgets = uiState.budgets,
                     summary = uiState.budgetSummary,
+                    incomeTotal = uiState.incomeTotal,
+                    totalAllocated = uiState.totalAllocated,
+                    unallocated = uiState.unallocated,
                     isLoading = uiState.isLoading,
                     onDelete = { viewModel.deleteBudget(it) },
                     onEdit = { id -> 

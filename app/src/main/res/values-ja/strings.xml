@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">AIとチャット</string>
     <string name="add_transaction_coordinator_button_manual">手動入力</string>
     <string name="add_transaction_coordinator_button_photo_library">フォトライブラリ</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">プレミアムにアップグレードしてすべての機能を解除 ✨</string>
     <string name="add_transaction_coordinator_message_premium">取引の追加方法を選んでください</string>
     <string name="add_transaction_coordinator_title">取引を追加</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">サブスクリプション</string>
     <string name="profile_status_free">無料</string>
     <string name="profile_status_premium">Premium</string>
+    <string name="profile_status_free_label">無料ユーザー</string>
+    <string name="profile_status_premium_label">Premiumユーザー</string>
     <string name="profile_subscription_active">有効</string>
     <string name="profile_subscription_inactive">無効</string>
     <string name="profile_subscription_status">Premiumステータス</string>
@@ -499,6 +503,17 @@
     <string name="nav_add">追加</string>
     <string name="nav_transactions">取引</string>
     <string name="nav_budget">予算</string>
+    <string name="nav_more">その他</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">アカウント設定</string>
+    <string name="more_section_financial_tools">財務ツール</string>
+    <string name="more_section_app_settings">アプリ設定</string>
+    <string name="more_section_subscription_account">サブスクリプションとアカウント</string>
+    <string name="more_title">その他</string>
+    <string name="more_menu_wallets">ウォレット</string>
+    <string name="more_menu_language">言語</string>
+    
     <string name="subscription_button_lifetime">永久アクセスを取得</string>
     <string name="subscription_button_processing">処理中...</string>
     <string name="subscription_button_retrying">リトライ中...</string>

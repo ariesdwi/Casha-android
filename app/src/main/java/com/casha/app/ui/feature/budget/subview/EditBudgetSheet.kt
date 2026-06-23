@@ -16,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.BudgetCasha
 import com.casha.app.domain.model.NewBudgetRequest
 import androidx.compose.ui.res.stringResource
@@ -31,7 +32,6 @@ fun EditBudgetSheet(
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var amountText by remember { mutableStateOf(budget.amount.toInt().toString()) }
     var amountValue by remember { mutableStateOf(budget.amount) }
-    var isAmountFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     val isFormValid = amountValue > 0 && amountValue != budget.amount
@@ -68,40 +68,25 @@ onDismissRequest = onDismiss,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                OutlinedTextField(
-                    value = if (isAmountFocused) amountText else CurrencyFormatter.format(amountValue),
+                CurrencyInputField(
+                    value = amountText,
                     onValueChange = { input ->
-                        val cleaned = input.filter { it.isDigit() }
-                        if (cleaned.isNotEmpty()) {
-                            amountText = cleaned
-                            amountValue = cleaned.toDoubleOrNull() ?: 0.0
-                        } else if (input.isEmpty()) {
-                            amountText = ""
-                            amountValue = 0.0
-                        }
+                        amountText = input
+                        amountValue = input.toDoubleOrNull() ?: 0.0
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .focusRequester(focusRequester)
-                        .onFocusChanged { isAmountFocused = it.isFocused },
-                    placeholder = { Text("0.00") },
-                    prefix = { 
-                        if (isAmountFocused) {
-                            Text(CurrencyFormatter.symbol())
-                        }
-                    },
+                        .focusRequester(focusRequester),
+                    placeholder = { Text("0") },
+                    prefix = { Text(CurrencyFormatter.symbol()) },
                     suffix = {
-                        if (isAmountFocused) {
-                            Text(
-                                text = CurrencyFormatter.defaultCurrency,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        Text(
+                            text = CurrencyFormatter.defaultCurrency,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    shape = RoundedCornerShape(12.dp),
-                    singleLine = true
+                    shape = RoundedCornerShape(12.dp)
                 )
                 
                 Text(

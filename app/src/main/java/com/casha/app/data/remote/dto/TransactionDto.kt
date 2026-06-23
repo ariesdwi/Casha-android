@@ -15,7 +15,10 @@ data class TransactionDto(
     val datetime: String = "",
     val note: String? = null,
     val createdAt: String? = null,
-    val updatedAt: String? = null
+    val updatedAt: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null,
+    val assetId: String? = null
 )
 
 /**
@@ -29,7 +32,8 @@ data class TransactionUploadDto(
     val amount: Double = 0.0,
     val currency: String? = null,
     val datetime: String = "",
-    val note: String? = null
+    val note: String? = null,
+    val assetId: String? = null
 )
 
 /**
@@ -40,7 +44,8 @@ data class UpdateTransactionDto(
     val name: String = "",
     val amount: Double = 0.0,
     val category: String? = null,
-    val datetime: String = ""
+    val datetime: String = "",
+    val note: String? = null
 )
 
 /**

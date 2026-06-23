@@ -1,20 +1,24 @@
 package com.casha.app.ui.feature.transaction.coordinator
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.background
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.navigation.NavRoutes
 import androidx.compose.ui.res.stringResource
@@ -27,6 +31,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.io.File
 import androidx.core.content.FileProvider
+import com.casha.app.ui.feature.transaction.voice.VoiceTransactionSheet
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,7 +63,7 @@ fun AddTransactionCoordinator(
     }
 
     // ── Camera Launcher ──
-    var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
+    var cameraImageUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
@@ -75,13 +80,24 @@ fun AddTransactionCoordinator(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            // Create temp file and launch camera
-            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg")
+            // Pre-create the file so all camera apps can write to it
+            val tempFile = File(context.cacheDir, "camera_${System.currentTimeMillis()}.jpg").also { it.createNewFile() }
             val uri = FileProvider.getUriForFile(
                 context,
                 "${context.packageName}.fileprovider",
                 tempFile
             )
+            // Explicitly grant write permission to all camera apps (some ignore FLAG_GRANT_WRITE_URI_PERMISSION in the intent)
+            val cameraIntent = android.content.Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE)
+            context.packageManager
+                .queryIntentActivities(cameraIntent, android.content.pm.PackageManager.MATCH_DEFAULT_ONLY)
+                .forEach { resolveInfo ->
+                    context.grantUriPermission(
+                        resolveInfo.activityInfo.packageName,
+                        uri,
+                        android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                    )
+                }
             cameraImageUri = uri
             cameraLauncher.launch(uri)
         } else {
@@ -125,6 +141,9 @@ fun AddTransactionCoordinator(
             PresentationState.PHOTO_LIBRARY -> {
                 imagePickerLauncher.launch("image/*")
                 // Don't close/dismiss yet, wait for picker result
+            }
+            PresentationState.VOICE_NOTE -> {
+                // Handled by VoiceTransactionSheet rendered below
             }
             PresentationState.UPGRADE_PROMPT -> {
                 onNavigate(NavRoutes.Subscription.route)
@@ -232,81 +251,139 @@ fun AddTransactionCoordinator(
                     }
                     // ────────────────────────────────────────────────────────
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                    CoordinatorOption(
-                        title = stringResource(R.string.add_transaction_coordinator_button_manual),
-                        onClick = { viewModel.onFeatureSelected(PresentationState.MANUAL_ENTRY) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    CoordinatorOption(
-                        title = stringResource(R.string.add_transaction_coordinator_button_chat),
-                        isPremiumFeature = true,
-                        hasPremiumAccess = uiState.isPremium,
-                        onClick = { viewModel.onFeatureSelected(PresentationState.CHAT) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    CoordinatorOption(
-                        title = stringResource(R.string.add_transaction_coordinator_button_camera),
-                        isPremiumFeature = true,
-                        hasPremiumAccess = uiState.isPremium,
-                        onClick = { viewModel.onFeatureSelected(PresentationState.CAMERA) }
-                    )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
-                    CoordinatorOption(
-                        title = stringResource(R.string.add_transaction_coordinator_button_photo_library),
-                        isPremiumFeature = true,
-                        hasPremiumAccess = uiState.isPremium,
-                        onClick = { viewModel.onFeatureSelected(PresentationState.PHOTO_LIBRARY) }
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        CoordinatorOption(
+                            title = stringResource(R.string.add_transaction_coordinator_button_manual),
+                            icon = Icons.Default.Edit,
+                            onClick = { viewModel.onFeatureSelected(PresentationState.MANUAL_ENTRY) }
+                        )
+                        CoordinatorOption(
+                            title = stringResource(R.string.add_transaction_coordinator_button_chat),
+                            icon = Icons.Default.Forum,
+                            isPremiumFeature = true,
+                            hasPremiumAccess = uiState.isPremium,
+                            onClick = { viewModel.onFeatureSelected(PresentationState.CHAT) }
+                        )
+                        CoordinatorOption(
+                            title = stringResource(R.string.add_transaction_coordinator_button_camera),
+                            icon = Icons.Default.CameraAlt,
+                            isPremiumFeature = true,
+                            hasPremiumAccess = uiState.isPremium,
+                            onClick = { viewModel.onFeatureSelected(PresentationState.CAMERA) }
+                        )
+                        CoordinatorOption(
+                            title = stringResource(R.string.add_transaction_coordinator_button_photo_library),
+                            icon = Icons.Default.PhotoLibrary,
+                            isPremiumFeature = true,
+                            hasPremiumAccess = uiState.isPremium,
+                            onClick = { viewModel.onFeatureSelected(PresentationState.PHOTO_LIBRARY) }
+                        )
+                        CoordinatorOption(
+                            title = stringResource(R.string.add_transaction_coordinator_button_voice),
+                            icon = Icons.Default.Mic,
+                            isPremiumFeature = true,
+                            hasPremiumAccess = uiState.isPremium,
+                            onClick = { viewModel.onFeatureSelected(PresentationState.VOICE_NOTE) }
+                        )
+                    }
                 }
             }
         }
+    }
+
+    // ── Voice Note bottom-sheet ──────────────────────────────────────────────
+    if (uiState.presentationState == PresentationState.VOICE_NOTE) {
+        VoiceTransactionSheet(
+            onDismiss = {
+                viewModel.close()
+                onDismiss()
+            },
+            onSuccess = { result ->
+                // Do not show a success toast when the AI could not parse a valid transaction
+                if (result.intent == com.casha.app.domain.model.ChatParseIntent.UNKNOWN) {
+                    val aiMessage = result.message?.takeIf { it.isNotBlank() }
+                        ?: "Could not identify a transaction. Please try again with a clearer description."
+                    android.widget.Toast.makeText(context, aiMessage, android.widget.Toast.LENGTH_LONG).show()
+                } else {
+                    val toastLabel = when (result.intent) {
+                        com.casha.app.domain.model.ChatParseIntent.INCOME -> "Income Added ✓"
+                        com.casha.app.domain.model.ChatParseIntent.PAYMENT -> "Payment Recorded ✓"
+                        com.casha.app.domain.model.ChatParseIntent.MULTI_EXPENSE -> "Expenses Added ✓"
+                        else -> "Expense Added ✓"
+                    }
+                    android.widget.Toast.makeText(context, toastLabel, android.widget.Toast.LENGTH_SHORT).show()
+                    viewModel.refreshData()
+                }
+                viewModel.close()
+                onDismiss()
+            }
+        )
     }
 }
 
 @Composable
 fun CoordinatorOption(
     title: String,
+    icon: ImageVector,
     isPremiumFeature: Boolean = false,
     hasPremiumAccess: Boolean = true,
     onClick: () -> Unit
 ) {
     Surface(
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f),
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
             .clickable(onClick = onClick)
     ) {
-        Box(
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 16.dp),
-            contentAlignment = Alignment.Center
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+
             Text(
                 text = title,
-                style = MaterialTheme.typography.titleSmall,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.weight(1f)
             )
-            
+
             if (isPremiumFeature && !hasPremiumAccess) {
-                androidx.compose.material3.Icon(
+                Icon(
                     imageVector = Icons.Default.Lock,
                     contentDescription = "Premium Feature",
-                    modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .size(16.dp),
+                    modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
                 )
             }
         }

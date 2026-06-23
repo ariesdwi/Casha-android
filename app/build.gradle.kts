@@ -18,11 +18,12 @@ android {
         applicationId = "com.casha.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 16
-        versionName = "1.0.0"
+        versionCode = 41
+        versionName = "1.4.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "GOOGLE_WEB_CLIENT_ID", "\"842221844066-4ompq96p8q1mj2u0a6fuc2kdjjdv4oa2.apps.googleusercontent.com\"")
+        buildConfigField("String", "GOOGLE_EMAIL_SYNC_WEB_CLIENT_ID", "\"842221844066-9o5k20forh7t4bl8vp2v8sjj2l7tifnj.apps.googleusercontent.com\"")
     }
 
     signingConfigs {
@@ -40,7 +41,7 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".dev"
             versionNameSuffix = "-dev"
-            buildConfigField("String", "BASE_URL", "\"http://192.168.1.6:3000/\"") // Use 10.0.2.2 for emulator
+            buildConfigField("String", "BASE_URL", "\"https://be-casha-apps-production.up.railway.app/\"") // Use 10.0.2.2 for emulator
             buildConfigField("String", "ENVIRONMENT", "\"development\"")
             buildConfigField("String", "LOG_LEVEL", "\"debug\"")
             buildConfigField("Boolean", "ENABLE_ANALYTICS", "false")
@@ -83,6 +84,10 @@ android {
 
     // Disable ART profile embedding to fix INSTALL_BASELINE_PROFILE_FAILED on local devices
     experimentalProperties["android.experimental.art-profile-r8-rewriting"] = false
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -156,11 +161,24 @@ dependencies {
     // Play Billing
     implementation(libs.play.billing)
 
+    // Play Services Auth (legacy GoogleSignIn — needed for requestServerAuthCode + Gmail OAuth scope)
+    implementation(libs.play.services.auth)
+
     // Image Loading
     implementation(libs.coil.compose)
 
+    // Glance (App Widgets)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
+
+    // WorkManager
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.work.hilt)
+    ksp(libs.work.hilt.compiler)
+
     // Testing
     testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.compose.ui.test.junit4)
     debugImplementation(libs.compose.ui.test.manifest)

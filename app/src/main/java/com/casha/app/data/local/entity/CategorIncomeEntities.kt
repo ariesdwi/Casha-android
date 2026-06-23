@@ -29,6 +29,8 @@ data class IncomeEntity(
     val isRecurring: Boolean = false,
     val frequency: IncomeFrequency?,
     val note: String?,
+    val isSynced: Boolean = false,
+    val remoteId: String? = null,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date()
 )

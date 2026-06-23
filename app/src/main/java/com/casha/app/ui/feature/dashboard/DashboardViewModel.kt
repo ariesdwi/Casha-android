@@ -1,8 +1,11 @@
 package com.casha.app.ui.feature.dashboard
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.casha.app.core.auth.AuthManager
+import com.casha.app.core.auth.SubscriptionManager
 import com.casha.app.core.network.NetworkMonitor
 import com.casha.app.domain.model.*
 import com.casha.app.domain.repository.IncomeRepository
@@ -11,7 +14,12 @@ import com.casha.app.domain.usecase.auth.GetProfileUseCase
 import com.casha.app.domain.usecase.dashboard.*
 import com.casha.app.domain.usecase.goal.GetGoalsUseCase
 import com.casha.app.domain.usecase.goal.GetGoalSummaryUseCase
+import com.casha.app.domain.usecase.wallet.GetWalletsUseCase
+import com.casha.app.domain.usecase.wallet.GetWalletSummaryUseCase
+import com.casha.app.widget.WidgetUpdater
+import com.casha.app.widget.data.WidgetSummary
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
@@ -38,7 +46,11 @@ data class DashboardUiState(
     val goals: List<Goal> = emptyList(),
     val goalSummary: GoalSummary? = null,
     val selectedChartTab: ChartTab = ChartTab.WEEK,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val wallets: List<Wallet> = emptyList(),
+    val walletSummary: WalletSummary? = null,
+    val defaultWalletId: String? = null,
+    val budgetAlerts: List<BudgetCasha> = emptyList()
 )
 
 @HiltViewModel
@@ -49,16 +61,22 @@ class DashboardViewModel @Inject constructor(
     private val getUnsyncTransactionCountUseCase: GetUnsyncTransactionCountUseCase,
     private val getCashflowHistoryUseCase: GetCashflowHistoryUseCase,
     private val getCashflowSummaryUseCase: GetCashflowSummaryUseCase,
+    private val getSafeSpendTodayUseCase: GetSafeSpendTodayUseCase,
     private val getGoalsUseCase: GetGoalsUseCase,
     private val getGoalSummaryUseCase: GetGoalSummaryUseCase,
+    private val getWalletsUseCase: GetWalletsUseCase,
+    private val getWalletSummaryUseCase: GetWalletSummaryUseCase,
     private val cashflowSyncUseCase: CashflowSyncUseCase,
     private val transactionSyncUseCase: TransactionSyncUseCase,
     private val getProfileUseCase: GetProfileUseCase,
+    private val getBudgetAlertsUseCase: com.casha.app.domain.usecase.budget.GetBudgetAlertsUseCase,
     private val authManager: AuthManager,
+    private val subscriptionManager: SubscriptionManager,
     private val networkMonitor: NetworkMonitor,
     private val syncEventBus: SyncEventBus,
     private val transactionRepository: TransactionRepository,
-    private val incomeRepository: IncomeRepository
+    private val incomeRepository: IncomeRepository,
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DashboardUiState())
@@ -70,7 +88,28 @@ class DashboardViewModel @Inject constructor(
     init {
         setupNetworkMonitoring()
         setupSyncEventListener()
+        observeProfileChanges()
+        observeDefaultWallet()
         loadInitialData()
+    }
+
+    private fun observeDefaultWallet() {
+        viewModelScope.launch {
+            authManager.defaultWalletId.collect { walletId ->
+                _uiState.update { it.copy(defaultWalletId = walletId) }
+            }
+        }
+    }
+
+    private fun observeProfileChanges() {
+        viewModelScope.launch {
+            authManager.userName.collect { name ->
+                if (!name.isNullOrBlank()) {
+                    val firstName = name.trim().split("\\s+".toRegex()).firstOrNull() ?: "User"
+                    _uiState.update { it.copy(nickname = firstName) }
+                }
+            }
+        }
     }
 
     private fun setupSyncEventListener() {
@@ -86,6 +125,7 @@ class DashboardViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val profile = getProfileUseCase()
+                authManager.saveProfileInfo(profile.name, profile.email, profile.avatar)
                 val firstName = profile.name.trim().split("\\s+".toRegex()).firstOrNull() ?: "User"
                 _uiState.update { it.copy(nickname = firstName) }
             } catch (e: Exception) {
@@ -157,22 +197,35 @@ class DashboardViewModel @Inject constructor(
 
             try {
                 coroutineScope {
-                    // Always sync from remote first when online
+                    // === CHANGED: Use syncAndFetchAll instead of syncAndFetch ===
                     if (_uiState.value.isOnline) {
-                        try { cashflowSyncUseCase.syncAndFetch() } catch (_: Exception) { }
+                        try {
+                            Log.d(TAG, "🔄 Starting full sync for month: $monthStr, year: $yearStr")
+                            cashflowSyncUseCase.syncAndFetchAll(
+                                month = monthStr,
+                                year = yearStr
+                            )
+                            Log.d(TAG, "✅ Full sync complete, refreshing dashboard...")
+                        } catch (e: Exception) {
+                            Log.e(TAG, "❌ Full sync failed, using local data", e)
+                            // Continue with local data
+                        }
                     }
 
                     val spendingTask = async { getTotalSpendingUseCase.execute(period) }
                     val reportsTask = async { getSpendingReportUseCase.execute() }
                     val unsyncedTask = async { getUnsyncTransactionCountUseCase.execute() }
                     
-                    // Always read from local DB (populated by syncAndFetch above when online)
+                    // Always read from local DB (populated by syncAndFetchAll above when online)
                     val historyTask = async {
                         cashflowSyncUseCase.loadFromLocal(startDate, endDate ?: Date()).take(5)
                     }
                     
                     val summaryTask = async {
-                        if (_uiState.value.isOnline) {
+                        // Only use remote API for periods it can filter (month/year params)
+                        // For THIS_WEEK, LAST_THREE_MONTHS, ALL_TIME, FUTURE: always calculate locally
+                        val canUseRemote = monthStr != null || yearStr != null
+                        if (_uiState.value.isOnline && canUseRemote) {
                             try {
                                 getCashflowSummaryUseCase.execute(monthStr, yearStr)
                             } catch (_: Exception) {
@@ -185,6 +238,9 @@ class DashboardViewModel @Inject constructor(
                     
                     val goalsTask = async { getGoalsUseCase.execute() }
                     val goalSummaryTask = async { getGoalSummaryUseCase.execute() }
+                    val walletsTask = async { try { getWalletsUseCase.execute() } catch (_: Exception) { emptyList() } }
+                    val walletSummaryTask = async { try { getWalletSummaryUseCase.execute() } catch (_: Exception) { null } }
+                    val budgetAlertsTask = async { try { getBudgetAlertsUseCase(monthStr) } catch (_: Exception) { emptyList() } }
 
                     _uiState.update { it.copy(
                         totalSpending = spendingTask.await(),
@@ -194,8 +250,14 @@ class DashboardViewModel @Inject constructor(
                         cashflowSummary = summaryTask.await(),
                         goals = goalsTask.await(),
                         goalSummary = goalSummaryTask.await(),
+                        wallets = walletsTask.await(),
+                        walletSummary = walletSummaryTask.await(),
+                        budgetAlerts = budgetAlertsTask.await(),
                         isSyncing = false
                     ) }
+
+                    // Update widget with latest data
+                    updateWidgetData()
                 }
             } catch (e: Exception) {
                 _uiState.update { it.copy(isSyncing = false, errorMessage = "Dashboard refresh failed: ${e.message}") }
@@ -270,5 +332,64 @@ class DashboardViewModel @Inject constructor(
                 formatter.format(period.start)
             }
         }
+    }
+
+    private fun updateWidgetData() {
+        viewModelScope.launch {
+            // Read actual premium state
+            val isPremium = subscriptionManager.isPremium.firstOrNull() ?: false
+            val isLoggedIn = authManager.accessToken.firstOrNull() != null
+
+            WidgetUpdater.setAuthState(appContext, isLoggedIn = isLoggedIn, isPremium = isPremium)
+
+            // Only write summary data if user is premium and logged in
+            if (!isLoggedIn || !isPremium) return@launch
+
+            try {
+                // ✅ Use API endpoint instead of manual calculation
+                val safeSpendData = getSafeSpendTodayUseCase.execute()
+                
+                // Compute today's spending for spentToday field
+                val cal = Calendar.getInstance()
+                val todayStart = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val todayEnd = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.time
+                val spentToday = try {
+                    getTotalSpendingUseCase.execute(SpendingPeriod.CUSTOM(todayStart, todayEnd))
+                } catch (_: Exception) { 0.0 }
+
+                val widgetSummary = WidgetSummary(
+                    safeSpendToday = safeSpendData.safeSpendToday,
+                    currency = safeSpendData.currency,
+                    daysRemaining = safeSpendData.daysRemaining,
+                    monthlyIncome = safeSpendData.monthlyIncome,
+                    spentSoFar = safeSpendData.spentSoFar,
+                    freeRemaining = safeSpendData.freeRemaining,
+                    status = safeSpendData.status,
+                    statusLabel = safeSpendData.statusLabel,
+                    budgetPctUsed = safeSpendData.budgetPctUsed,
+                    lastUpdatedAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).format(Date()),
+                    spentToday = spentToday
+                )
+
+                WidgetUpdater.updateSummary(appContext, widgetSummary)
+            } catch (e: Exception) {
+                // Fallback to empty data if API fails
+                android.util.Log.e("DashboardViewModel", "Failed to update widget data: ${e.message}")
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "DashboardViewModel"
     }
 }

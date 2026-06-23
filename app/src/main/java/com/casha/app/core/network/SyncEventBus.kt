@@ -11,7 +11,11 @@ import javax.inject.Singleton
  */
 @Singleton
 class SyncEventBus @Inject constructor() {
-    private val _syncCompletedEvent = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    // replay=1: the last event is always replayed to new subscribers.
+    // This ensures ViewModels that weren't alive when the event fired
+    // (e.g. BudgetViewModel while user was on chat screen) still refresh
+    // when they are eventually created.
+    private val _syncCompletedEvent = MutableSharedFlow<Unit>(replay = 1)
     
     /**
      * Flow that emits an event whenever data is modified and other screens should refresh.

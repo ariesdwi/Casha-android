@@ -21,6 +21,16 @@ data class BudgetCasha(
 )
 
 /**
+ * Full budget list response data (budgets + income + allocation info from GET /budgets).
+ */
+data class BudgetListData(
+    val budgets: List<BudgetCasha>,
+    val incomeTotal: Double = 0.0,
+    val totalAllocated: Double = 0.0,
+    val unallocated: Double = 0.0
+)
+
+/**
  * Aggregated budget summary.
  */
 data class BudgetSummary(

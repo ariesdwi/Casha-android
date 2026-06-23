@@ -72,6 +72,8 @@
     <string name="add_transaction_coordinator_button_chat">AI와 대화</string>
     <string name="add_transaction_coordinator_button_manual">수동 입력</string>
     <string name="add_transaction_coordinator_button_photo_library">사진 라이브러리</string>
+    <string name="add_transaction_coordinator_button_voice">Voice Note</string>
+
     <string name="add_transaction_coordinator_message_free">모든 기능을 잠금 해제하려면 프리미엄으로 업그레이드하세요 ✨</string>
     <string name="add_transaction_coordinator_message_premium">거래를 추가할 방법을 선택하세요</string>
     <string name="add_transaction_coordinator_title">거래 추가</string>
@@ -440,6 +442,8 @@
     <string name="profile_section_subscription">구독</string>
     <string name="profile_status_free">무료</string>
     <string name="profile_status_premium">프리미엄</string>
+    <string name="profile_status_free_label">무료 사용자</string>
+    <string name="profile_status_premium_label">프리미엄 사용자</string>
     <string name="profile_subscription_active">활성</string>
     <string name="profile_subscription_inactive">비활성</string>
     <string name="profile_subscription_status">프리미엄 상태</string>
@@ -499,6 +503,17 @@
     <string name="nav_add">추가</string>
     <string name="nav_transactions">거래</string>
     <string name="nav_budget">예산</string>
+    <string name="nav_more">더보기</string>
+    
+    <!-- ── More Screen Section Headers ── -->
+    <string name="more_section_account_settings">계정 설정</string>
+    <string name="more_section_financial_tools">금융 도구</string>
+    <string name="more_section_app_settings">앱 설정</string>
+    <string name="more_section_subscription_account">구독 및 계정</string>
+    <string name="more_title">더보기</string>
+    <string name="more_menu_wallets">지갑</string>
+    <string name="more_menu_language">언어</string>
+    
     <string name="subscription_button_lifetime">평생 이용권 받기</string>
     <string name="subscription_button_processing">처리 중...</string>
     <string name="subscription_button_retrying">재시도 중...</string>

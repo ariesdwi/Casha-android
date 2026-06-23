@@ -16,7 +16,10 @@ data class TransactionCasha(
     val remoteId: String? = null,
     val createdAt: Date = Date(),
     val updatedAt: Date = Date(),
-    val liabilityId: String? = null
+    val liabilityId: String? = null,
+    val groupId: String? = null,
+    val groupName: String? = null,
+    val assetId: String? = null
 )
 
 /**
@@ -27,7 +30,8 @@ data class TransactionRequest(
     val category: String,
     val amount: Double,
     val datetime: Date,
-    val note: String? = null
+    val note: String? = null,
+    val assetId: String? = null
 )
 
 /**
@@ -41,13 +45,89 @@ data class UpdateTransactionRequest(
 )
 
 enum class ChatParseIntent(val rawValue: String) {
-    EXPENSE("EXPENSE"), 
-    INCOME("INCOME"), 
+    EXPENSE("EXPENSE"),
+    INCOME("INCOME"),
     PAYMENT("PAYMENT"),
+    MULTI_EXPENSE("MULTI_EXPENSE"),
+    WHAT_IF("WHAT_IF"),
+    FINANCIAL_SUMMARY("FINANCIAL_SUMMARY"),
+    BUDGET_RECOMMENDATION("BUDGET_RECOMMENDATION"),
     UNKNOWN("UNKNOWN")
 }
 
+data class MultiExpenseSummary(
+    val groupId: String,
+    val groupName: String,
+    val count: Int,
+    val total: Double,
+    val currency: String
+)
+
 data class ChatParseResult(
     val intent: ChatParseIntent,
-    val message: String
+    val message: String,
+    val expenses: List<TransactionCasha>? = null,
+    val summary: MultiExpenseSummary? = null,
+    val whatIfSimulation: WhatIfSimulation? = null,
+    val budgetRecommendation: BudgetRecommendationData? = null,
+    val financialSummary: FinancialSummaryData? = null
 )
+
+// ─── Budget Recommendation Models ────────────────────────────────────────────
+
+data class BudgetRecommendationData(
+    val title: String,
+    val summary: String,
+    val monthlyIncome: Double,
+    val totalDebtObligation: Double,
+    val freeCashflow: Double,
+    val recommendedBudgets: List<RecommendedBudget>,
+    val debtPayoffPlan: DebtPayoffPlan?,
+    val coachingNote: String
+)
+
+data class RecommendedBudget(
+    val category: String,
+    val amount: Double,
+    val percentage: Double,
+    val priority: String,
+    val note: String
+)
+
+data class DebtPayoffPlan(
+    val strategy: String,
+    val loans: List<LoanPayoff>,
+    val extraPaymentSuggestion: Double,
+    val estimatedMonthsToDebtFree: Int
+)
+
+data class LoanPayoff(
+    val name: String,
+    val balance: Double,
+    val monthlyPayment: Double,
+    val monthsToPayoff: Int
+)
+
+// ─── Financial Summary Model ──────────────────────────────────────────────────
+
+data class FinancialSummaryData(
+    val period: Period,
+    val totalIncome: Double,
+    val totalSpending: Double,
+    val budgetTotal: Double,
+    val budgetSpent: Double,
+    val budgetRemaining: Double,
+    val budgetPercentage: Int,
+    val safeToSpendDaily: Double,
+    val safeToSpendRemaining: Double,
+    val totalWallet: Double,
+    val totalLiquidAssets: Double,
+    val totalDebt: Double,
+    val currency: String
+) {
+    data class Period(
+        val month: String,
+        val year: Int,
+        val daysRemaining: Int
+    )
+}

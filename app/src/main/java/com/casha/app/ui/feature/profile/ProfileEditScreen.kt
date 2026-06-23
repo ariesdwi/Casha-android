@@ -86,7 +86,7 @@ fun ProfileEditScreen(
                                     UpdateProfileRequest(
                                         name = name,
                                         email = email,
-                                        phone = phone.ifBlank { null }
+                                        phone = formatPhoneNumber(phone)
                                     )
                                 )
                             },
@@ -272,4 +272,15 @@ private fun BasicProfileTextField(
 private fun isValidEmail(email: String): Boolean {
     val emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
     return email.matches(Regex(emailRegEx))
+}
+
+private fun formatPhoneNumber(phone: String): String {
+    if (phone.isBlank()) return ""
+    var cleaned = phone.replace(Regex("[^0-9+]"), "")
+    if (cleaned.startsWith("0")) {
+        cleaned = "+62" + cleaned.substring(1)
+    } else if (cleaned.startsWith("62")) {
+        cleaned = "+" + cleaned
+    }
+    return cleaned
 }

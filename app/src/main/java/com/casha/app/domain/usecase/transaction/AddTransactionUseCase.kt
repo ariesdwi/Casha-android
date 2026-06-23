@@ -18,6 +18,7 @@ class AddTransactionUseCase @Inject constructor(
             amount = request.amount,
             datetime = request.datetime,
             note = request.note,
+            assetId = request.assetId,
             isSynced = false,
             createdAt = Date(),
             updatedAt = Date()

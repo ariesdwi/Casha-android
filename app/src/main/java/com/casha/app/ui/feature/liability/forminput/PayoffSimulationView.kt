@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.R
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.SimulationStrategy
 import com.casha.app.domain.model.SimulatePayoffResponse
 import com.casha.app.domain.model.LiabilityBreakdown
@@ -44,7 +45,6 @@ fun PayoffSimulationView(
     var additionalPayment by remember { mutableStateOf("") }
     var additionalPaymentValue by remember { mutableStateOf(0.0) }
     var hasSimulated by remember { mutableStateOf(false) }
-    var isAdditionalPaymentFocused by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -120,42 +120,35 @@ onDismissRequest = onDismissRequest,
 
                 // Additional Payment Input
                 InputCard(title = stringResource(R.string.liabilities_simulation_additional_budget)) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = CurrencyFormatter.symbol(userCurrency),
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        androidx.compose.foundation.text.BasicTextField(
-                            value = if (isAdditionalPaymentFocused) additionalPayment else if (additionalPayment.isNotEmpty()) CurrencyFormatter.formatInput(additionalPayment) else "",
-                            onValueChange = {
-                                additionalPayment = it.filter { char -> char.isDigit() }
-                                additionalPaymentValue = additionalPayment.toDoubleOrNull() ?: 0.0
-                            },
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .onFocusChanged { isAdditionalPaymentFocused = it.isFocused },
-                            textStyle = androidx.compose.ui.text.TextStyle(
-                                fontSize = 20.sp,
+                    CurrencyInputField(
+                        value = additionalPayment,
+                        onValueChange = {
+                            additionalPayment = it
+                            additionalPaymentValue = it.toDoubleOrNull() ?: 0.0
+                        },
+                        currencyCode = userCurrency,
+                        placeholder = { Text("0", color = Color.Gray.copy(alpha = 0.3f), fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                        leadingIcon = {
+                            Text(
+                                text = CurrencyFormatter.symbol(userCurrency),
                                 fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
                                 color = MaterialTheme.colorScheme.onSurface
-                            ),
-                            decorationBox = { innerTextField ->
-                                if (additionalPayment.isEmpty() && !isAdditionalPaymentFocused) {
-                                    Text("0", color = Color.Gray.copy(alpha = 0.3f), fontSize = 20.sp, fontWeight = FontWeight.Bold)
-                                }
-                                innerTextField()
-                            }
+                            )
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        textStyle = androidx.compose.ui.text.TextStyle(
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        ),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent,
+                            unfocusedBorderColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent,
+                            unfocusedContainerColor = Color.Transparent
                         )
-                    }
+                    )
                 }
 
                 // Simulate Button

@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.*
+import com.casha.app.widget.WidgetUpdater
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -236,12 +237,14 @@ class SubscriptionManager @Inject constructor(
                             // Write ONLY to DataStore — hasPremiumAccess flow updates automatically
                             viewModelScope.launch {
                                 coreSubscriptionManager.setPremiumStatus(true)
+                                WidgetUpdater.setAuthState(context, isLoggedIn = true, isPremium = true)
                             }
                         }
                     }
                 } else {
                     // Already acknowledged, just persist
                     coreSubscriptionManager.setPremiumStatus(true)
+                    WidgetUpdater.setAuthState(context, isLoggedIn = true, isPremium = true)
                 }
             }
         }

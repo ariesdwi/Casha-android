@@ -2,8 +2,11 @@ package com.casha.app.ui.feature.goaltracker
 import androidx.compose.foundation.layout.fillMaxSize
 
 import androidx.compose.animation.*
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -37,6 +40,7 @@ fun InputCard(
                 color = MaterialTheme.colorScheme.surface,
                 shape = RoundedCornerShape(16.dp)
             )
+            .border(BorderStroke(0.5.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)), RoundedCornerShape(16.dp))
             .padding(vertical = 12.dp, horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp)
     ) {
@@ -306,10 +310,14 @@ fun GoalCategoryPickerBottomSheet(
     onDismiss: () -> Unit,
     onCategorySelected: (GoalCategory) -> Unit
 ) {
+    val isDark = isSystemInDarkTheme()
+    
     ModalBottomSheet(
-modifier = Modifier.fillMaxSize(),
-onDismissRequest = onDismiss) {
-        Column(modifier = Modifier.padding(bottom = 24.dp)) {
+        modifier = Modifier.fillMaxSize(),
+        onDismissRequest = onDismiss,
+        containerColor = if (isDark) Color(0xFF121212) else Color(0xFFF8F9FA)
+    ) {
+        Column(modifier = Modifier.padding(bottom = 50.dp)) {
             Text(
                 stringResource(R.string.goal_details_select_category),
                 style = MaterialTheme.typography.titleLarge,

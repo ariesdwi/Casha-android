@@ -12,6 +12,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import com.casha.app.domain.model.InterestType
 
 @Composable
@@ -34,15 +35,12 @@ fun PayLaterFormView(
 
     Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
         // ── Limit Kredit ────────────────────────────────────────
-        var isCreditLimitFocused by remember { mutableStateOf(false) }
         InputCard(title = "Limit Kredit *") {
-            OutlinedTextField(
-                value = if (isCreditLimitFocused) creditLimit else if (creditLimit.isNotEmpty()) CurrencyFormatter.formatInput(creditLimit) else "",
+            CurrencyInputField(
+                value = creditLimit,
                 onValueChange = onCreditLimitChange,
                 placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth().onFocusChanged { isCreditLimitFocused = it.isFocused },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = cashaBorderlessTextFieldColors(),
                 leadingIcon = {
@@ -62,15 +60,12 @@ fun PayLaterFormView(
         }
 
         // ── Saldo Saat Ini ──────────────────────────────────────
-        var isCurrentBalanceFocused by remember { mutableStateOf(false) }
         InputCard(title = "Saldo Saat Ini") {
-            OutlinedTextField(
-                value = if (isCurrentBalanceFocused) currentBalance else if (currentBalance.isNotEmpty()) CurrencyFormatter.formatInput(currentBalance) else "",
+            CurrencyInputField(
+                value = currentBalance,
                 onValueChange = onCurrentBalanceChange,
                 placeholder = { Text("0", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth().onFocusChanged { isCurrentBalanceFocused = it.isFocused },
-                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
                 colors = cashaBorderlessTextFieldColors(),
                 leadingIcon = {

@@ -2,6 +2,7 @@ package com.casha.app.domain.repository
 
 import com.casha.app.domain.model.CashflowEntry
 import com.casha.app.domain.model.CashflowSummary
+import com.casha.app.domain.model.SafeSpendToday
 import com.casha.app.domain.model.SpendingPeriod
 import com.casha.app.domain.model.SpendingReport
 import com.casha.app.domain.model.TransactionCasha
@@ -22,6 +23,9 @@ interface TransactionRepository {
     suspend fun fetchSpendingReport(): SpendingReport
     suspend fun getTransactionsByCategory(category: String, startDate: java.util.Date, endDate: java.util.Date): List<TransactionCasha>
     suspend fun getCategorySpendings(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.ChartCategorySpending>
+    suspend fun getDailySpending(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.DailySpending>
+    suspend fun getMonthlySpending(startDate: java.util.Date, endDate: java.util.Date): List<com.casha.app.domain.model.MonthlySpending>
+    suspend fun getTransactionsByDate(date: java.time.LocalDate): List<TransactionCasha>
     
     // Command
     suspend fun saveTransaction(transaction: TransactionCasha)
@@ -36,6 +40,22 @@ interface TransactionRepository {
 interface CashflowRepository {
     suspend fun getHistory(month: String?, year: String?, page: Int, pageSize: Int): CashflowHistoryResponse
     suspend fun getSummary(month: String?, year: String?): CashflowSummary
+    suspend fun getSafeSpendToday(): SafeSpendToday
+    suspend fun deleteGroup(groupId: String)
+    suspend fun renameGroup(groupId: String, newName: String)
+    
+    /**
+     * Fetch ALL pages of cashflow history automatically
+     * @param month Optional month filter (format: "2026-06")
+     * @param year Optional year filter (format: "2026")
+     * @param pageSize Number of items per page (default: 100)
+     * @return Complete list of all entries across all pages
+     */
+    suspend fun getHistoryAllPages(
+        month: String? = null,
+        year: String? = null,
+        pageSize: Int = 100
+    ): List<CashflowEntry>
 }
 
 /**
@@ -82,6 +102,7 @@ interface CategoryRepository {
 interface BudgetRepository {
     // Remote
     suspend fun fetchRemoteBudgets(month: String? = null): List<com.casha.app.domain.model.BudgetCasha>
+    suspend fun fetchRemoteBudgetListData(month: String? = null): com.casha.app.domain.model.BudgetListData
     suspend fun fetchRemoteSummary(month: String? = null): com.casha.app.domain.model.BudgetSummary
     suspend fun createRemoteBudget(request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha
     suspend fun updateRemoteBudget(id: String, request: com.casha.app.domain.model.NewBudgetRequest): com.casha.app.domain.model.BudgetCasha

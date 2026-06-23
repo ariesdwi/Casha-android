@@ -8,8 +8,8 @@
 # Tracks: internal (default), alpha, beta, production
 #
 # Setup (sekali saja):
-#   1. Install Python dependency:
-#        pip3 install google-api-python-client google-auth
+#   1. Python dependencies akan diinstall otomatis ke virtual environment
+#      (Script akan create .venv/ folder otomatis)
 #   2. Buat Service Account di Google Play Console:
 #        → Setup → API access → Link Google Cloud Project
 #        → Create service account → Grant "Release Manager" role
@@ -57,10 +57,25 @@ fi
 
 # ── Validate Python dependencies ──
 echo "🔍 Checking Python dependencies..."
+
+# Create virtual environment if it doesn't exist
+VENV_DIR=".venv"
+if [ ! -d "$VENV_DIR" ]; then
+  echo "📦 Creating Python virtual environment..."
+  python3 -m venv "$VENV_DIR"
+  echo "✅ Virtual environment created!"
+fi
+
+# Activate virtual environment
+source "$VENV_DIR/bin/activate"
+
+# Check if packages are installed
 if ! python3 -c "from googleapiclient.discovery import build; from google.oauth2 import service_account" 2>/dev/null; then
   echo "📦 Installing required Python packages..."
   pip3 install google-api-python-client google-auth --quiet
   echo "✅ Dependencies installed!"
+else
+  echo "✅ Dependencies already installed"
 fi
 
 # ── Increment version ──
@@ -106,6 +121,8 @@ echo ""
 # ── Upload via Google Play Developer API ──
 python3 - <<PYTHON
 import sys
+import httplib2
+import google_auth_httplib2
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from google.oauth2 import service_account
@@ -119,7 +136,9 @@ except Exception as e:
     print(f"❌ Gagal membaca credentials: {e}")
     sys.exit(1)
 
-service = build('androidpublisher', 'v3', credentials=credentials)
+# Use a 10-minute timeout — httplib2 is the correct transport for googleapiclient
+http = google_auth_httplib2.AuthorizedHttp(credentials, http=httplib2.Http(timeout=600))
+service = build('androidpublisher', 'v3', http=http, cache_discovery=False)
 
 # Create a new edit
 edit = service.edits().insert(body={}, packageName='$PACKAGE_NAME').execute()
@@ -203,9 +222,15 @@ if [ $? -eq 0 ]; then
   echo "       ./publish-play-store.sh alpha"
   echo "       ./publish-play-store.sh beta"
   echo "       ./publish-play-store.sh production"
+  
+  # Deactivate virtual environment
+  deactivate
 else
   echo ""
   echo "❌ Upload gagal!"
   echo "💡 Cek credentials dan pastikan service account punya akses 'Release Manager'"
+  
+  # Deactivate virtual environment
+  deactivate
   exit 1
 fi

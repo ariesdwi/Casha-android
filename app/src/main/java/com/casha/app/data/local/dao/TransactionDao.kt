@@ -15,6 +15,9 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE id = :id")
     suspend fun getTransactionById(id: String): TransactionEntity?
 
+    @Query("SELECT * FROM transactions WHERE groupId = :groupId ORDER BY datetime DESC")
+    suspend fun getTransactionsByGroupId(groupId: String): List<TransactionEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTransaction(transaction: TransactionEntity)
 
@@ -44,6 +47,15 @@ interface TransactionDao {
     @Query("SELECT category, SUM(amount) as total FROM transactions WHERE datetime >= :startDate AND datetime <= :endDate GROUP BY category ORDER BY total DESC")
     suspend fun getCategorySpendingBetween(startDate: Long, endDate: Long): List<CategoryTotal>
 
+    @Query("SELECT strftime('%Y-%m-%d', datetime / 1000, 'unixepoch') as date, SUM(amount) as total FROM transactions WHERE datetime >= :startDate AND datetime <= :endDate GROUP BY date ORDER BY date ASC")
+    suspend fun getDailySpendingBetween(startDate: Long, endDate: Long): List<DailyTotal>
+
+    @Query("SELECT strftime('%Y-%m', datetime / 1000, 'unixepoch') as month, SUM(amount) as total FROM transactions WHERE datetime >= :startDate AND datetime <= :endDate GROUP BY month ORDER BY month ASC")
+    suspend fun getMonthlySpendingBetween(startDate: Long, endDate: Long): List<MonthlyTotal>
+
+    @Query("SELECT * FROM transactions WHERE datetime >= :startOfDayMs AND datetime < :endOfDayMs ORDER BY datetime DESC")
+    suspend fun getTransactionsByDate(startOfDayMs: Long, endOfDayMs: Long): List<TransactionEntity>
+
     @Query("DELETE FROM transactions")
     suspend fun clearAll()
 
@@ -53,5 +65,15 @@ interface TransactionDao {
 
 data class CategoryTotal(
     val category: String,
+    val total: Double
+)
+
+data class DailyTotal(
+    val date: String,   // "yyyy-MM-dd"
+    val total: Double
+)
+
+data class MonthlyTotal(
+    val month: String,  // "yyyy-MM"
     val total: Double
 )

@@ -19,6 +19,9 @@ import javax.inject.Inject
 data class BudgetUiState(
     val budgets: List<BudgetCasha> = emptyList(),
     val budgetSummary: BudgetSummary? = null,
+    val incomeTotal: Double = 0.0,
+    val totalAllocated: Double = 0.0,
+    val unallocated: Double = 0.0,
     val categories: List<CategoryCasha> = emptyList(),
     val fixedExpenses: Map<String, Double> = emptyMap(),
     val financialRecommendationResponse: FinancialRecommendationResponse? = null,
@@ -89,7 +92,12 @@ class BudgetViewModel @Inject constructor(
                 // If online: sync remote → local
                 if (_uiState.value.isOnline) {
                     try { 
-                        budgetSyncUseCase.syncAllBudgets(monthYear) 
+                        val listData = budgetSyncUseCase.syncAllBudgets(monthYear)
+                        _uiState.update { it.copy(
+                            incomeTotal = listData.incomeTotal,
+                            totalAllocated = listData.totalAllocated,
+                            unallocated = listData.unallocated
+                        ) }
                     } catch (e: Exception) {
                         // Log or show error but continue to load from local
                         _uiState.update { it.copy(errorMessage = "Sync failed: ${e.message}") }
@@ -227,12 +235,11 @@ class BudgetViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
             try {
-                val monthOptions = DateHelper.generateMonthYearOptions()
-                val currentMonthRaw = _uiState.value.currentMonthYear ?: monthOptions.first()
-                val monthDisplay = DateHelper.formatMonthYearDisplay(currentMonthRaw)
+                val currentMonthRaw = _uiState.value.currentMonthYear
+                    ?: DateHelper.generateMonthYearOptions().firstOrNull() ?: ""
 
                 val payload = ApplyRecommendationsRequest(
-                    month = monthDisplay,
+                    month = currentMonthRaw,
                     budgets = recommendations.map {
                         RecommendedBudgetPayload(
                             amount = it.suggestedAmount,

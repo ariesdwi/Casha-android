@@ -95,6 +95,14 @@ object ApiEndpoints {
     const val CHAT_PARSE = "chat/parse"
     const val CHAT_PARSE_IMAGE = "chat/parse-image"
 
+    // ── Wallets ──
+    const val WALLETS = "wallets"
+    const val WALLETS_SUMMARY = "wallets/summary"
+    const val WALLETS_DEFAULT = "wallets/default"
+    const val WALLETS_TRANSFER = "wallets/transfer"
+    fun loanUpdate(id: String) = "loans/$id"
+    fun loanDelete(id: String) = "loans/$id"
+
     // ── Cashflow Engine ──
     const val CASHFLOW_HISTORY = "cashflow/history"
     const val CASHFLOW_SUMMARY = "cashflow/summary"

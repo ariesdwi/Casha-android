@@ -26,6 +26,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.casha.app.core.util.DateHelper
 import com.casha.app.domain.model.NewBudgetRequest
 import com.casha.app.core.util.CurrencyFormatter
+import com.casha.app.ui.component.CurrencyInputField
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.res.stringResource
 import com.casha.app.R
@@ -43,7 +44,6 @@ fun AddBudgetSheet(
     // Form State
     var selectedCategoryName by remember { mutableStateOf("") }
     var amountText by remember { mutableStateOf("") }
-    var isAmountFocused by remember { mutableStateOf(false) }
     var selectedMonthYear by remember { mutableStateOf(uiState.currentMonthYear ?: DateHelper.generateMonthYearOptions().firstOrNull() ?: "") }
     
     var showCategoryDropdown by remember { mutableStateOf(false) }
@@ -56,7 +56,7 @@ fun AddBudgetSheet(
             budget?.let {
                 selectedCategoryName = it.category
                 // If it ends with .0, remove it for cleaner display
-                amountText = if (it.amount % 1.0 == 0.0) it.amount.toLong().toString() else it.amount.toString()
+                amountText = if (it.amount % 1.0 == 0.0) it.amount.toLong().toString() else String.format("%.2f", it.amount)
                 selectedMonthYear = it.period
             }
         }
@@ -157,27 +157,22 @@ onDismissRequest = onDismiss,
                                 .fillMaxWidth()
                                 .padding(horizontal = 16.dp, vertical = 14.dp)
                         ) {
-                            BasicTextField(
-                                value = if (isAmountFocused) amountText else if (amountText.isNotEmpty()) CurrencyFormatter.formatInput(amountText) else "",
-                                onValueChange = { if (it.isEmpty() || it.matches(Regex("^\\d*\\.?\\d*$"))) amountText = it },
+                            CurrencyInputField(
+                                value = amountText,
+                                onValueChange = { amountText = it },
+                                modifier = Modifier.fillMaxWidth(),
+                                placeholder = { Text("0", style = TextStyle(fontSize = 17.sp, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))) },
                                 textStyle = TextStyle(
                                     fontSize = 17.sp,
                                     color = MaterialTheme.colorScheme.onSurface
                                 ),
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                modifier = Modifier.fillMaxWidth().onFocusChanged { isAmountFocused = it.isFocused },
-                                decorationBox = { innerTextField ->
-                                    if (amountText.isEmpty()) {
-                                        Text(
-                                            text = "0",
-                                            style = TextStyle(
-                                                fontSize = 17.sp,
-                                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
-                                            )
-                                        )
-                                    }
-                                    innerTextField()
-                                }
+                                colors = OutlinedTextFieldDefaults.colors(
+                                    focusedBorderColor = Color.Transparent,
+                                    unfocusedBorderColor = Color.Transparent,
+                                    focusedContainerColor = Color.Transparent,
+                                    unfocusedContainerColor = Color.Transparent
+                                ),
+                                shape = RoundedCornerShape(0.dp)
                             )
                         }
                         
